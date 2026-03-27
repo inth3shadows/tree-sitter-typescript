@@ -813,6 +813,7 @@ module.exports = function defineGrammar(dialect) {
         '`',
         repeat(choice(
           alias($._template_chars, $.string_fragment),
+          $.escape_sequence,
           $.template_type,
         )),
         '`',
