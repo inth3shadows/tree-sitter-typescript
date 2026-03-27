@@ -2293,3 +2293,32 @@ type Covariant<out T extends string> = T;
         (constraint
           (predefined_type))))
     (type_identifier)))
+
+=====================
+Generic call signature overloads without semicolons
+=====================
+
+const f: {
+  (): string
+  <T>(): T
+}
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (object_type
+          (call_signature
+            (formal_parameters)
+            (type_annotation
+              (predefined_type)))
+          (call_signature
+            (type_parameters
+              (type_parameter
+                (type_identifier)))
+            (formal_parameters)
+            (type_annotation
+              (type_identifier))))))))

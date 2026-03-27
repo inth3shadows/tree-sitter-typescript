@@ -123,7 +123,6 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         case '*':
         case '%':
         case '>':
-        case '<':
         case '=':
         case '?':
         case '^':
@@ -139,11 +138,20 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             }
             break;
 
-            // Don't insert a semicolon before a '[' or '(', unless we're parsing
-            // a type. Detect whether we're parsing a type or an expression using
-            // the validity of a binary operator token.
+            // Don't insert a semicolon before a '[', '(', or '<', unless we're
+            // parsing a type. Detect whether we're parsing a type or an expression
+            // using the validity of a binary operator token.
+            //
+            // This covers the case where a generic call-signature overload starts
+            // on a new line inside an object type, e.g.:
+            //
+            //   const f: {
+            //     (): string
+            //     <T>(): T    ← the `<` here needs an implicit semicolon before it
+            //   }
         case '(':
         case '[':
+        case '<':
             if (valid_symbols[LOGICAL_OR]) {
                 return false;
             }
