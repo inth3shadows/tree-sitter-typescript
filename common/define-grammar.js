@@ -749,8 +749,6 @@ module.exports = function defineGrammar(dialect) {
         $.readonly_type,
         $.constructor_type,
         $.infer_type,
-        prec(-1, alias($._type_query_member_expression_in_type_annotation, $.member_expression)),
-        prec(-1, alias($._type_query_call_expression_in_type_annotation, $.call_expression)),
       ),
 
       tuple_parameter: $ => seq(
@@ -805,6 +803,8 @@ module.exports = function defineGrammar(dialect) {
         $.intersection_type,
         $.union_type,
         'const',
+        prec(-1, alias($._type_query_member_expression_in_type_annotation, $.member_expression)),
+        prec(-1, alias($._type_query_call_expression_in_type_annotation, $.call_expression)),
       ),
 
       template_type: $ => seq('${', choice($.primary_type, $.infer_type), '}'),
@@ -842,6 +842,7 @@ module.exports = function defineGrammar(dialect) {
         field('name', choice(
           $._type_identifier,
           $.nested_type_identifier,
+          alias($._type_query_member_expression_in_type_annotation, $.member_expression),
         )),
         field('type_arguments', $.type_arguments),
       )),

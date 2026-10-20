@@ -2195,6 +2195,78 @@ type Foo = import('node:fs').ReadStream & {
           (formal_parameters))))))
 
 =========================
+Import types as primary types
+=========================
+
+type Nodes = import('unist').Node[];
+type Edits = readonly import('./edits').TextEdit[];
+type Value = import('vscode').TelemetryTrustedValue<string>;
+type Content = import('sdk').Message['content'][number];
+type Keys = keyof import('a').A;
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (array_type
+      (member_expression
+        (call_expression
+          (import)
+          (arguments
+            (string
+              (string_fragment))))
+        (property_identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (readonly_type
+      (array_type
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (generic_type
+      (member_expression
+        (call_expression
+          (import)
+          (arguments
+            (string
+              (string_fragment))))
+        (property_identifier))
+      (type_arguments
+        (predefined_type))))
+  (type_alias_declaration
+    (type_identifier)
+    (lookup_type
+      (lookup_type
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier))
+        (literal_type
+          (string
+            (string_fragment))))
+      (predefined_type)))
+  (type_alias_declaration
+    (type_identifier)
+    (index_type_query
+      (member_expression
+        (call_expression
+          (import)
+          (arguments
+            (string
+              (string_fragment))))
+        (property_identifier)))))
+
+=========================
 Import assert
 =========================
 
