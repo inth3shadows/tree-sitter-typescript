@@ -63,7 +63,6 @@ module.exports = function defineGrammar(dialect) {
       [$.decorator_call_expression, $.decorator],
       [$.literal_type, $.pattern],
       [$.predefined_type, $.pattern],
-      [$.call_expression, $._type_query_call_expression],
       [$.call_expression, $._type_query_call_expression_in_type_annotation],
       [$.new_expression, $.primary_expression],
       [$.meta_property, $.primary_expression],
@@ -111,6 +110,10 @@ module.exports = function defineGrammar(dialect) {
       [$.array_pattern, $.tuple_type],
 
       [$.template_literal_type, $.template_string],
+
+      // `f<typeof import('m')>()` is a call with a type argument, and `a < typeof import('m')` is a
+      // comparison, so the parser keeps both until one of them fails.
+      [$.call_expression, $._type_query_call_expression],
     ]).concat(
       dialect === 'typescript' ? [
         [$.primary_type, $.type_parameter],

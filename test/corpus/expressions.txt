@@ -325,6 +325,40 @@ f<T>(x)
         (identifier)))))
 
 ==================================
+Generic calls with type queries of imports
+==================================
+
+f<typeof import('./m')>(x);
+g<typeof import('vscode')>();
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))))
+      (arguments))))
+
+==================================
 Instantiation expressions
 ==================================
 
