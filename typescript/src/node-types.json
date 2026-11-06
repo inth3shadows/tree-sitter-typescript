@@ -5997,6 +5997,10 @@
     "named": true
   },
   {
+    "type": "unique",
+    "named": false
+  },
+  {
     "type": "unique symbol",
     "named": false
   },
