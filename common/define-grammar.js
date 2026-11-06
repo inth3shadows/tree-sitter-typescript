@@ -1,9 +1,11 @@
 const JavaScript = require('tree-sitter-javascript/grammar');
 
-// Words a tuple label may be that already lex as keywords where a type starts
-// (`[symbol: string]`, `[readonly: T]`). Any other contextual keyword (type, get,
-// declare...) is lexed as an identifier there, and listing it here would make
-// `[type]` (a type named type) fail.
+// Keywords a tuple label may be (`[symbol: string]`, `[readonly: T]`). Each already
+// lexes as a keyword where a type starts, so accepting it as a label changes nothing
+// else. Not every such word is here: void, null, undefined, this, typeof, infer,
+// unique, true, false, import and abstract still fail as labels. And a contextual
+// keyword that lexes as an identifier there (type, get, declare...) must NOT be
+// listed: that would make `[type]` (a type named type) fail.
 const TUPLE_LABEL_KEYWORDS = [
   'any', 'number', 'boolean', 'string', 'symbol', 'object', 'never', 'unknown',
   'readonly', 'new', 'keyof',
@@ -84,9 +86,8 @@ module.exports = function defineGrammar(dialect) {
     ]),
 
     conflicts: ($, previous) => previous.concat([
-      // A tuple label that is also a type keyword: `[any?: T]` vs `[any?]`,
-      // `[readonly: T]` vs `[readonly T[]]`, `[keyof: T]` vs `[keyof T]`; the
-      // next token decides.
+      // A tuple label that is also a predefined type: `[any?: T]` vs `[any?]`;
+      // the token after `?` decides.
       [$.optional_tuple_parameter, $.predefined_type],
       // `<in out>` (modifier `in`, parameter named `out`)
       // vs `<in out T>`; the token after `out` decides.
