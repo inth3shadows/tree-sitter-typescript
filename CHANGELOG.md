@@ -7,6 +7,10 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- After a class field initializer, `in(b) ? 1 : 2` on the next line is again `(x in (b)) ? 1 : 2`;
+  the previous fix dropped `in(b)` from the tree without an error. A `)` inside a string or comment
+  in `in(…)` no longer decides member vs operator, `in () {}` (a space before the parameters) is a
+  method, and U+2028/U+2029 end a line comment inside `unique // … symbol` (codegraph#17 round 2).
 - A member named `in` is recognised only between class or object-type members, so `for (var k\n in!o)`
   and `for (var k\n in<T>x)` stay for-in loops; `in(): T {}` after a block-bodied arrow field, and `in?:`
   after any member, start a member named `in` (inth3shadows/codegraph#17 review S1, S2).
