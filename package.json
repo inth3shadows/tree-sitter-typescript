@@ -59,7 +59,8 @@
     "lint": "eslint common/define-grammar.js",
     "test": "node --test bindings/node/*_test.js",
     "build:wasm": "tree-sitter build --wasm -o tree-sitter-typescript.wasm typescript && tree-sitter build --wasm -o tree-sitter-tsx.wasm tsx",
-    "differential": "node scripts/ts-differential.mjs"
+    "differential": "node scripts/ts-differential.mjs",
+    "triage": "node --liftoff-only scripts/upstream-triage.mjs"
   },
   "overrides": {
     "tree-sitter-javascript": {
