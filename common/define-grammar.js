@@ -1,5 +1,14 @@
 const JavaScript = require('tree-sitter-javascript/grammar');
 
+// Words a tuple label may be that already lex as keywords where a type starts
+// (`[symbol: string]`, `[readonly: T]`). Any other contextual keyword (type, get,
+// declare...) is lexed as an identifier there, and listing it here would make
+// `[type]` (a type named type) fail.
+const TUPLE_LABEL_KEYWORDS = [
+  'any', 'number', 'boolean', 'string', 'symbol', 'object', 'never', 'unknown',
+  'readonly', 'new', 'keyof',
+];
+
 module.exports = function defineGrammar(dialect) {
   return grammar(JavaScript, {
     name: dialect,
@@ -75,8 +84,9 @@ module.exports = function defineGrammar(dialect) {
     ]),
 
     conflicts: ($, previous) => previous.concat([
-      // `[any?: T]` (a labeled optional element) vs `[any?]` (an optional type):
-      // only the token after `?` decides.
+      // A tuple label that is also a type keyword: `[any?: T]` vs `[any?]`,
+      // `[readonly: T]` vs `[readonly T[]]`, `[keyof: T]` vs `[keyof T]`; the
+      // next token decides.
       [$.optional_tuple_parameter, $.predefined_type],
       // `<in out>` (modifier `in`, parameter named `out`)
       // vs `<in out T>`; the token after `out` decides.
@@ -779,12 +789,12 @@ module.exports = function defineGrammar(dialect) {
       // A tuple label may be a contextual keyword that also names a type:
       // [symbol: string], [string: number, number?: string].
       tuple_parameter: $ => seq(
-        field('name', choice($.identifier, alias($._reserved_identifier, $.identifier), $.rest_pattern)),
+        field('name', choice($.identifier, ...TUPLE_LABEL_KEYWORDS.map((k) => alias(k, $.identifier)), $.rest_pattern)),
         field('type', $.type_annotation),
       ),
 
       optional_tuple_parameter: $ => seq(
-        field('name', choice($.identifier, alias($._reserved_identifier, $.identifier))),
+        field('name', choice($.identifier, ...TUPLE_LABEL_KEYWORDS.map((k) => alias(k, $.identifier)))),
         '?',
         field('type', $.type_annotation),
       ),
@@ -1150,9 +1160,6 @@ module.exports = function defineGrammar(dialect) {
         'object',
         'new',
         'readonly',
-        // `unique` is only a keyword in `unique symbol`; elsewhere it is a name
-        // (`i < unique.length`).
-        'unique',
         previous,
       ),
     },
