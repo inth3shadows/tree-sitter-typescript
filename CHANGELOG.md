@@ -7,6 +7,8 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- `unique` is a name everywhere except `unique symbol` (`i < unique.length`, `let x: unique`,
+  `[unique: T]`, `implements unique`).
 - A tuple label may be named like a type keyword: `[symbol: string]`, `[number?: string]` (upstream #378).
 - A tagged template with type arguments parses: ``sql<{ id: number }>`SELECT ...` ``.
 - A member name followed by its signature on the next line (`find\n  <T>(id): T`,
@@ -19,6 +21,8 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- `unique symbol` is a single anonymous token (it was `unique` then `symbol`); the anonymous
+  `unique` token is gone.
 - New `variance` node inside `type_parameter`, holding the `in` / `out` keywords (marionebl).
 - New `escape_sequence` child of `template_literal_type` (marionebl).
 - An import type is now a `primary_type`, and `generic_type`'s `name` may be a
