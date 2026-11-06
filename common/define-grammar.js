@@ -1006,7 +1006,9 @@ module.exports = function defineGrammar(dialect) {
         'boolean',
         'string',
         'symbol',
-        alias(seq('unique', 'symbol'), 'unique symbol'),
+        // One token, so `unique` alone is never a keyword: it stays a name in
+        // `i < unique.length`, `let x: unique` and `[unique: T]`.
+        alias(token(seq('unique', /(\s|\/\/[^\r\n]*|\/\*[^*]*\*+([^/*][^*]*\*+)*\/)+/, 'symbol')), 'unique symbol'),
         'void',
         'unknown',
         'string',

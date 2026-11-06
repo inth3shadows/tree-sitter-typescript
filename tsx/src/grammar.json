@@ -10553,17 +10553,24 @@
         {
           "type": "ALIAS",
           "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "unique"
-              },
-              {
-                "type": "STRING",
-                "value": "symbol"
-              }
-            ]
+            "type": "TOKEN",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "unique"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "(\\s|\\/\\/[^\\r\\n]*|\\/\\*[^*]*\\*+([^/*][^*]*\\*+)*\\/)+"
+                },
+                {
+                  "type": "STRING",
+                  "value": "symbol"
+                }
+              ]
+            }
           },
           "named": false,
           "value": "unique symbol"

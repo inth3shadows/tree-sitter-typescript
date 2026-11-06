@@ -487,3 +487,24 @@ a < b;
       (identifier)
       (identifier))))
 
+==================================================
+unique as a name
+==================================================
+
+i < unique.length;
+let s: unique symbol;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (member_expression
+        (identifier)
+        (property_identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (predefined_type)))))
