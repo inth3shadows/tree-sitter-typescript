@@ -21,8 +21,8 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
-- `unique symbol` is a single anonymous token (it was `unique` then `symbol`); the anonymous
-  `unique` token is gone.
+- In the tree, `unique symbol` is now one anonymous token under `predefined_type` (it was
+  `unique` then `symbol`); node-types.json is unchanged.
 - New `variance` node inside `type_parameter`, holding the `in` / `out` keywords (marionebl).
 - New `escape_sequence` child of `template_literal_type` (marionebl).
 - An import type is now a `primary_type`, and `generic_type`'s `name` may be a
