@@ -12436,17 +12436,19 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       if (lookahead > '@') ADVANCE(305);
       END_STATE();
     case 1:
-      if (lookahead == '\n') ADVANCE(38);
-      if (lookahead == '\r') ADVANCE(38);
-      if (lookahead != 0) ADVANCE(1);
-      END_STATE();
-    case 2:
       if (lookahead == '\n') SKIP(40);
       if (lookahead == '/') ADVANCE(25);
       if (lookahead == '[') ADVANCE(87);
       if (lookahead == '\\') ADVANCE(136);
       if (set_contains(aux_sym_predefined_type_token1_character_set_1, 11, lookahead)) ADVANCE(278);
       if (lookahead != 0) ADVANCE(279);
+      END_STATE();
+    case 2:
+      if (lookahead == '\r') ADVANCE(38);
+      if (lookahead == '\n' ||
+          lookahead == 0x2028 ||
+          lookahead == 0x2029) ADVANCE(38);
+      if (lookahead != 0) ADVANCE(2);
       END_STATE();
     case 3:
       ADVANCE_MAP(
@@ -12907,7 +12909,7 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       END_STATE();
     case 33:
       if (lookahead == '*') ADVANCE(30);
-      if (lookahead == '/') ADVANCE(1);
+      if (lookahead == '/') ADVANCE(2);
       END_STATE();
     case 34:
       if (lookahead == '.') ADVANCE(36);
@@ -22462,7 +22464,7 @@ static const TSLexerMode ts_lex_modes[STATE_COUNT] = {
   [6861] = {.lex_state = 139, .external_lex_state = 2},
   [6862] = {.lex_state = 139, .external_lex_state = 2},
   [6863] = {.lex_state = 139, .external_lex_state = 2},
-  [6864] = {.lex_state = 2, .external_lex_state = 16},
+  [6864] = {.lex_state = 1, .external_lex_state = 16},
   [6865] = {.lex_state = 139, .external_lex_state = 2},
   [6866] = {.lex_state = 139, .external_lex_state = 2},
   [6867] = {.lex_state = 139, .external_lex_state = 2},
@@ -22504,7 +22506,7 @@ static const TSLexerMode ts_lex_modes[STATE_COUNT] = {
   [6903] = {.lex_state = 139, .external_lex_state = 2},
   [6904] = {.lex_state = 139, .external_lex_state = 2},
   [6905] = {.lex_state = 139, .external_lex_state = 2},
-  [6906] = {.lex_state = 2, .external_lex_state = 16},
+  [6906] = {.lex_state = 1, .external_lex_state = 16},
   [6907] = {.lex_state = 139, .external_lex_state = 2},
   [6908] = {.lex_state = 139, .external_lex_state = 2},
   [6909] = {.lex_state = 139, .external_lex_state = 2},
@@ -22721,7 +22723,7 @@ static const TSLexerMode ts_lex_modes[STATE_COUNT] = {
   [7120] = {.lex_state = 139, .external_lex_state = 2},
   [7121] = {.lex_state = 139, .external_lex_state = 2},
   [7122] = {.lex_state = 139, .external_lex_state = 2},
-  [7123] = {.lex_state = 2, .external_lex_state = 16},
+  [7123] = {.lex_state = 1, .external_lex_state = 16},
   [7124] = {.lex_state = 139, .external_lex_state = 2},
   [7125] = {.lex_state = 139, .external_lex_state = 2},
   [7126] = {.lex_state = 139, .external_lex_state = 2},
@@ -22804,7 +22806,7 @@ static const TSLexerMode ts_lex_modes[STATE_COUNT] = {
   [7203] = {.lex_state = 139, .external_lex_state = 2},
   [7204] = {.lex_state = 139, .external_lex_state = 2},
   [7205] = {.lex_state = 139, .external_lex_state = 2},
-  [7206] = {.lex_state = 2, .external_lex_state = 16},
+  [7206] = {.lex_state = 1, .external_lex_state = 16},
   [7207] = {.lex_state = 139, .external_lex_state = 2},
   [7208] = {.lex_state = 139, .external_lex_state = 2},
   [7209] = {.lex_state = 139, .external_lex_state = 2},
@@ -22907,7 +22909,7 @@ static const TSLexerMode ts_lex_modes[STATE_COUNT] = {
   [7306] = {.lex_state = 139, .external_lex_state = 2},
   [7307] = {.lex_state = 139, .external_lex_state = 2},
   [7308] = {.lex_state = 139, .external_lex_state = 2},
-  [7309] = {.lex_state = 2, .external_lex_state = 16},
+  [7309] = {.lex_state = 1, .external_lex_state = 16},
   [7310] = {.lex_state = 139, .external_lex_state = 2},
   [7311] = {.lex_state = 139, .external_lex_state = 2},
   [7312] = {.lex_state = 139, .external_lex_state = 2},
@@ -22953,7 +22955,7 @@ static const TSLexerMode ts_lex_modes[STATE_COUNT] = {
   [7352] = {.lex_state = 139, .external_lex_state = 2},
   [7353] = {.lex_state = 139, .external_lex_state = 2},
   [7354] = {.lex_state = 139, .external_lex_state = 2},
-  [7355] = {.lex_state = 2, .external_lex_state = 16},
+  [7355] = {.lex_state = 1, .external_lex_state = 16},
   [7356] = {.lex_state = 139, .external_lex_state = 2},
   [7357] = {.lex_state = 139, .external_lex_state = 2},
   [7358] = {.lex_state = 139, .external_lex_state = 2},

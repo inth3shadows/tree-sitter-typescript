@@ -1,0 +1,11 @@
+# tree-sitter grammar DSL globals (injected by the tree-sitter CLI when it loads grammar.js)
+alias
+token
+seq
+choice
+repeat
+repeat1
+optional
+prec
+field
+blank

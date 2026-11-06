@@ -606,3 +606,97 @@ const b = a < unique // the symbol
           right: (identifier))
         (comment)
         right: (identifier)))))
+
+================================================================================
+The in operator after a field initializer, before a ternary or with a paren in a string or comment
+================================================================================
+
+class K {
+  a = x
+  in(b) ? 1 : 2
+  c = x
+  in("): ")
+  d = x
+  in(b /* ): */)
+}
+--------------------------------------------------------------------------------
+
+(program
+  (class_declaration
+    name: (type_identifier)
+    body: (class_body
+      (public_field_definition
+        name: (property_identifier)
+        value: (ternary_expression
+          condition: (binary_expression
+            left: (identifier)
+            right: (parenthesized_expression
+              (identifier)))
+          consequence: (number)
+          alternative: (number)))
+      (public_field_definition
+        name: (property_identifier)
+        value: (binary_expression
+          left: (identifier)
+          right: (parenthesized_expression
+            (string
+              (string_fragment)))))
+      (public_field_definition
+        name: (property_identifier)
+        value: (binary_expression
+          left: (identifier)
+          right: (parenthesized_expression
+            (identifier)
+            (comment)))))))
+
+================================================================================
+A method named in after an arrow field, with a comment or a string default
+================================================================================
+
+class M {
+  a = () => {}
+  in() /* c */ {}
+  b = () => {}
+  in(s = ")"): void {}
+  c: number
+  in () {}
+}
+--------------------------------------------------------------------------------
+
+(program
+  (class_declaration
+    name: (type_identifier)
+    body: (class_body
+      (public_field_definition
+        name: (property_identifier)
+        value: (arrow_function
+          parameters: (formal_parameters)
+          body: (statement_block)))
+      (method_definition
+        name: (property_identifier)
+        parameters: (formal_parameters)
+        (comment)
+        body: (statement_block))
+      (public_field_definition
+        name: (property_identifier)
+        value: (arrow_function
+          parameters: (formal_parameters)
+          body: (statement_block)))
+      (method_definition
+        name: (property_identifier)
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)
+            value: (string
+              (string_fragment))))
+        return_type: (type_annotation
+          (predefined_type))
+        body: (statement_block))
+      (public_field_definition
+        name: (property_identifier)
+        type: (type_annotation
+          (predefined_type)))
+      (method_definition
+        name: (property_identifier)
+        parameters: (formal_parameters)
+        body: (statement_block)))))

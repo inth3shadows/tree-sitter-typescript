@@ -1014,7 +1014,7 @@ module.exports = function defineGrammar(dialect) {
         // `i < unique.length` and `[unique: T]`. Between the words: whitespace
         // (the same class as `extras`) and comments; a line comment must reach
         // its newline, so `unique // the symbol` does not complete the token.
-        alias(token(seq('unique', /([\s\p{Zs}\uFEFF\u2028\u2029\u2060\u200B]|\/\/[^\r\n]*(\r\n|\r|\n)|\/\*[^*]*\*+([^/*][^*]*\*+)*\/)+/, 'symbol')), 'unique symbol'),
+        alias(token(seq('unique', /([\s\p{Zs}\uFEFF\u2028\u2029\u2060\u200B]|\/\/[^\r\n\u2028\u2029]*(\r\n|\r|\n|\u2028|\u2029)|\/\*[^*]*\*+([^/*][^*]*\*+)*\/)+/, 'symbol')), 'unique symbol'),
         'void',
         'unknown',
         'string',

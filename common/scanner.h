@@ -83,10 +83,10 @@ static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) 
 
 /**
  * At `(`: skip a balanced parameter list and report whether `:` or `{` follows
- * (a method's return type or body). Only looks ahead; the caller's token is
- * already marked, so nothing skipped here is consumed. Strings and comments
- * inside the list are not special-cased: a parenthesis in a default-value
- * string can end the scan early, which only means "not a method".
+ * (a method's return type or body), with whitespace and comments allowed between.
+ * Strings, template literals and comments inside the list are skipped, so a `)`
+ * inside them does not end it. Only looks ahead (the caller's token is already
+ * marked), but the lexer does move: the caller must not scan anything else after.
  */
 static bool scan_method_parameters(TSLexer *lexer) {
     unsigned depth = 0;
@@ -94,14 +94,55 @@ static bool scan_method_parameters(TSLexer *lexer) {
         if (lexer->eof(lexer)) {
             return false;
         }
-        if (lexer->lookahead == '(') {
+        int32_t c = lexer->lookahead;
+        if (c == '"' || c == '\'' || c == '`') {
+            skip(lexer);
+            while (lexer->lookahead != c) {
+                if (lexer->eof(lexer) || (c != '`' && lexer->lookahead == '\n')) {
+                    return false;
+                }
+                if (lexer->lookahead == '\\') {
+                    skip(lexer);
+                }
+                skip(lexer);
+            }
+            skip(lexer);
+            continue;
+        }
+        if (c == '/') {
+            skip(lexer);
+            if (lexer->lookahead == '/') {
+                while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
+                    skip(lexer);
+                }
+            } else if (lexer->lookahead == '*') {
+                skip(lexer);
+                for (;;) {
+                    if (lexer->eof(lexer)) {
+                        return false;
+                    }
+                    if (lexer->lookahead == '*') {
+                        skip(lexer);
+                        if (lexer->lookahead == '/') {
+                            skip(lexer);
+                            break;
+                        }
+                    } else {
+                        skip(lexer);
+                    }
+                }
+            }
+            continue;
+        }
+        if (c == '(') {
             depth++;
-        } else if (lexer->lookahead == ')') {
+        } else if (c == ')') {
             depth--;
             if (depth == 0) {
                 skip(lexer);
-                while (iswspace(lexer->lookahead)) {
-                    skip(lexer);
+                bool comment = false;
+                if (!scan_whitespace_and_comments(lexer, &comment)) {
+                    return false;
                 }
                 return lexer->lookahead == ':' || lexer->lookahead == '{';
             }
@@ -236,6 +277,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
                 if (!valid_symbols[MEMBER_END_MARKER]) {
                     return false;
                 }
+                // `in ()`, `in <T>()`: spaces may sit between the name and what follows.
+                while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                    skip(lexer);
+                }
                 // `x in ?` is never an expression, so `in?` starts a member.
                 if (lexer->lookahead == '?') {
                     return true;
@@ -250,6 +295,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
                 // operator. A parameter list followed by `:` or `{` is a method, though,
                 // which covers `a = () => {}\n in(): void {}`: an arrow body cannot continue.
                 if (lexer->lookahead == '(') {
+                    // The scan moves the lexer, so the caller's `?` fallback (a ternary
+                    // after the newline) must not run from wherever it stopped:
+                    // `a = x\n in(b) ? 1 : 2` is `(x in (b)) ? 1 : 2`.
+                    *scanned_comment = true;
                     return scan_method_parameters(lexer);
                 }
                 return false;
