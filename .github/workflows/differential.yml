@@ -1,0 +1,98 @@
+name: tsc differential
+
+# tsc is the ground truth for TypeScript syntax: this builds the grammar to
+# wasm and checks it against tsc over pinned real-world corpora.
+# See docs/differential.md.
+
+on:
+  pull_request:
+    paths:
+      - 'common/**'
+      - '*/grammar.js'
+      - '*/src/**'
+      - 'scripts/ts-differential.*'
+      - 'test/tsc-fixtures/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/differential.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'common/**'
+      - '*/grammar.js'
+      - '*/src/**'
+      - 'scripts/ts-differential.*'
+      - 'test/tsc-fixtures/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/differential.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: differential-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  differential:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      # actions/cache rejects paths containing "..", so the cache lives in
+      # $RUNNER_TEMP, exported once for every later step.
+      - name: Set corpus cache dir
+        run: echo "TS_DIFF_CACHE=$RUNNER_TEMP/ts-diff-cache" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # --ignore-scripts skips the native binding build; the CLI binary needs its own install script.
+      - run: npm ci --ignore-scripts && npm rebuild tree-sitter-cli
+
+      # The checked-in src/ must be what grammar.js generates.
+      - name: Generated parsers are up to date
+        run: |
+          (cd typescript && npx tree-sitter generate) && (cd tsx && npx tree-sitter generate)
+          git diff --exit-code -- typescript/src tsx/src
+
+      # No local emcc: tree-sitter build --wasm runs in the emscripten Docker image.
+      - run: npm run build:wasm
+
+      - uses: actions/cache/restore@v4
+        id: corpus-cache
+        with:
+          path: ${{ env.TS_DIFF_CACHE }}
+          key: ts-diff-corpora-v1-${{ hashFiles('scripts/ts-differential.corpora.json') }}
+
+      - name: Differential parse (tsc vs tree-sitter)
+        run: node scripts/ts-differential.mjs --json "$RUNNER_TEMP/ts-differential.json"
+
+      - name: Upload full per-file results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ts-differential-json
+          path: ${{ runner.temp }}/ts-differential.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # Save only once at least one corpus finished fetching.
+      - name: Check for fetched corpora
+        id: corpus-fetched
+        if: always() && steps.corpus-cache.outputs.cache-hit != 'true'
+        run: |
+          rm -rf "$TS_DIFF_CACHE"/*.partial-*
+          if find "$TS_DIFF_CACHE" -maxdepth 2 -name .ts-differential-complete 2>/dev/null | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.corpus-cache.outputs.cache-hit != 'true' && steps.corpus-fetched.outputs.present == 'true'
+        with:
+          path: ${{ env.TS_DIFF_CACHE }}
+          key: ts-diff-corpora-v1-${{ hashFiles('scripts/ts-differential.corpora.json') }}

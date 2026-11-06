@@ -1,0 +1,7 @@
+[
+  { "name": "effect", "repo": "Effect-TS/effect", "sha": "7a87ff9b88b1a570995b1b5570559c1b4dd5367b", "subdir": "" },
+  { "name": "zod", "repo": "colinhacks/zod", "sha": "2554b70c3d4a80273381e61d527d820720626440", "subdir": "" },
+  { "name": "excalidraw", "repo": "excalidraw/excalidraw", "sha": "dd2f8fc32b92cbf56f4abee6a0cf3b14681b4b55", "subdir": "" },
+  { "name": "vscode", "repo": "microsoft/vscode", "sha": "ca43fc94a6cc0a20cb4deefc90e63693d15063e8", "subdir": "src" },
+  { "name": "local", "local": "test/tsc-fixtures" }
+]

@@ -1,8 +1,9 @@
 name: Publish packages
 
+# No npm/crates/PyPI releases from this fork until someone asks for one;
+# manual only, so pushing a tag never publishes.
 on:
-  push:
-    tags: ["*"]
+  workflow_dispatch:
 
 permissions:
   contents: write

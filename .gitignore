@@ -38,3 +38,7 @@ dist/
 *.tar.gz
 *.tgz
 *.zip
+
+# Grammar wasm built for the tsc differential (npm run build:wasm)
+/tree-sitter-typescript.wasm
+/tree-sitter-tsx.wasm
