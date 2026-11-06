@@ -7,6 +7,8 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- ASI before a line starting with an identifier such as `in2` or `in$x` (upstream #373), and before
+  members named `in` written `in?:`, `in<T>()` or `in!:`; `a\n in(b)` stays `a in (b)`.
 - `unique` is a name everywhere except `unique symbol` (`i < unique.length`, `let x: unique`,
   `[unique: T]`, `implements unique`).
 - A tuple label may be named like a type keyword: `[symbol: string]`, `[number?: string]` (upstream #378).

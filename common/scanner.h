@@ -191,11 +191,17 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             }
             skip(lexer);
 
-            if (!iswalpha(lexer->lookahead) && lexer->lookahead != '_') {
-                // `in` followed by non-word: could be `in `, `in:`, `in(`, etc.
-                // Insert ASI if the next non-space char is `:` or `(` (property name),
-                // but not if it is a space followed by an expression (keyword operator).
-                if (lexer->lookahead == ':' || lexer->lookahead == '(') {
+            if (!iswalnum(lexer->lookahead) && lexer->lookahead != '_' && lexer->lookahead != '$') {
+                // `in` itself, not an identifier such as `in2` or `in$x` (those get ASI below).
+                // `in:` is a property name. Where no expression continues (no `||`), `in` cannot
+                // be the operator, so `in(`, `in?`, `in<` and `in!` start a member named `in`;
+                // after an expression they continue it (`a\n in(b)` is `a in (b)`).
+                if (lexer->lookahead == ':') {
+                    return true;
+                }
+                if (!valid_symbols[LOGICAL_OR] &&
+                    (lexer->lookahead == '(' || lexer->lookahead == '?' || lexer->lookahead == '<' ||
+                     lexer->lookahead == '!')) {
                     return true;
                 }
                 return false;
@@ -208,7 +214,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
                 skip(lexer);
             }
 
-            if (!iswalpha(lexer->lookahead)) {
+            if (!iswalnum(lexer->lookahead) && lexer->lookahead != '_' && lexer->lookahead != '$') {
                 return false;
             }
             break;
