@@ -1,42 +1,16 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.25.10",
- "generatedAt": "2026-11-06T14:44:52.470Z",
+ "generatedAt": "2026-11-06T15:07:40.005Z",
  "wasmSha256": {
-  "typescript": "1c9f9d3047815b15ccafbd33ba85eeaa045feca4d0438421a77a781ba51d8c6a",
-  "tsx": "34da1f49d4c84acfc6a4f795ecd932f9e1de82b7fee2b563ce114eaefd1557a3"
+  "typescript": "6c1e83c94e677aa58d6811374bf881f001ca4cec5e8570d379c502457e4952a6",
+  "tsx": "09f58839384c5a51da574e141d22fa2e9386c3592beb7d79b1b0c32e1467d0b3"
  },
  "divergent": {
   "effect": {
-   "ai-docs/src/01_effect/03_services/20_layer-composition.ts": 45,
    "packages/effect/src/PubSub.ts": 1381,
-   "packages/effect/src/eventlog/SqlEventLogServerEncrypted.ts": 273,
-   "packages/effect/src/eventlog/SqlEventLogServerUnencrypted.ts": 164,
-   "packages/effect/src/persistence/KeyValueStore.ts": 830,
-   "packages/effect/src/persistence/Persistence.ts": 611,
-   "packages/effect/src/sql/Migrator.ts": 201,
    "packages/effect/test/encoding/Json5.test.ts": 102,
-   "packages/effect/typetest/schema/Schema.tst.ts": 1,
-   "packages/platform/node/test/cluster/SqlMessageStorage.integration.test.ts": 190,
-   "packages/sql/d1/test/Client.test.ts": 78,
-   "packages/sql/libsql/test/Client.integration.test.ts": 303,
-   "packages/sql/mssql/test/Binary.test.ts": 98,
-   "packages/sql/mssql/test/Cancellation.integration.test.ts": 26,
-   "packages/sql/mssql/test/Client.integration.test.ts": 21,
-   "packages/sql/mssql/test/Persistence.integration.test.ts": 53,
-   "packages/sql/mysql2/test/Cancellation.integration.test.ts": 18,
-   "packages/sql/mysql2/test/Client.integration.test.ts": 46,
-   "packages/sql/mysql2/test/Persistence.integration.test.ts": 46,
-   "packages/sql/pg/test/Client.integration.test.ts": 288,
-   "packages/sql/pg/test/Persistence.integration.test.ts": 111,
-   "packages/sql/pg/test/PgMigrator.integration.test.ts": 17,
-   "packages/sql/pg/test/SqlEventJournal.integration.test.ts": 29,
-   "packages/sql/pglite/test/Client.test.ts": 25,
-   "packages/sql/pglite/test/Json.test.ts": 13,
-   "packages/sql/pglite/test/Migrator.test.ts": 36,
-   "packages/sql/pglite/test/PersistedQueue.test.ts": 22,
-   "packages/sql/sqlite-node/test/Persistence.test.ts": 210,
-   "packages/sql/sqlite-node/test/SqlEventJournal.test.ts": 353
+   "packages/effect/typetest/schema/Schema.tst.ts": 1
   },
   "zod": {},
   "excalidraw": {},

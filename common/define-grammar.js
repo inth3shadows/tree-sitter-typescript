@@ -187,6 +187,14 @@ module.exports = function defineGrammar(dialect) {
           field('type_arguments', optional($.type_arguments)),
           field('arguments', $.arguments),
         )),
+        // A tagged template with type arguments, sql<{ id: number }>`SELECT ...`, is
+        // ambiguous with `<` / `>` comparisons exactly like f<T>(x), so it takes the
+        // generic call's precedence and conflicts rather than template_call's.
+        prec('call', seq(
+          field('function', choice($.expression, $.import)),
+          field('type_arguments', $.type_arguments),
+          field('arguments', $.template_string),
+        )),
         prec('template_call', seq(
           field('function', choice($.primary_expression, $.new_expression)),
           field('arguments', $.template_string),

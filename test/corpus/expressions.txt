@@ -458,3 +458,31 @@ a ? function(){ return true } : b;
           (return_statement
             (true))))
       (identifier))))
+
+==================================================
+Tagged templates with type arguments
+==================================================
+
+sql<{ id: number }>`SELECT ${x}`;
+a < b;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (object_type
+          (property_signature
+            (property_identifier)
+            (type_annotation
+              (predefined_type)))))
+      (template_string
+        (string_fragment)
+        (template_substitution
+          (identifier)))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (identifier))))
