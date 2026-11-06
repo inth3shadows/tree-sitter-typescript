@@ -2394,3 +2394,81 @@ const f: {
             (formal_parameters)
             (type_annotation
               (type_identifier))))))))
+
+==================================================
+Type parameters named out
+==================================================
+
+type F<out> = out[];
+type H<out = number> = out;
+type I<out, T> = [out, T];
+type J<in out> = out;
+type K<out out> = out;
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (type_identifier)))
+    (array_type
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (type_identifier)
+        (default_type
+          (predefined_type))))
+    (type_identifier))
+  (type_alias_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (type_identifier))
+      (type_parameter
+        (type_identifier)))
+    (tuple_type
+      (type_identifier)
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (variance)
+        (type_identifier)))
+    (type_identifier))
+  (type_alias_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (variance)
+        (type_identifier)))
+    (type_identifier)))
+
+==================================================
+Const after a variance modifier
+==================================================
+
+class C<in const T> {}
+class D<const in T> {}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (variance)
+        (type_identifier)))
+    (class_body))
+  (class_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (variance)
+        (type_identifier)))
+    (class_body)))

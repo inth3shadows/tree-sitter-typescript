@@ -70,6 +70,9 @@ module.exports = function defineGrammar(dialect) {
     ]),
 
     conflicts: ($, previous) => previous.concat([
+      // `<in out>` (modifier `in`, parameter named `out`)
+      // vs `<in out T>`; the token after `out` decides.
+      [$.variance],
       [$.call_expression, $.instantiation_expression, $.binary_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.unary_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.update_expression],
@@ -1033,7 +1036,12 @@ module.exports = function defineGrammar(dialect) {
       type_parameter: $ => seq(
         optional('const'),
         optional($.variance),
-        field('name', $._type_identifier),
+        // `out` stays usable as a parameter name (`<out>`,
+        // `<out = X>`, `<in out>` = modifier `in` on a parameter named `out`),
+        // as tsc accepts it (brajevicm@9fcaa13). tsc also takes `const` on
+        // either side of the variance (`<in const T>`).
+        optional('const'),
+        field('name', choice($._type_identifier, alias('out', $.type_identifier))),
         field('constraint', optional($.constraint)),
         field('value', optional($.default_type)),
       ),
