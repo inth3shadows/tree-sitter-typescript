@@ -14,7 +14,8 @@ export interface J {
   in<T>(): T
 }
 export class K {
-  a = 1
+  a: number = 1
+  b!: string
   in!: number
 }
 export const d = "x"
