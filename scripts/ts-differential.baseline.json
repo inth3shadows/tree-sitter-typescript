@@ -1,10 +1,10 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.25.10",
- "generatedAt": "2026-11-06T15:07:40.005Z",
+ "generatedAt": "2026-11-06T15:46:54.144Z",
  "wasmSha256": {
-  "typescript": "6c1e83c94e677aa58d6811374bf881f001ca4cec5e8570d379c502457e4952a6",
-  "tsx": "09f58839384c5a51da574e141d22fa2e9386c3592beb7d79b1b0c32e1467d0b3"
+  "typescript": "011a554f18d6e4ca4886d27aea58cb863fd1b8c2fbf615b945f8236eee74753c",
+  "tsx": "c8583149e816703b95a2b5721973be0c15505116708c79c1254770d9f7fb176c"
  },
  "divergent": {
   "effect": {
@@ -15,8 +15,6 @@
   "zod": {},
   "excalidraw": {},
   "vscode": {
-   "src/vs/platform/agentHost/node/agentHostDatabase.ts": 2419,
-   "src/vs/platform/browserView/electron-browser/preload-browserView.ts": 321,
    "src/vs/workbench/contrib/terminalContrib/voice/browser/terminalVoice.ts": 38
   },
   "local": {

@@ -6100,11 +6100,11 @@
   },
   {
     "type": "number",
-    "named": false
+    "named": true
   },
   {
     "type": "number",
-    "named": true
+    "named": false
   },
   {
     "type": "object",
@@ -6245,6 +6245,10 @@
   {
     "type": "undefined",
     "named": true
+  },
+  {
+    "type": "unique",
+    "named": false
   },
   {
     "type": "unique symbol",

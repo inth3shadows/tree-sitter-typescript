@@ -1145,6 +1145,9 @@ module.exports = function defineGrammar(dialect) {
         'object',
         'new',
         'readonly',
+        // `unique` is only a keyword in `unique symbol`; elsewhere it is a name
+        // (`i < unique.length`).
+        'unique',
         previous,
       ),
     },
