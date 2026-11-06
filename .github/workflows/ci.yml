@@ -30,12 +30,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-14]
+        # Private burn-in: macOS runners are not available to this private repo, and
+        # windows-latest fails in node-gyp's Visual Studio detection. Restore both
+        # (windows-latest, macos-14) when the repo goes public.
+        os: [ubuntu-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      # Pin the CLI to the version the parsers are generated with: the action's
+      # default (latest) broke its own config step at v0.27.1.
       - name: Set up tree-sitter
         uses: tree-sitter/setup-action/cli@v1
+        with:
+          tree-sitter-ref: v0.25.10
       # Parsing real code is the differential's job (differential.yml): pinned corpora,
       # tsc as the oracle, a baseline of known gaps. Unpinned HEAD clones made this red
       # whenever upstream projects added syntax the grammar lacks.
