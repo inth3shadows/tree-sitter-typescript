@@ -1495,3 +1495,163 @@ export type * as Types from 'foo';
       (identifier))
     source: (string
       (string_fragment))))
+
+==================================================
+Member name with its signature on the next line
+==================================================
+
+interface Repo {
+  find
+    <T>(id: string): T
+  get
+    (id: string): T
+}
+class Svc {
+  load
+    <T>(id: string): T { return helper(id) }
+}
+
+---
+
+(program
+  (interface_declaration
+    (type_identifier)
+    (interface_body
+      (method_signature
+        (property_identifier)
+        (type_parameters
+          (type_parameter
+            (type_identifier)))
+        (formal_parameters
+          (required_parameter
+            (identifier)
+            (type_annotation
+              (predefined_type))))
+        (type_annotation
+          (type_identifier)))
+      (method_signature
+        (property_identifier)
+        (formal_parameters
+          (required_parameter
+            (identifier)
+            (type_annotation
+              (predefined_type))))
+        (type_annotation
+          (type_identifier)))))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (type_parameters
+          (type_parameter
+            (type_identifier)))
+        (formal_parameters
+          (required_parameter
+            (identifier)
+            (type_annotation
+              (predefined_type))))
+        (type_annotation
+          (type_identifier))
+        (statement_block
+          (return_statement
+            (call_expression
+              (identifier)
+              (arguments
+                (identifier)))))))))
+
+==================================================
+Call signature on its own line after a typed member
+==================================================
+
+interface I {
+  a: string
+  <A>(self: A): A
+  b: typeof c
+  <B>(self: B): B
+  d: import("m").X
+  <C>(self: C): C
+}
+
+---
+
+(program
+  (interface_declaration
+    (type_identifier)
+    (interface_body
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (call_signature
+        (type_parameters
+          (type_parameter
+            (type_identifier)))
+        (formal_parameters
+          (required_parameter
+            (identifier)
+            (type_annotation
+              (type_identifier))))
+        (type_annotation
+          (type_identifier)))
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (type_query
+            (identifier))))
+      (call_signature
+        (type_parameters
+          (type_parameter
+            (type_identifier)))
+        (formal_parameters
+          (required_parameter
+            (identifier)
+            (type_annotation
+              (type_identifier))))
+        (type_annotation
+          (type_identifier)))
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (member_expression
+            (call_expression
+              (import)
+              (arguments
+                (string
+                  (string_fragment))))
+            (property_identifier))))
+      (call_signature
+        (type_parameters
+          (type_parameter
+            (type_identifier)))
+        (formal_parameters
+          (required_parameter
+            (identifier)
+            (type_annotation
+              (type_identifier))))
+        (type_annotation
+          (type_identifier))))))
+
+==================================================
+Return then a line starting with <
+:language(typescript)
+==================================================
+
+function f() {
+  return
+  <any>x
+}
+
+---
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement)
+      (expression_statement
+        (type_assertion
+          (type_arguments
+            (predefined_type))
+          (identifier))))))

@@ -7,6 +7,11 @@ module.exports = function defineGrammar(dialect) {
     externals: ($, previous) => previous.concat([
       $._function_signature_automatic_semicolon,
       $.__error_recovery,
+      // never produced. It is valid only between a member's
+      // name and its signature, so the scanner can tell that a `<` or `(` on
+      // the next line continues that member (tsc reads `find\n<T>(id): T` as
+      // one method) rather than starting a call signature.
+      $._member_signature_marker,
     ]),
 
     supertypes: ($, previous) => previous.concat([
@@ -376,6 +381,7 @@ module.exports = function defineGrammar(dialect) {
         optional(choice('get', 'set', '*')),
         field('name', $._property_name),
         optional('?'),
+        optional($._member_signature_marker),
         $._call_signature,
       ),
 
@@ -386,6 +392,7 @@ module.exports = function defineGrammar(dialect) {
         optional(choice('get', 'set', '*')),
         field('name', $._property_name),
         optional('?'),
+        optional($._member_signature_marker),
         $._call_signature,
       ),
 
@@ -481,6 +488,7 @@ module.exports = function defineGrammar(dialect) {
         optional(choice('get', 'set', '*')),
         field('name', $._property_name),
         optional('?'),
+        optional($._member_signature_marker),
         $._call_signature,
         field('body', $.statement_block),
       )),
