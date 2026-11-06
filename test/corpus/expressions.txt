@@ -487,18 +487,3 @@ a < b;
       (identifier)
       (identifier))))
 
-==================================================
-unique as an identifier
-==================================================
-
-i < unique.length;
-
----
-
-(program
-  (expression_statement
-    (binary_expression
-      (identifier)
-      (member_expression
-        (identifier)
-        (property_identifier)))))

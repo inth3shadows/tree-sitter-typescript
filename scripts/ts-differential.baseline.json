@@ -1,10 +1,10 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.25.10",
- "generatedAt": "2026-11-06T16:03:12.961Z",
+ "generatedAt": "2026-11-06T17:54:05.208Z",
  "wasmSha256": {
-  "typescript": "bfa93afb35585d68aaf753f0578716590b06fe5f5367af85ce8c80ff73078f56",
-  "tsx": "89212941fd61d3e15b0f5c5d3be4719ebe68decd77e319334980847bf594bfbd"
+  "typescript": "a4f6366673b68181d171d52f099ac2083f064a5b5c646f559a186b602e21fc86",
+  "tsx": "f6974cd56d78975a7a17888ae5be165becd368661982af89e8c63b35426a2f15"
  },
  "divergent": {
   "effect": {
@@ -14,12 +14,17 @@
   },
   "zod": {},
   "excalidraw": {},
-  "vscode": {},
+  "vscode": {
+   "src/vs/platform/agentHost/node/agentHostDatabase.ts": 2419,
+   "src/vs/platform/browserView/electron-browser/preload-browserView.ts": 321
+  },
   "local": {
    "test/tsc-fixtures/gap-await-using-in-for.ts": 3,
    "test/tsc-fixtures/gap-export-named-from-attributes.ts": 2,
    "test/tsc-fixtures/gap-export-star-from-attributes.ts": 2,
    "test/tsc-fixtures/gap-static-accessor.ts": 2,
+   "test/tsc-fixtures/gap-unique-in-comparison.ts": 5,
+   "test/tsc-fixtures/gap-unique-in-comparison.tsx": 5,
    "test/tsc-fixtures/gap-using-in-for.ts": 3
   }
  }
