@@ -30,8 +30,10 @@
  * root; never counted as now-agree), on a full run a baseline corpus that is not in
  * corpora.json (vanished corpus), a malformed baseline (a row must be a non-negative
  * integer, or the corpus an old-format array), version mismatch, a blind oracle
- * (ScriptKind.TS or TSX) or grammar, a missing wasm, or the relaunch guard set
- * without --liftoff-only.
+ * (ScriptKind.TS or TSX) or grammar, a missing wasm, the relaunch guard set
+ * without --liftoff-only, or a parser hang: an input in test/hang/ that does not parse
+ * within 2s (the hang canary; web-tree-sitter < 0.27.1 livelocks on them), or a corpus
+ * file that does not parse within 30s.
  * now-agree counts only baselined paths that are now agree-ok; a baselined path that
  * is now agree-err / tsc-only-err is counted separately (now-err). All are reported
  * so the baseline can be re-generated; none but "vanished" fails the run.
@@ -87,7 +89,19 @@ const CANARY_GOOD = 'let x: number = 1;';
 const CANARY_TSX_BAD = 'const a = <div>;';
 const CANARY_TSX_GOOD = 'const a = <div />;';
 
+// Inputs that once hung the parser (test/hang/*): each must finish within HANG_DEADLINE_MS.
+// A corpus file gets CORPUS_DEADLINE_MS, so a new hang fails the run instead of stalling CI.
+const HANG_DIR = path.join(ROOT, 'test', 'hang');
+const HANG_DEADLINE_MS = 2000;
+const CORPUS_DEADLINE_MS = 30000;
+
 class SetupError extends Error {}
+
+/** parser.parse with a wall-clock deadline: the tree, or null if the deadline cancelled it. */
+function parseWithin(parser, text, ms) {
+  const deadline = Date.now() + ms;
+  return parser.parse(text, null, { progressCallback: () => Date.now() > deadline });
+}
 
 /** A fixture that is allowed to diverge: a recorded grammar gap. */
 const isGapFixture = (p) => /^gap-/.test(path.basename(p));
@@ -374,6 +388,16 @@ async function main() {
     }
   }
 
+  // Hang canary: error recovery in web-tree-sitter < 0.27.1 livelocks on these
+  // (tree-sitter/tree-sitter#5997; tree-sitter-typescript#323). Any tree, error or not, passes.
+  const hangFiles = fs.existsSync(HANG_DIR) ? fs.readdirSync(HANG_DIR).filter((f) => EXTS.has(path.extname(f))).sort() : [];
+  if (!hangFiles.length) throw new SetupError(`hang canary: no inputs in ${path.relative(ROOT, HANG_DIR)}`);
+  for (const f of hangFiles) {
+    const t = parseWithin(parsers[path.extname(f) === '.tsx' ? 'tsx' : 'typescript'], fs.readFileSync(path.join(HANG_DIR, f), 'utf8'), HANG_DEADLINE_MS);
+    if (!t) throw new SetupError(`hang canary: ${path.relative(ROOT, path.join(HANG_DIR, f))} did not parse within ${HANG_DEADLINE_MS}ms (web-tree-sitter ${wtsVersion}; the error-recovery livelock is fixed in 0.27.1)`);
+    t.delete();
+  }
+
   const cacheRoot = process.env.TS_DIFF_CACHE || path.join(os.homedir(), '.cache', 'tree-sitter-typescript-differential');
   const dirs = new Map();
   for (const c of selected) {
@@ -398,8 +422,8 @@ async function main() {
       }
       const isTsx = ext === '.tsx';
       const tscErr = tscDiagnostics(ts, f, text, isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS).length > 0;
-      const tree = parsers[isTsx ? 'tsx' : 'typescript'].parse(text);
-      if (!tree) throw new SetupError(`tree-sitter returned no tree for ${f}`);
+      const tree = parseWithin(parsers[isTsx ? 'tsx' : 'typescript'], text, CORPUS_DEADLINE_MS);
+      if (!tree) throw new SetupError(`tree-sitter did not parse ${c.name}:${f} within ${CORPUS_DEADLINE_MS}ms (a parser hang: copy the file, or a minimal repro, into ${path.relative(ROOT, HANG_DIR)})`);
       const tsErr = tree.rootNode.hasError;
       const row = tsErr ? firstErrorRow(tree.rootNode) : null;
       tree.delete();
