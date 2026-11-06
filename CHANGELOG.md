@@ -7,6 +7,11 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A member named `in` is recognised only between class or object-type members, so `for (var k\n in!o)`
+  and `for (var k\n in<T>x)` stay for-in loops; `in(): T {}` after a block-bodied arrow field, and `in?:`
+  after any member, start a member named `in` (inth3shadows/codegraph#17 review S1, S2).
+- `unique symbol` accepts any whitespace the grammar skips elsewhere (`unique\u00A0symbol`), and a line
+  comment between the words must end at its newline: `unique // the symbol` stays a name (S3, S4).
 - The tsx parser no longer hangs on `<a {{b:>c:d(e f)` (upstream #323). The livelock is in
   tree-sitter's error recovery, not this grammar (tree-sitter/tree-sitter#5997), so the fix is
   a runtime of 0.27.1 or later: web-tree-sitter is now pinned to 0.27.1, and the differential
