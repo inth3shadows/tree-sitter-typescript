@@ -7,6 +7,7 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A tuple label may be named like a type keyword: `[symbol: string]`, `[number?: string]` (upstream #378).
 - `unique` works as a name outside `unique symbol` (`i < unique.length`).
 - A tagged template with type arguments parses: ``sql<{ id: number }>`SELECT ...` ``.
 - A member name followed by its signature on the next line (`find\n  <T>(id): T`,

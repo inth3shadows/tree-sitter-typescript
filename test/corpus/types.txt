@@ -2472,3 +2472,30 @@ class D<const in T> {}
         (variance)
         (type_identifier)))
     (class_body)))
+
+==================================================
+Tuple labels named like type keywords
+==================================================
+
+type A = [symbol: string, number?: string];
+type D = [any?];
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (tuple_type
+      (required_parameter
+        (identifier)
+        (type_annotation
+          (predefined_type)))
+      (optional_parameter
+        (identifier)
+        (type_annotation
+          (predefined_type)))))
+  (type_alias_declaration
+    (type_identifier)
+    (tuple_type
+      (optional_type
+        (predefined_type)))))
