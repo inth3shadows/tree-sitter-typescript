@@ -1,10 +1,10 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.25.10",
- "generatedAt": "2026-11-06T15:46:54.144Z",
+ "generatedAt": "2026-11-06T16:03:12.961Z",
  "wasmSha256": {
-  "typescript": "011a554f18d6e4ca4886d27aea58cb863fd1b8c2fbf615b945f8236eee74753c",
-  "tsx": "c8583149e816703b95a2b5721973be0c15505116708c79c1254770d9f7fb176c"
+  "typescript": "bfa93afb35585d68aaf753f0578716590b06fe5f5367af85ce8c80ff73078f56",
+  "tsx": "89212941fd61d3e15b0f5c5d3be4719ebe68decd77e319334980847bf594bfbd"
  },
  "divergent": {
   "effect": {
@@ -14,9 +14,7 @@
   },
   "zod": {},
   "excalidraw": {},
-  "vscode": {
-   "src/vs/workbench/contrib/terminalContrib/voice/browser/terminalVoice.ts": 38
-  },
+  "vscode": {},
   "local": {
    "test/tsc-fixtures/gap-await-using-in-for.ts": 3,
    "test/tsc-fixtures/gap-export-named-from-attributes.ts": 2,

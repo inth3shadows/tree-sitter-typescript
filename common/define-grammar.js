@@ -75,6 +75,9 @@ module.exports = function defineGrammar(dialect) {
     ]),
 
     conflicts: ($, previous) => previous.concat([
+      // `[any?: T]` (a labeled optional element) vs `[any?]` (an optional type):
+      // only the token after `?` decides.
+      [$.optional_tuple_parameter, $.predefined_type],
       // `<in out>` (modifier `in`, parameter named `out`)
       // vs `<in out T>`; the token after `out` decides.
       [$.variance],
@@ -773,13 +776,15 @@ module.exports = function defineGrammar(dialect) {
         $.infer_type,
       ),
 
+      // A tuple label may be a contextual keyword that also names a type:
+      // [symbol: string], [string: number, number?: string].
       tuple_parameter: $ => seq(
-        field('name', choice($.identifier, $.rest_pattern)),
+        field('name', choice($.identifier, alias($._reserved_identifier, $.identifier), $.rest_pattern)),
         field('type', $.type_annotation),
       ),
 
       optional_tuple_parameter: $ => seq(
-        field('name', $.identifier),
+        field('name', choice($.identifier, alias($._reserved_identifier, $.identifier))),
         '?',
         field('type', $.type_annotation),
       ),
