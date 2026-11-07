@@ -119,3 +119,14 @@ run `node scripts/ts-differential.mjs --only local`. If the current grammar pars
 you're done. If it doesn't, name the file `gap-<construct>.ts` and re-baseline
 (`--update`), so the gap is recorded and its fix shows up as `now-agree`. A file that is not
 valid TypeScript, or a non-gap name that diverges, fails the run and blocks `--update`.
+
+## Triage upstream issues
+
+`npm run triage` (after `npm run build:wasm`; needs `gh`) runs the same oracle over the
+code blocks in upstream's open issues and prints the ones this fork still gets wrong:
+`DIVERGENT` (tsc parses the snippet, tree-sitter errors) or `TIMEOUT` (a parse over 5s).
+`--all` prints every issue, `--state all` includes closed ones, `--issue N` checks one,
+`--wasm-dir DIR` points at another build (e.g. upstream's, to see what the fork already
+fixed), `--json PATH` keeps per-snippet results. It reads `hasError` only: an issue about a
+wrong but error-free tree, or about queries, reads `agree-ok`. It costs seconds and no
+judgment, so run it before reading issues by hand.
