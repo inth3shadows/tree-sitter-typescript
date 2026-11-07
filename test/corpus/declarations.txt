@@ -1707,3 +1707,33 @@ abstract class A { abstract abstract: number; abstract m(): void }
         (formal_parameters)
         (type_annotation
           (predefined_type))))))
+
+==================================
+Bare abstract before a line break
+==================================
+
+abstract class A {
+  abstract
+  m(): void;
+}
+abstract
+class B {}
+
+---
+
+(program
+  (abstract_class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (method_signature
+        (property_identifier)
+        (formal_parameters)
+        (type_annotation
+          (predefined_type)))))
+  (expression_statement
+    (identifier))
+  (class_declaration
+    (type_identifier)
+    (class_body)))
