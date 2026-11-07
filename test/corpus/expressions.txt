@@ -725,3 +725,40 @@ String.raw`\usepackage \x \u{zz} \x41 \u0041`;
         (escape_sequence)
         (string_fragment)
         (escape_sequence)))))
+
+==================================
+Untagged templates with invalid escapes
+==================================
+
+`\x \u{1F600} \x4`;
+
+---
+
+(program
+  (expression_statement
+    (template_string
+      (escape_sequence)
+      (string_fragment)
+      (escape_sequence)
+      (string_fragment)
+      (escape_sequence)
+      (string_fragment))))
+
+==================================
+Strings reject bare \u and \x
+:error
+==================================
+
+"\u";
+'\x';
+
+---
+
+==================================
+Template literal types reject bare \u
+:error
+==================================
+
+type T = `\u${string}`;
+
+---

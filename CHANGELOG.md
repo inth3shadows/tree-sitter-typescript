@@ -7,10 +7,10 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
-- A tagged template may contain a bare `\x` or `\u` (no hex digits after it), as ES2018 allows:
-  String.raw`\usepackage{x}` no longer errors (upstream #353; effect Json5.test.ts now agrees with
-  tsc). `escape_sequence` is shared with strings, so `"\u"` in a string is also accepted rather than
-  an ERROR.
+- A template string may contain a bare `\x` or `\u` (no hex digits after it), as ES2018 allows in
+  tagged templates: String.raw`\usepackage{x}` no longer errors (upstream #353; effect Json5.test.ts
+  now agrees with tsc). The token cannot see the tag, so untagged templates accept it too. Strings
+  and template literal types still reject it.
 - After a class field initializer, `in(b) ? 1 : 2` on the next line is again `(x in (b)) ? 1 : 2`;
   the previous fix dropped `in(b)` from the tree without an error. A `)` inside a string or comment
   in `in(…)` no longer decides member vs operator, `in () {}` (a space before the parameters) is a
