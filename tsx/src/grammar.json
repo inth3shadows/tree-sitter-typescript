@@ -5681,6 +5681,15 @@
                 "name": "escape_sequence"
               },
               {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_template_bare_escape"
+                },
+                "named": true,
+                "value": "escape_sequence"
+              },
+              {
                 "type": "SYMBOL",
                 "name": "template_substitution"
               }
@@ -9759,6 +9768,22 @@
         }
       ]
     },
+    "_template_bare_escape": {
+      "type": "IMMEDIATE_TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "\\"
+          },
+          {
+            "type": "PATTERN",
+            "value": "[xu]"
+          }
+        ]
+      }
+    },
     "template_type": {
       "type": "SEQ",
       "members": [
@@ -9809,6 +9834,15 @@
               {
                 "type": "SYMBOL",
                 "name": "escape_sequence"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_template_bare_escape"
+                },
+                "named": true,
+                "value": "escape_sequence"
               },
               {
                 "type": "SYMBOL",

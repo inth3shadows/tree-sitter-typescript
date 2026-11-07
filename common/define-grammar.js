@@ -849,6 +849,28 @@ module.exports = function defineGrammar(dialect) {
         prec(-1, alias($._type_query_call_expression_in_type_annotation, $.call_expression)),
       ),
 
+      // A tagged template may contain escapes that are invalid elsewhere (ES2018), e.g.
+      // String.raw`\usepackage` (upstream #353). JavaScript's escape_sequence rejects a
+      // bare `\x` or `\u` (no hex digits after it), so template strings also take this
+      // token, under the same node name. The longest match still gives `\x41` and `\u0041`
+      // to escape_sequence. Template literal types take it too: tsc accepts `\u` in a
+      // type template without substitutions, and in `f<`\u`>(1)` the type-argument reading
+      // must survive as long as the comparison reading does (the two are a declared conflict).
+      // Strings keep JavaScript's rule. A token cannot see the tag, so untagged templates,
+      // and type templates with substitutions, accept the bare form though tsc rejects it.
+      _template_bare_escape: _ => token.immediate(seq('\\', /[xu]/)),
+
+      template_string: $ => seq(
+        '`',
+        repeat(choice(
+          alias($._template_chars, $.string_fragment),
+          $.escape_sequence,
+          alias($._template_bare_escape, $.escape_sequence),
+          $.template_substitution,
+        )),
+        '`',
+      ),
+
       template_type: $ => seq('${', choice($.primary_type, $.infer_type), '}'),
 
       template_literal_type: $ => seq(
@@ -856,6 +878,7 @@ module.exports = function defineGrammar(dialect) {
         repeat(choice(
           alias($._template_chars, $.string_fragment),
           $.escape_sequence,
+          alias($._template_bare_escape, $.escape_sequence),
           $.template_type,
         )),
         '`',

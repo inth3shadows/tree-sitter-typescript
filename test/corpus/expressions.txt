@@ -700,3 +700,88 @@ class M {
         name: (property_identifier)
         parameters: (formal_parameters)
         body: (statement_block)))))
+
+==================================
+Tagged templates with invalid escapes
+==================================
+
+String.raw`\usepackage \x \u{zz} \x41 \u0041`;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      function: (member_expression
+        object: (identifier)
+        property: (property_identifier))
+      arguments: (template_string
+        (escape_sequence)
+        (string_fragment)
+        (escape_sequence)
+        (string_fragment)
+        (escape_sequence)
+        (string_fragment)
+        (escape_sequence)
+        (string_fragment)
+        (escape_sequence)))))
+
+==================================
+Untagged templates accept invalid escapes (known false-accept: tsc rejects)
+==================================
+
+`\x \u{1F600} \x4`;
+
+---
+
+(program
+  (expression_statement
+    (template_string
+      (escape_sequence)
+      (string_fragment)
+      (escape_sequence)
+      (string_fragment)
+      (escape_sequence)
+      (string_fragment))))
+
+==================================
+Strings reject bare \u and \x
+:error
+==================================
+
+"\u";
+'\x';
+
+---
+
+==================================
+Template literal types with invalid escapes
+==================================
+
+f<`\u`>(1);
+tag<`\x`>`x`;
+type T = `\u`;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      type_arguments: (type_arguments
+        (template_literal_type
+          (escape_sequence)))
+      arguments: (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      type_arguments: (type_arguments
+        (template_literal_type
+          (escape_sequence)))
+      arguments: (template_string
+        (string_fragment))))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (template_literal_type
+      (escape_sequence))))
