@@ -849,6 +849,23 @@ module.exports = function defineGrammar(dialect) {
         prec(-1, alias($._type_query_call_expression_in_type_annotation, $.call_expression)),
       ),
 
+      // JavaScript's rule, plus a bare `\x` or `\u` not followed by hex digits. A tagged
+      // template may contain such escapes (ES2018), e.g. String.raw`\usepackage` (upstream
+      // #353). The longest match still takes `\x41` and `\u0041` whole. Shared with strings,
+      // where tsc rejects them: tree-sitter stays error-tolerant there rather than adding a
+      // template-only token.
+      escape_sequence: _ => token.immediate(seq(
+        '\\',
+        choice(
+          /[^0-7]/,
+          /[0-7]{1,3}/,
+          /x[0-9a-fA-F]{2}/,
+          /u[0-9a-fA-F]{4}/,
+          /u\{[0-9a-fA-F]+\}/,
+          /[\r?][\n\u2028\u2029]/,
+        ),
+      )),
+
       template_type: $ => seq('${', choice($.primary_type, $.infer_type), '}'),
 
       template_literal_type: $ => seq(
