@@ -19,3 +19,9 @@ export const typed = tag<string>`\usepackage`;
 export const cont = tag`a\
 b\u\
 c`;
+
+// Bare escapes in template literal types: type arguments, not comparisons.
+declare function g<T>(x: number): T;
+export const ga = g<`\u`>(1);
+export const gb = tag<`\x`>`x`;
+export type Bare = `\u`;

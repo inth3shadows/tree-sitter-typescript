@@ -727,7 +727,7 @@ String.raw`\usepackage \x \u{zz} \x41 \u0041`;
         (escape_sequence)))))
 
 ==================================
-Untagged templates with invalid escapes
+Untagged templates accept invalid escapes (known false-accept: tsc rejects)
 ==================================
 
 `\x \u{1F600} \x4`;
@@ -755,10 +755,33 @@ Strings reject bare \u and \x
 ---
 
 ==================================
-Template literal types reject bare \u
-:error
+Template literal types with invalid escapes
 ==================================
 
-type T = `\u${string}`;
+f<`\u`>(1);
+tag<`\x`>`x`;
+type T = `\u`;
 
 ---
+
+(program
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      type_arguments: (type_arguments
+        (template_literal_type
+          (escape_sequence)))
+      arguments: (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      type_arguments: (type_arguments
+        (template_literal_type
+          (escape_sequence)))
+      arguments: (template_string
+        (string_fragment))))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (template_literal_type
+      (escape_sequence))))

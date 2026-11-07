@@ -1,5 +1,8 @@
 * text=auto eol=lf
 
+# Keep the CRLF line continuation in these fixtures byte-exact.
+test/tsc-fixtures/tagged-template-invalid-escape.* -text
+
 # Generated source files
 typescript/src/*.json linguist-generated
 typescript/src/parser.c linguist-generated
