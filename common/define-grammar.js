@@ -1174,6 +1174,7 @@ module.exports = function defineGrammar(dialect) {
       _type_identifier: $ => alias($.identifier, $.type_identifier),
 
       _reserved_identifier: (_, previous) => choice(
+        'abstract',
         'declare',
         'namespace',
         'type',

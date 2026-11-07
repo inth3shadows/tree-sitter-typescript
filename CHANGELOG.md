@@ -7,6 +7,9 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A class, interface or object-type member named `abstract` parses: `abstract?: boolean`,
+  `abstract(): void`, `abstract = 1`, and `abstract` alone on a line before another member
+  (upstream #377). `abstract` as a modifier is unchanged.
 - A template string may contain a bare `\x` or `\u` (no hex digits after it), as ES2018 allows in
   tagged templates: String.raw`\usepackage{x}` no longer errors (upstream #353; effect Json5.test.ts
   now agrees with tsc). Template literal types take it too, so `type T = `\u`` and
