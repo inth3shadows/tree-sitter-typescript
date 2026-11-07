@@ -7,6 +7,13 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A class, interface or object-type member named `abstract` parses: `abstract?: boolean`,
+  `abstract(): void`, `abstract = 1` (upstream #377). `abstract` is also an ordinary identifier in
+  expressions (`abstract = 5`, `abstract()`). A bare `abstract` followed by a line break now ends the
+  member or statement, as in tsc: `abstract\n m(): void` is a field `abstract` and a method `m`
+  (it was one abstract method), and `abstract\nclass A {}` is an expression statement and a
+  `class_declaration` (it was an `abstract_class_declaration`). Still failing after a line break:
+  a next member named `in` or `instanceof`, a generator `*m()`, or a multi-line comment between.
 - A template string may contain a bare `\x` or `\u` (no hex digits after it), as ES2018 allows in
   tagged templates: String.raw`\usepackage{x}` no longer errors (upstream #353; effect Json5.test.ts
   now agrees with tsc). Template literal types take it too, so `type T = `\u`` and

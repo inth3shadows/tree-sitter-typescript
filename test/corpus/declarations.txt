@@ -1655,3 +1655,85 @@ function f() {
           (type_arguments
             (predefined_type))
           (identifier))))))
+
+==================================
+Members named abstract
+==================================
+
+interface I { abstract?: boolean; abstract(): void }
+class C {
+  abstract = 1;
+  abstract
+  x: number;
+}
+abstract class A { abstract abstract: number; abstract m(): void }
+
+---
+
+(program
+  (interface_declaration
+    (type_identifier)
+    (interface_body
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (method_signature
+        (property_identifier)
+        (formal_parameters)
+        (type_annotation
+          (predefined_type)))))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))))
+  (abstract_class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (abstract_method_signature
+        (property_identifier)
+        (formal_parameters)
+        (type_annotation
+          (predefined_type))))))
+
+==================================
+Bare abstract before a line break
+==================================
+
+abstract class A {
+  abstract
+  m(): void;
+}
+abstract
+class B {}
+
+---
+
+(program
+  (abstract_class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (method_signature
+        (property_identifier)
+        (formal_parameters)
+        (type_annotation
+          (predefined_type)))))
+  (expression_statement
+    (identifier))
+  (class_declaration
+    (type_identifier)
+    (class_body)))
