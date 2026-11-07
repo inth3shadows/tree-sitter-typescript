@@ -14,6 +14,7 @@ enum TokenType {
     FUNCTION_SIGNATURE_AUTOMATIC_SEMICOLON,
     ERROR_RECOVERY,
     MEMBER_SIGNATURE_MARKER,
+    MEMBER_END_MARKER,
 };
 
 static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
@@ -78,6 +79,77 @@ static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) 
             return true;
         }
     }
+}
+
+/**
+ * At `(`: skip a balanced parameter list and report whether `:` or `{` follows
+ * (a method's return type or body), with whitespace and comments allowed between.
+ * Strings, template literals and comments inside the list are skipped, so a `)`
+ * inside them does not end it. Only looks ahead (the caller's token is already
+ * marked), but the lexer does move: the caller must not scan anything else after.
+ */
+static bool scan_method_parameters(TSLexer *lexer) {
+    unsigned depth = 0;
+    for (unsigned n = 0; n < 4096; n++) {
+        if (lexer->eof(lexer)) {
+            return false;
+        }
+        int32_t c = lexer->lookahead;
+        if (c == '"' || c == '\'' || c == '`') {
+            skip(lexer);
+            while (lexer->lookahead != c) {
+                if (lexer->eof(lexer) || (c != '`' && lexer->lookahead == '\n')) {
+                    return false;
+                }
+                if (lexer->lookahead == '\\') {
+                    skip(lexer);
+                }
+                skip(lexer);
+            }
+            skip(lexer);
+            continue;
+        }
+        if (c == '/') {
+            skip(lexer);
+            if (lexer->lookahead == '/') {
+                while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
+                    skip(lexer);
+                }
+            } else if (lexer->lookahead == '*') {
+                skip(lexer);
+                for (;;) {
+                    if (lexer->eof(lexer)) {
+                        return false;
+                    }
+                    if (lexer->lookahead == '*') {
+                        skip(lexer);
+                        if (lexer->lookahead == '/') {
+                            skip(lexer);
+                            break;
+                        }
+                    } else {
+                        skip(lexer);
+                    }
+                }
+            }
+            continue;
+        }
+        if (c == '(') {
+            depth++;
+        } else if (c == ')') {
+            depth--;
+            if (depth == 0) {
+                skip(lexer);
+                bool comment = false;
+                if (!scan_whitespace_and_comments(lexer, &comment)) {
+                    return false;
+                }
+                return lexer->lookahead == ':' || lexer->lookahead == '{';
+            }
+        }
+        skip(lexer);
+    }
+    return false;
 }
 
 static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
@@ -178,9 +250,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             skip(lexer);
             return lexer->lookahead != '=';
 
-            // Don't insert a semicolon before `in` or `instanceof`, but do insert one
-            // before an identifier.  Also insert one before `in` when it is used as
-            // a property/method name (i.e. followed by `:` or `(`), because
+            // Don't insert a semicolon before the `in` or `instanceof` operator, but do
+            // insert one before an identifier (`in2`, `instanceofX`) and before a member
+            // named `in`: `in:` anywhere, and between class or object-type members
+            // `in?`, `in(`, `in<`, `in!` (see the rules below), because
             //   interface Foo { name: string\n  in: string }
             // must parse `in:` as a property name, not as a keyword operator.
         case 'i':
@@ -193,16 +266,40 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
             if (!iswalnum(lexer->lookahead) && lexer->lookahead != '_' && lexer->lookahead != '$') {
                 // `in` itself, not an identifier such as `in2` or `in$x` (those get ASI below).
-                // `in:` is a property name. Where no expression continues (no `||`), `in` cannot
-                // be the operator, so `in(`, `in?`, `in<` and `in!` start a member named `in`;
-                // after an expression they continue it (`a\n in(b)` is `a in (b)`).
+                // `in:` is a property name.
                 if (lexer->lookahead == ':') {
                     return true;
                 }
-                if (!valid_symbols[LOGICAL_OR] &&
-                    (lexer->lookahead == '(' || lexer->lookahead == '?' || lexer->lookahead == '<' ||
-                     lexer->lookahead == '!')) {
+                // Anywhere but between class or object-type members, `in` is the operator
+                // (`a\n in(b)` is `a in (b)`, `for (var k\n in!o)` is a for-in).
+                // MEMBER_END_MARKER is never produced; the grammar makes it valid only
+                // where a member ends.
+                if (!valid_symbols[MEMBER_END_MARKER]) {
+                    return false;
+                }
+                // `in ()`, `in <T>()`: spaces may sit between the name and what follows.
+                while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                    skip(lexer);
+                }
+                // `x in ?` is never an expression, so `in?` starts a member.
+                if (lexer->lookahead == '?') {
                     return true;
+                }
+                // After a member that cannot continue (no `||`: a typed member, a method),
+                // `in(`, `in<` and `in!` start a member named `in`.
+                if (!valid_symbols[LOGICAL_OR] &&
+                    (lexer->lookahead == '(' || lexer->lookahead == '<' || lexer->lookahead == '!')) {
+                    return true;
+                }
+                // After an initializer `||` is valid, and tsc reads `a = x\n in(b)` as the
+                // operator. A parameter list followed by `:` or `{` is a method, though,
+                // which covers `a = () => {}\n in(): void {}`: an arrow body cannot continue.
+                if (lexer->lookahead == '(') {
+                    // The scan moves the lexer, so the caller's `?` fallback (a ternary
+                    // after the newline) must not run from wherever it stopped:
+                    // `a = x\n in(b) ? 1 : 2` is `(x in (b)) ? 1 : 2`.
+                    *scanned_comment = true;
+                    return scan_method_parameters(lexer);
                 }
                 return false;
             }

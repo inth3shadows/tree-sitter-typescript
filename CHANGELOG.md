@@ -7,6 +7,21 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- After a class field initializer, `in(b) ? 1 : 2` on the next line is again `(x in (b)) ? 1 : 2`;
+  the previous fix dropped `in(b)` from the tree without an error. A `)` inside a string or comment
+  in `in(…)` no longer decides member vs operator, `in () {}` (a space before the parameters) is a
+  method, and U+2028/U+2029 end a line comment inside `unique // … symbol` (codegraph#17 round 2).
+- A member named `in` is recognised only between class or object-type members, so `for (var k\n in!o)`
+  and `for (var k\n in<T>x)` stay for-in loops; `in(): T {}` after a block-bodied arrow field, and `in?:`
+  after any member, start a member named `in` (inth3shadows/codegraph#17 review S1, S2).
+- `unique symbol` accepts any whitespace the grammar skips elsewhere (`unique\u00A0symbol`), and a line
+  comment between the words must end at its newline: `unique // the symbol` stays a name (S3, S4).
+- The tsx parser no longer hangs on `<a {{b:>c:d(e f)` (upstream #323). The livelock is in
+  tree-sitter's error recovery, not this grammar (tree-sitter/tree-sitter#5997), so the fix is
+  a runtime of 0.27.1 or later: web-tree-sitter is now pinned to 0.27.1, and the differential
+  fails if any input in `test/hang/` takes over 2s or any corpus file over 30s. **Consumers on
+  an older runtime still hang on this input**, including the Node binding (`tree-sitter` 0.25.1
+  on npm is the latest).
 - ASI before a line starting with an identifier such as `in2` or `in$x` (upstream #373), and before
   members named `in` written `in?:`, `in<T>()` or `in!:`; `a\n in(b)` stays `a in (b)`.
 - `unique` is a name everywhere except `unique symbol` (`i < unique.length`, `let x: unique`,

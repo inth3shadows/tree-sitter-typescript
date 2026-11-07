@@ -23,6 +23,10 @@ module.exports = function defineGrammar(dialect) {
       // the next line continues that member (tsc reads `find\n<T>(id): T` as
       // one method) rather than starting a call signature.
       $._member_signature_marker,
+      // never produced. It is valid only where a class or object-type member
+      // ends, so the scanner knows a member named `in` may start on the next
+      // line (and not in a `for (var k\n in o)` header, where `in` is the operator).
+      $._member_end_marker,
     ]),
 
     supertypes: ($, previous) => previous.concat([
@@ -494,7 +498,7 @@ module.exports = function defineGrammar(dialect) {
               $.method_signature,
               $.public_field_definition,
             ),
-            choice($._semicolon, ','),
+            choice(seq(optional($._member_end_marker), $._semicolon), ','),
           ),
           ';',
         )),
@@ -1007,8 +1011,10 @@ module.exports = function defineGrammar(dialect) {
         'string',
         'symbol',
         // One token, so `unique` alone is never a keyword: it stays a name in
-        // `i < unique.length`, `let x: unique` and `[unique: T]`.
-        alias(token(seq('unique', /(\s|\/\/[^\r\n]*|\/\*[^*]*\*+([^/*][^*]*\*+)*\/)+/, 'symbol')), 'unique symbol'),
+        // `i < unique.length` and `[unique: T]`. Between the words: whitespace
+        // (the same class as `extras`) and comments; a line comment must reach
+        // its newline, so `unique // the symbol` does not complete the token.
+        alias(token(seq('unique', /([\s\p{Zs}\uFEFF\u2028\u2029\u2060\u200B]|\/\/[^\r\n\u2028\u2029]*(\r\n|\r|\n|\u2028|\u2029)|\/\*[^*]*\*+([^/*][^*]*\*+)*\/)+/, 'symbol')), 'unique symbol'),
         'void',
         'unknown',
         'string',
@@ -1028,7 +1034,7 @@ module.exports = function defineGrammar(dialect) {
         optional(seq(
           optional(choice(',', ';')),
           sepBy1(
-            choice(',', $._semicolon),
+            choice(',', seq(optional($._member_end_marker), $._semicolon)),
             choice(
               $.export_statement,
               $.property_signature,
@@ -1038,7 +1044,7 @@ module.exports = function defineGrammar(dialect) {
               $.method_signature,
             ),
           ),
-          optional(choice(',', $._semicolon)),
+          optional(choice(',', seq(optional($._member_end_marker), $._semicolon))),
         )),
         choice('}', '|}'),
       ),
