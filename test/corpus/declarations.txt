@@ -1737,3 +1737,217 @@ class B {}
   (class_declaration
     (type_identifier)
     (class_body)))
+
+==================================
+Members named accessor
+==================================
+
+class Methods {
+  accessor() { return 1; }
+  static accessor() {}
+  get accessor() { return 2; }
+}
+class Fields {
+  accessor;
+  accessor = 1;
+  accessor: number = 1;
+  accessor?: number;
+  accessor!: number;
+  readonly accessor = 1;
+  accessor accessor = 1;
+}
+interface I { accessor?: boolean; accessor(): void; }
+type T = { accessor: number; accessor(): void; };
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (return_statement
+            (number))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (return_statement
+            (number))))))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type))
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (number))))
+  (interface_declaration
+    (type_identifier)
+    (interface_body
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (method_signature
+        (property_identifier)
+        (formal_parameters)
+        (type_annotation
+          (predefined_type)))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (method_signature
+        (property_identifier)
+        (formal_parameters)
+        (type_annotation
+          (predefined_type))))))
+
+==================================
+Auto-accessors with other modifiers
+==================================
+
+class C extends B {
+  accessor value = 1;
+  public accessor flag = true;
+  @dec accessor decorated = 1;
+  accessor #hidden = 1;
+  static accessor shared = 1;
+  public static accessor sharedName: number = 2;
+  private static accessor #privateShared = 3;
+  override accessor value = 4;
+  public override accessor accessor = 5;
+}
+abstract class A {
+  abstract accessor value: number;
+  protected abstract accessor protectedValue: number;
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_heritage
+      (extends_clause
+        (identifier)))
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (accessibility_modifier)
+        (property_identifier)
+        (true))
+      (public_field_definition
+        (decorator
+          (identifier))
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (private_property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (accessibility_modifier)
+        (property_identifier)
+        (type_annotation
+          (predefined_type))
+        (number))
+      (public_field_definition
+        (accessibility_modifier)
+        (private_property_identifier)
+        (number))
+      (public_field_definition
+        (override_modifier)
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (accessibility_modifier)
+        (override_modifier)
+        (property_identifier)
+        (number))))
+  (abstract_class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (accessibility_modifier)
+        (property_identifier)
+        (type_annotation
+          (predefined_type))))))
+
+==================================
+Bare accessor before a line break
+==================================
+
+class C {
+  accessor
+  value = 1;
+  accessor
+  method() {}
+}
+class D {
+  accessor
+  () {}
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block)))))

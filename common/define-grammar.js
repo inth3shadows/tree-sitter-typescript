@@ -160,6 +160,13 @@ module.exports = function defineGrammar(dialect) {
       ]),
 
     rules: {
+      // The field modifier competes with class member names, but the keyword
+      // must not steal identifiers from types, expressions or object shorthand.
+      _class_member_name: $ => choice(
+        $._property_name,
+        alias('accessor', $.property_identifier),
+      ),
+
       public_field_definition: $ => seq(
         repeat(field('decorator', $.decorator)),
         optional(choice(
@@ -170,9 +177,9 @@ module.exports = function defineGrammar(dialect) {
           seq(optional('static'), optional($.override_modifier), optional('readonly')),
           seq(optional('abstract'), optional('readonly')),
           seq(optional('readonly'), optional('abstract')),
-          optional('accessor'),
         ),
-        field('name', $._property_name),
+        optional('accessor'),
+        field('name', $._class_member_name),
         optional(choice('?', '!')),
         field('type', optional($.type_annotation)),
         optional($._initializer),
@@ -398,25 +405,16 @@ module.exports = function defineGrammar(dialect) {
         )),
       ),
 
-      method_signature: $ => seq(
-        optional($.accessibility_modifier),
-        optional('static'),
-        optional($.override_modifier),
-        optional('readonly'),
-        optional('async'),
-        optional(choice('get', 'set', '*')),
-        field('name', $._property_name),
-        optional('?'),
-        optional($._member_signature_marker),
-        $._call_signature,
-      ),
+      method_signature: $ => methodSignature($, $._property_name),
+
+      _class_method_signature: $ => methodSignature($, $._class_member_name),
 
       abstract_method_signature: $ => seq(
         optional($.accessibility_modifier),
         'abstract',
         optional($.override_modifier),
         optional(choice('get', 'set', '*')),
-        field('name', $._property_name),
+        field('name', $._class_member_name),
         optional('?'),
         optional($._member_signature_marker),
         $._call_signature,
@@ -478,7 +476,7 @@ module.exports = function defineGrammar(dialect) {
         repeat(choice(
           seq(
             repeat(field('decorator', $.decorator)),
-            $.method_definition,
+            alias($._class_method_definition, $.method_definition),
             optional($._semicolon),
           ),
           // As it happens for functions, the semicolon insertion should not
@@ -489,13 +487,13 @@ module.exports = function defineGrammar(dialect) {
           //     }
           // The same rule applies for functions and that's why we use
           // "_function_signature_automatic_semicolon".
-          seq($.method_signature, choice($._function_signature_automatic_semicolon, ',')),
+          seq(alias($._class_method_signature, $.method_signature), choice($._function_signature_automatic_semicolon, ',')),
           $.class_static_block,
           seq(
             choice(
               $.abstract_method_signature,
               $.index_signature,
-              $.method_signature,
+              alias($._class_method_signature, $.method_signature),
               $.public_field_definition,
             ),
             choice(seq(optional($._member_end_marker), $._semicolon), ','),
@@ -506,16 +504,12 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       method_definition: $ => prec.left(seq(
-        optional($.accessibility_modifier),
-        optional('static'),
-        optional($.override_modifier),
-        optional('readonly'),
-        optional('async'),
-        optional(choice('get', 'set', '*')),
-        field('name', $._property_name),
-        optional('?'),
-        optional($._member_signature_marker),
-        $._call_signature,
+        methodSignature($, $._property_name),
+        field('body', $.statement_block),
+      )),
+
+      _class_method_definition: $ => prec.left(seq(
+        methodSignature($, $._class_member_name),
         field('body', $.statement_block),
       )),
 
@@ -1198,6 +1192,28 @@ module.exports = function defineGrammar(dialect) {
     },
   });
 };
+
+/**
+ * Share method syntax while keeping contextual keyword names local to classes.
+ *
+ * @param {GrammarSymbols<string>} $
+ * @param {RuleOrLiteral} name
+ * @returns {SeqRule}
+ */
+function methodSignature($, name) {
+  return seq(
+    optional($.accessibility_modifier),
+    optional('static'),
+    optional($.override_modifier),
+    optional('readonly'),
+    optional('async'),
+    optional(choice('get', 'set', '*')),
+    field('name', name),
+    optional('?'),
+    optional($._member_signature_marker),
+    $._call_signature,
+  );
+}
 
 /**
  * Creates a rule to match one or more of the rules separated by a comma

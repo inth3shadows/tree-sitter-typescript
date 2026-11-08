@@ -2522,3 +2522,105 @@ type B = (typeof unique)[];
       (parenthesized_type
         (type_query
           (identifier))))))
+
+==================================
+Accessor as a type name in ambiguous contexts
+==================================
+
+type accessor = number;
+type Parenthesized = (accessor);
+let value: (accessor);
+f<accessor>();
+f<accessor>(0);
+f<accessor>``;
+class Derived extends Base<accessor> {}
+type Qualified = accessor.Value;
+f<accessor.Value>(0);
+f<typeof accessor>();
+f<typeof accessor>``;
+const shorthand = { accessor };
+const { accessor: renamed } = shorthand;
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (predefined_type))
+  (type_alias_declaration
+    (type_identifier)
+    (parenthesized_type
+      (type_identifier)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (parenthesized_type
+          (type_identifier)))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_identifier))
+      (arguments)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_identifier))
+      (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_identifier))
+      (template_string)))
+  (class_declaration
+    (type_identifier)
+    (class_heritage
+      (extends_clause
+        (identifier)
+        (type_arguments
+          (type_identifier))))
+    (class_body))
+  (type_alias_declaration
+    (type_identifier)
+    (nested_type_identifier
+      (identifier)
+      (type_identifier)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (nested_type_identifier
+          (identifier)
+          (type_identifier)))
+      (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (identifier)))
+      (arguments)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (identifier)))
+      (template_string)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (object
+        (shorthand_property_identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (object_pattern
+        (pair_pattern
+          (property_identifier)
+          (identifier)))
+      (identifier))))
