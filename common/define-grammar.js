@@ -315,6 +315,36 @@ module.exports = function defineGrammar(dialect) {
         '/>',
       )),
 
+      // The external text scanner stops at '&' so complete entities can keep
+      // their own nodes. A shorter literal fallback handles the other cases.
+      _jsx_child: ($, previous) => choice(previous, alias('&', $.jsx_text)),
+
+      _jsx_string: $ => choice(
+        seq(
+          '"',
+          repeat(choice(
+            alias($.unescaped_double_jsx_string_fragment, $.string_fragment),
+            $.html_character_reference,
+            alias(token.immediate('&'), $.string_fragment),
+          )),
+          '"',
+        ),
+        seq(
+          '\'',
+          repeat(choice(
+            alias($.unescaped_single_jsx_string_fragment, $.string_fragment),
+            $.html_character_reference,
+            alias(token.immediate('&'), $.string_fragment),
+          )),
+          '\'',
+        ),
+      ),
+
+      // Keep existing literal fragments, but never swallow the closing quote
+      // or the next '&', which could begin a complete character reference.
+      unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /([^"&]|&[^#A-Za-z"&])+/)),
+      unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /([^'&]|&[^#A-Za-z'&])+/)),
+
       export_specifier: (_, previous) => seq(
         optional(choice('type', 'typeof')),
         previous,

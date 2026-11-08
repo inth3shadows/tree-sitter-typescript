@@ -7,6 +7,12 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- TSX accepts literal ampersands in JSX text and quoted attributes, including URL
+  query parameters and a trailing ampersand. Complete named and numeric character
+  references retain their existing nodes; ordinary strings and operators are unchanged.
+  Literal ampersands use the existing `jsx_text` and `string_fragment` node kinds;
+  mixed literal/entity runs can have finer fragment boundaries and different leading
+  whitespace in entity spans, without losing text or character references.
 - A value named `abstract` stays an identifier in type queries: `f<typeof abstract>(x)`,
   typed tags, qualified queries such as `typeof abstract.value`, and parenthesized
   `(typeof abstract)` types retain their type interpretation instead of becoming comparisons
