@@ -3054,10 +3054,6 @@
           {
             "type": "member_expression",
             "named": true
-          },
-          {
-            "type": "subscript_expression",
-            "named": true
           }
         ]
       },

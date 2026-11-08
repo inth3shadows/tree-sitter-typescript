@@ -2709,3 +2709,122 @@ type L = typeof abstract["value"];
       (literal_type
         (string
           (string_fragment))))))
+
+==================================
+Runtime typeof comparisons stay expressions
+==================================
+
+// Invalid type-query operands must keep the valid runtime comparison reading.
+namespace RuntimeCalls {
+  declare function abstract(x: unknown): number;
+  declare const f: string, x: any;
+  f < typeof abstract(x) > (x);
+  const holder = { abstract: abstract };
+  f < typeof holder.abstract(x) > (x);
+}
+namespace RuntimeProperties {
+  declare const abstract: { abstract: { abstract: number } };
+  declare const f: any, x: any;
+  f < typeof abstract["abstract"].abstract > (x);
+}
+
+---
+
+(program
+  (comment)
+  (expression_statement
+    (internal_module
+      (identifier)
+      (statement_block
+        (ambient_declaration
+          (function_signature
+            (identifier)
+            (formal_parameters
+              (required_parameter
+                (identifier)
+                (type_annotation
+                  (predefined_type))))
+            (type_annotation
+              (predefined_type))))
+        (ambient_declaration
+          (lexical_declaration
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (call_expression
+                  (identifier)
+                  (arguments
+                    (identifier)))))
+            (parenthesized_expression
+              (identifier))))
+        (lexical_declaration
+          (variable_declarator
+            (identifier)
+            (object
+              (pair
+                (property_identifier)
+                (identifier)))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (call_expression
+                  (member_expression
+                    (identifier)
+                    (property_identifier))
+                  (arguments
+                    (identifier)))))
+            (parenthesized_expression
+              (identifier)))))))
+  (expression_statement
+    (internal_module
+      (identifier)
+      (statement_block
+        (ambient_declaration
+          (lexical_declaration
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (object_type
+                  (property_signature
+                    (property_identifier)
+                    (type_annotation
+                      (object_type
+                        (property_signature
+                          (property_identifier)
+                          (type_annotation
+                            (predefined_type)))))))))))
+        (ambient_declaration
+          (lexical_declaration
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (member_expression
+                  (subscript_expression
+                    (identifier)
+                    (string
+                      (string_fragment)))
+                  (property_identifier))))
+            (parenthesized_expression
+              (identifier))))))))
