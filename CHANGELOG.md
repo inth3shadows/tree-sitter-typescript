@@ -7,6 +7,10 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A value named `abstract` stays an identifier in type queries: `f<typeof abstract>(x)`,
+  typed tags, qualified queries such as `typeof abstract.value`, and parenthesized
+  `(typeof abstract)` types retain their type interpretation instead of becoming comparisons
+  or errors. Existing `abstract` member names and modifiers continue to parse.
 - A class, interface or object-type member may be named `accessor`, including fields,
   methods and optional members (upstream #369). Auto-accessor fields also parse after
   `static`, `override` or `abstract`, including static private names. A bare `accessor`

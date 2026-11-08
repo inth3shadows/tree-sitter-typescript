@@ -156,6 +156,7 @@ module.exports = function defineGrammar(dialect) {
       ].includes(rule.name))
       .concat([
         $._type_identifier,
+        $._type_query_identifier,
         $._jsx_start_opening_element,
       ]),
 
@@ -758,6 +759,7 @@ module.exports = function defineGrammar(dialect) {
         field('property', choice(
           $.private_property_identifier,
           alias($.identifier, $.property_identifier),
+          alias('abstract', $.property_identifier),
         )),
       ),
       _type_query_call_expression_in_type_annotation: $ => seq(
@@ -926,9 +928,16 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       // Type query expressions are more restrictive than regular expressions
+      // `abstract` is also an expression keyword token. Keep the identifier
+      // interpretation in competing type parses such as f<typeof abstract>(x).
+      _type_query_identifier: $ => choice(
+        $.identifier,
+        alias('abstract', $.identifier),
+      ),
+
       _type_query_member_expression: $ => seq(
         field('object', choice(
-          $.identifier,
+          $._type_query_identifier,
           $.this,
           alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
@@ -938,11 +947,12 @@ module.exports = function defineGrammar(dialect) {
         field('property', choice(
           $.private_property_identifier,
           alias($.identifier, $.property_identifier),
+          alias('abstract', $.property_identifier),
         )),
       ),
       _type_query_subscript_expression: $ => seq(
         field('object', choice(
-          $.identifier,
+          $._type_query_identifier,
           $.this,
           alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
@@ -954,7 +964,7 @@ module.exports = function defineGrammar(dialect) {
       _type_query_call_expression: $ => seq(
         field('function', choice(
           $.import,
-          $.identifier,
+          $._type_query_identifier,
           alias($._type_query_member_expression, $.member_expression),
           alias($._type_query_subscript_expression, $.subscript_expression),
         )),
@@ -963,7 +973,7 @@ module.exports = function defineGrammar(dialect) {
       _type_query_instantiation_expression: $ => seq(
         field('function', choice(
           $.import,
-          $.identifier,
+          $._type_query_identifier,
           alias($._type_query_member_expression, $.member_expression),
           alias($._type_query_subscript_expression, $.subscript_expression),
         )),
@@ -976,7 +986,7 @@ module.exports = function defineGrammar(dialect) {
           alias($._type_query_member_expression, $.member_expression),
           alias($._type_query_call_expression, $.call_expression),
           alias($._type_query_instantiation_expression, $.instantiation_expression),
-          $.identifier,
+          $._type_query_identifier,
           $.this,
         ),
       )),

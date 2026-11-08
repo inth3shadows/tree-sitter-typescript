@@ -9473,6 +9473,15 @@
                 },
                 "named": true,
                 "value": "property_identifier"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "STRING",
+                  "value": "abstract"
+                },
+                "named": true,
+                "value": "property_identifier"
               }
             ]
           }
@@ -10363,6 +10372,24 @@
         }
       ]
     },
+    "_type_query_identifier": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "abstract"
+          },
+          "named": true,
+          "value": "identifier"
+        }
+      ]
+    },
     "_type_query_member_expression": {
       "type": "SEQ",
       "members": [
@@ -10374,7 +10401,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "identifier"
+                "name": "_type_query_identifier"
               },
               {
                 "type": "SYMBOL",
@@ -10441,6 +10468,15 @@
                 },
                 "named": true,
                 "value": "property_identifier"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "STRING",
+                  "value": "abstract"
+                },
+                "named": true,
+                "value": "property_identifier"
               }
             ]
           }
@@ -10458,7 +10494,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "identifier"
+                "name": "_type_query_identifier"
               },
               {
                 "type": "SYMBOL",
@@ -10552,7 +10588,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "identifier"
+                "name": "_type_query_identifier"
               },
               {
                 "type": "ALIAS",
@@ -10600,7 +10636,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "identifier"
+                "name": "_type_query_identifier"
               },
               {
                 "type": "ALIAS",
@@ -10684,7 +10720,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "identifier"
+                "name": "_type_query_identifier"
               },
               {
                 "type": "SYMBOL",
@@ -12776,6 +12812,7 @@
     "_jsx_identifier",
     "_lhs_expression",
     "_type_identifier",
+    "_type_query_identifier",
     "_jsx_start_opening_element"
   ],
   "supertypes": [

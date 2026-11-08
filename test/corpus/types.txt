@@ -2624,3 +2624,88 @@ const { accessor: renamed } = shorthand;
           (property_identifier)
           (identifier)))
       (identifier))))
+
+==================================
+Type queries of a value named abstract
+==================================
+
+const abstract = 0;
+f<typeof abstract>(0);
+f<typeof abstract.value>(0);
+f<typeof holder.abstract>(0);
+tag<typeof abstract>`hello`;
+type T = (typeof abstract);
+type Q = (typeof abstract.value);
+type I = typeof abstract<number>;
+type L = typeof abstract["value"];
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (number)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (identifier)))
+      (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (member_expression
+            (identifier)
+            (property_identifier))))
+      (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (member_expression
+            (identifier)
+            (property_identifier))))
+      (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_query
+          (identifier)))
+      (template_string
+        (string_fragment))))
+  (type_alias_declaration
+    (type_identifier)
+    (parenthesized_type
+      (type_query
+        (identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (parenthesized_type
+      (type_query
+        (member_expression
+          (identifier)
+          (property_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (type_query
+      (instantiation_expression
+        (identifier)
+        (type_arguments
+          (predefined_type)))))
+  (type_alias_declaration
+    (type_identifier)
+    (lookup_type
+      (type_query
+        (identifier))
+      (literal_type
+        (string
+          (string_fragment))))))
