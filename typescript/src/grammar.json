@@ -10429,17 +10429,8 @@
           }
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "."
-            },
-            {
-              "type": "STRING",
-              "value": "?."
-            }
-          ]
+          "type": "STRING",
+          "value": "."
         },
         {
           "type": "FIELD",
@@ -10520,18 +10511,6 @@
               }
             ]
           }
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "?."
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
         },
         {
           "type": "STRING",
@@ -12060,11 +12039,6 @@
     [
       "_type_query_instantiation_expression",
       "primary_expression"
-    ],
-    [
-      "primary_expression",
-      "_type_query_member_expression",
-      "_type_query_subscript_expression"
     ],
     [
       "primary_expression",

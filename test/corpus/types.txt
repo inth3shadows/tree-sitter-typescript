@@ -2828,3 +2828,165 @@ namespace RuntimeProperties {
                   (property_identifier))))
             (parenthesized_expression
               (identifier))))))))
+
+==================================
+Optional typeof operands stay runtime expressions
+==================================
+
+namespace RuntimeOptional {
+  declare const abstract: { abstract: { value: number } } | undefined;
+  declare const f: string, x: any;
+  f < typeof abstract?.abstract > (x);
+  f < typeof abstract?.abstract.value > (x);
+  f < typeof abstract?.["abstract"] > (x);
+  f < typeof abstract?.abstract["value"] > (x);
+}
+namespace RuntimeOptionalNested {
+  declare const abstract: { abstract: { value: number } | undefined };
+  declare const f: string, x: any;
+  f < typeof abstract.abstract?.value > (x);
+  f < typeof abstract.abstract?.["value"] > (x);
+}
+
+---
+
+(program
+  (expression_statement
+    (internal_module
+      (identifier)
+      (statement_block
+        (ambient_declaration
+          (lexical_declaration
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (union_type
+                  (object_type
+                    (property_signature
+                      (property_identifier)
+                      (type_annotation
+                        (object_type
+                          (property_signature
+                            (property_identifier)
+                            (type_annotation
+                              (predefined_type)))))))
+                  (literal_type
+                    (undefined)))))))
+        (ambient_declaration
+          (lexical_declaration
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (member_expression
+                  (identifier)
+                  (optional_chain)
+                  (property_identifier))))
+            (parenthesized_expression
+              (identifier))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (member_expression
+                  (member_expression
+                    (identifier)
+                    (optional_chain)
+                    (property_identifier))
+                  (property_identifier))))
+            (parenthesized_expression
+              (identifier))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (subscript_expression
+                  (identifier)
+                  (optional_chain)
+                  (string
+                    (string_fragment)))))
+            (parenthesized_expression
+              (identifier))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (subscript_expression
+                  (member_expression
+                    (identifier)
+                    (optional_chain)
+                    (property_identifier))
+                  (string
+                    (string_fragment)))))
+            (parenthesized_expression
+              (identifier)))))))
+  (expression_statement
+    (internal_module
+      (identifier)
+      (statement_block
+        (ambient_declaration
+          (lexical_declaration
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (object_type
+                  (property_signature
+                    (property_identifier)
+                    (type_annotation
+                      (union_type
+                        (object_type
+                          (property_signature
+                            (property_identifier)
+                            (type_annotation
+                              (predefined_type))))
+                        (literal_type
+                          (undefined))))))))))
+        (ambient_declaration
+          (lexical_declaration
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))
+            (variable_declarator
+              (identifier)
+              (type_annotation
+                (predefined_type)))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (member_expression
+                  (member_expression
+                    (identifier)
+                    (property_identifier))
+                  (optional_chain)
+                  (property_identifier))))
+            (parenthesized_expression
+              (identifier))))
+        (expression_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (subscript_expression
+                  (member_expression
+                    (identifier)
+                    (property_identifier))
+                  (optional_chain)
+                  (string
+                    (string_fragment)))))
+            (parenthesized_expression
+              (identifier))))))))

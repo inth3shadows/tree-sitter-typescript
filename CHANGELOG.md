@@ -10,7 +10,7 @@ because editor queries match on node names.
 - A value named `abstract` stays an identifier in type queries: `f<typeof abstract>(x)`,
   typed tags, qualified queries such as `typeof abstract.value`, and parenthesized
   `(typeof abstract)` types retain their type interpretation instead of becoming comparisons
-  or errors. Runtime `typeof` calls and indexed property expressions keep their comparison
+  or errors. Runtime `typeof` calls, optional chains and indexed property expressions keep their comparison
   interpretation when they are not valid type-query operands. Existing `abstract` member
   names and modifiers continue to parse.
 - A class, interface or object-type member may be named `accessor`, including fields,

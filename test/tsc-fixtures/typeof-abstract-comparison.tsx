@@ -11,3 +11,18 @@ namespace RuntimeProperties {
   declare const f: any, x: any;
   f < typeof abstract["abstract"].abstract > (x);
 }
+
+namespace RuntimeOptional {
+  declare const abstract: { abstract: { value: number } } | undefined;
+  declare const f: string, x: any;
+  f < typeof abstract?.abstract > (x);
+  f < typeof abstract?.abstract.value > (x);
+  f < typeof abstract?.["abstract"] > (x);
+  f < typeof abstract?.abstract["value"] > (x);
+}
+namespace RuntimeOptionalNested {
+  declare const abstract: { abstract: { value: number } | undefined };
+  declare const f: string, x: any;
+  f < typeof abstract.abstract?.value > (x);
+  f < typeof abstract.abstract?.["value"] > (x);
+}
