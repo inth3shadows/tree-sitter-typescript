@@ -170,8 +170,8 @@ module.exports = function defineGrammar(dialect) {
           seq(optional('static'), optional($.override_modifier), optional('readonly')),
           seq(optional('abstract'), optional('readonly')),
           seq(optional('readonly'), optional('abstract')),
-          optional('accessor'),
         ),
+        optional('accessor'),
         field('name', $._property_name),
         optional(choice('?', '!')),
         field('type', optional($.type_annotation)),
@@ -1175,6 +1175,7 @@ module.exports = function defineGrammar(dialect) {
 
       _reserved_identifier: (_, previous) => choice(
         'abstract',
+        'accessor',
         'declare',
         'namespace',
         'type',

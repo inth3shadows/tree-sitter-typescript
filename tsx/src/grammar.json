@@ -7245,6 +7245,10 @@
         },
         {
           "type": "STRING",
+          "value": "accessor"
+        },
+        {
+          "type": "STRING",
           "value": "declare"
         },
         {
@@ -7529,18 +7533,18 @@
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "accessor"
             },
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "accessor"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
+              "type": "BLANK"
             }
           ]
         },

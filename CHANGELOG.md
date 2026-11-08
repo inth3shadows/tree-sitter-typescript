@@ -7,6 +7,11 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A class, interface or object-type member may be named `accessor`, including fields,
+  methods and optional members (upstream #369). Auto-accessor fields also parse after
+  `static`, `override` or `abstract`, including static private names. A bare `accessor`
+  followed by a line break before an ordinary field or method stays a separate field;
+  a signature on the next line still belongs to a method named `accessor`.
 - A class, interface or object-type member named `abstract` parses: `abstract?: boolean`,
   `abstract(): void`, `abstract = 1` (upstream #377). `abstract` is also an ordinary identifier in
   expressions (`abstract = 5`, `abstract()`). A bare `abstract` followed by a line break now ends the
@@ -51,6 +56,8 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- The regenerated TSX `node-types.json` reorders the named numeric literal and the
+  anonymous `number` type token; their definitions are unchanged.
 - In the tree, `unique symbol` is now one anonymous token under `predefined_type` (it was
   `unique` then `symbol`); node-types.json is unchanged.
 - New `variance` node inside `type_parameter`, holding the `in` / `out` keywords (marionebl).
