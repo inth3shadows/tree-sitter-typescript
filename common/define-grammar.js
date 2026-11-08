@@ -67,18 +67,12 @@ module.exports = function defineGrammar(dialect) {
       [$.tuple_type, $.array_type, $.pattern, $.type],
       [$.readonly_type, $.pattern],
       [$.readonly_type, $.primary_expression],
-      [$.type_query, $.subscript_expression, $.expression],
+      [$.subscript_expression, $.expression],
       [$.type_query, $._type_query_subscript_expression],
       [$.nested_type_identifier, $.generic_type, $.primary_type, $.lookup_type, $.index_type_query, $.type],
       [$.as_expression, $.satisfies_expression, $.primary_type],
-      [$._type_query_member_expression, $.member_expression],
       [$.member_expression, $._type_query_member_expression_in_type_annotation],
-      [$._type_query_member_expression, $.primary_expression],
-      [$._type_query_subscript_expression, $.subscript_expression],
-      [$._type_query_subscript_expression, $.primary_expression],
       [$._type_query_call_expression, $.primary_expression],
-      [$._type_query_instantiation_expression, $.primary_expression],
-      [$.type_query, $.primary_expression],
       [$.override_modifier, $.primary_expression],
       [$.decorator_call_expression, $.decorator],
       [$.literal_type, $.pattern],
@@ -118,6 +112,13 @@ module.exports = function defineGrammar(dialect) {
       [$.primary_expression, $.primary_type],
       [$.primary_expression, $.generic_type],
       [$.primary_expression, $.predefined_type],
+      // `typeof name["x"]` can be a lookup type or a runtime operand of
+      // comparisons; a following `.property` rules out the type branch.
+      [$.type_query, $.primary_expression],
+      [$._type_query_member_expression, $.type_query],
+      [$._type_query_instantiation_expression, $.type_query],
+      [$._type_query_member_expression, $.primary_expression],
+      [$._type_query_instantiation_expression, $.primary_expression],
       [$.primary_expression, $.pattern, $.primary_type],
       [$._parameter_name, $.primary_type],
       [$.pattern, $.primary_type],
@@ -156,6 +157,7 @@ module.exports = function defineGrammar(dialect) {
       ].includes(rule.name))
       .concat([
         $._type_identifier,
+        $._type_query_identifier,
         $._jsx_start_opening_element,
       ]),
 
@@ -758,6 +760,7 @@ module.exports = function defineGrammar(dialect) {
         field('property', choice(
           $.private_property_identifier,
           alias($.identifier, $.property_identifier),
+          alias('abstract', $.property_identifier),
         )),
       ),
       _type_query_call_expression_in_type_annotation: $ => seq(
@@ -926,18 +929,25 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       // Type query expressions are more restrictive than regular expressions
+      // `abstract` is also an expression keyword token. Keep the identifier
+      // interpretation in competing type parses such as f<typeof abstract>(x).
+      _type_query_identifier: $ => choice(
+        $.identifier,
+        alias('abstract', $.identifier),
+      ),
+
       _type_query_member_expression: $ => seq(
         field('object', choice(
-          $.identifier,
+          $._type_query_identifier,
           $.this,
-          alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
           alias($._type_query_call_expression, $.call_expression),
         )),
-        choice('.', '?.'),
+        '.',
         field('property', choice(
           $.private_property_identifier,
           alias($.identifier, $.property_identifier),
+          alias('abstract', $.property_identifier),
         )),
       ),
       _type_query_subscript_expression: $ => seq(
@@ -948,38 +958,33 @@ module.exports = function defineGrammar(dialect) {
           alias($._type_query_member_expression, $.member_expression),
           alias($._type_query_call_expression, $.call_expression),
         )),
-        optional('?.'),
         '[', field('index', choice($.predefined_type, $.string, $.number)), ']',
       ),
       _type_query_call_expression: $ => seq(
-        field('function', choice(
-          $.import,
-          $.identifier,
-          alias($._type_query_member_expression, $.member_expression),
-          alias($._type_query_subscript_expression, $.subscript_expression),
-        )),
+        // Only import calls belong in a type query. Other calls must keep
+        // their runtime-expression branch, e.g. f < typeof abstract(x) > (x).
+        field('function', $.import),
         field('arguments', $.arguments),
       ),
       _type_query_instantiation_expression: $ => seq(
         field('function', choice(
           $.import,
-          $.identifier,
+          $._type_query_identifier,
           alias($._type_query_member_expression, $.member_expression),
-          alias($._type_query_subscript_expression, $.subscript_expression),
         )),
         field('type_arguments', $.type_arguments),
       ),
-      type_query: $ => prec.right(seq(
+      type_query: $ => seq(
         'typeof',
         choice(
           alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
           alias($._type_query_call_expression, $.call_expression),
           alias($._type_query_instantiation_expression, $.instantiation_expression),
-          $.identifier,
+          $._type_query_identifier,
           $.this,
         ),
-      )),
+      ),
 
       index_type_query: $ => seq(
         'keyof',
