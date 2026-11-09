@@ -1,0 +1,94 @@
+==========================
+Bare ampersands in JSX text
+:language(tsx)
+==========================
+
+<div>Privacy & Data</div>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element (identifier))
+      (jsx_text)
+      (jsx_text)
+      (jsx_text)
+      (jsx_closing_element (identifier)))))
+
+==================================
+Bare ampersands in JSX attributes
+:language(tsx)
+==================================
+
+<a href="https://example.test/?a=1&b=2" title='&' />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      (identifier)
+      (jsx_attribute
+        (property_identifier)
+        (string (string_fragment) (string_fragment) (string_fragment)))
+      (jsx_attribute
+        (property_identifier)
+        (string (string_fragment))))))
+
+==========================================
+Comment markers inside JSX attribute strings
+:language(tsx)
+==========================================
+
+<a first="&&amp;//&#38;" second='&&amp;/*&#38;*/' />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      (identifier)
+      (jsx_attribute
+        (property_identifier)
+        (string
+          (string_fragment)
+          (html_character_reference)
+          (string_fragment)
+          (html_character_reference)))
+      (jsx_attribute
+        (property_identifier)
+        (string
+          (string_fragment)
+          (html_character_reference)
+          (string_fragment)
+          (html_character_reference)
+          (string_fragment))))))
+
+==========================================
+HTML comment markers inside JSX attribute strings
+:language(tsx)
+==========================================
+
+<a first="&&amp;-->&#38;" second='&&amp;<!--&#38;' />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      (identifier)
+      (jsx_attribute
+        (property_identifier)
+        (string
+          (string_fragment)
+          (html_character_reference)
+          (string_fragment)
+          (html_character_reference)))
+      (jsx_attribute
+        (property_identifier)
+        (string
+          (string_fragment)
+          (html_character_reference)
+          (string_fragment)
+          (html_character_reference))))))
