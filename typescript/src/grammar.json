@@ -3170,8 +3170,13 @@
                     "value": "string_fragment"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "html_character_reference"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_jsx_character_reference"
+                    },
+                    "named": true,
+                    "value": "html_character_reference"
                   },
                   {
                     "type": "ALIAS",
@@ -3189,8 +3194,11 @@
               }
             },
             {
-              "type": "STRING",
-              "value": "\""
+              "type": "IMMEDIATE_TOKEN",
+              "content": {
+                "type": "STRING",
+                "value": "\""
+              }
             }
           ]
         },
@@ -3216,8 +3224,13 @@
                     "value": "string_fragment"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "html_character_reference"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_jsx_character_reference"
+                    },
+                    "named": true,
+                    "value": "html_character_reference"
                   },
                   {
                     "type": "ALIAS",
@@ -3235,8 +3248,11 @@
               }
             },
             {
-              "type": "STRING",
-              "value": "'"
+              "type": "IMMEDIATE_TOKEN",
+              "content": {
+                "type": "STRING",
+                "value": "'"
+              }
             }
           ]
         }
@@ -3249,7 +3265,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "([^\"&]|&[^#A-Za-z\"&])+"
+          "value": "[^\"&]+"
         }
       }
     },
@@ -3260,7 +3276,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "([^'&]|&[^#A-Za-z'&])+"
+          "value": "[^'&]+"
         }
       }
     },
@@ -7776,6 +7792,13 @@
           ]
         }
       ]
+    },
+    "_jsx_character_reference": {
+      "type": "IMMEDIATE_TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "&(#([xX][0-9a-fA-F]{1,6}|[0-9]{1,5})|[A-Za-z]{1,30});"
+      }
     },
     "_import_identifier": {
       "type": "CHOICE",

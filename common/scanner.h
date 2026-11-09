@@ -15,6 +15,8 @@ enum TokenType {
     ERROR_RECOVERY,
     MEMBER_SIGNATURE_MARKER,
     MEMBER_END_MARKER,
+    // TSX-only, never produced: quoted JSX must not scan HTML comments.
+    JSX_STRING_MARKER,
 };
 
 static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }

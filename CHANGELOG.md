@@ -11,8 +11,12 @@ because editor queries match on node names.
   query parameters and a trailing ampersand. Complete named and numeric character
   references retain their existing nodes; ordinary strings and operators are unchanged.
   Literal ampersands use the existing `jsx_text` and `string_fragment` node kinds;
-  mixed literal/entity runs can have finer fragment boundaries and different leading
-  whitespace in entity spans, without losing text or character references.
+  quoted literals split before every ampersand, and spaces between entities remain
+  string fragments rather than leading trivia in entity spans. No text or reference is lost.
+  Quoted JSX content is tokenized without JavaScript comment extras, so `//` and
+  `/* ... */`, `<!--` and `-->` after an entity remain literal attribute text and
+  cannot hide a quote. A TSX-only scanner marker keeps HTML comment scanning outside
+  quoted attributes.
 - A value named `abstract` stays an identifier in type queries: `f<typeof abstract>(x)`,
   typed tags, qualified queries such as `typeof abstract.value`, and parenthesized
   `(typeof abstract)` types retain their type interpretation instead of becoming comparisons

@@ -27,7 +27,7 @@ module.exports = function defineGrammar(dialect) {
       // ends, so the scanner knows a member named `in` may start on the next
       // line (and not in a `for (var k\n in o)` header, where `in` is the operator).
       $._member_end_marker,
-    ]),
+    ], dialect === 'tsx' ? [$._jsx_string_marker] : []),
 
     supertypes: ($, previous) => previous.concat([
       $.type,
@@ -323,27 +323,34 @@ module.exports = function defineGrammar(dialect) {
         seq(
           '"',
           repeat(choice(
+            ...(dialect === 'tsx' ? [$._jsx_string_marker] : []),
             alias($.unescaped_double_jsx_string_fragment, $.string_fragment),
-            $.html_character_reference,
+            alias($._jsx_character_reference, $.html_character_reference),
             alias(token.immediate('&'), $.string_fragment),
           )),
-          '"',
+          token.immediate('"'),
         ),
         seq(
           '\'',
           repeat(choice(
+            ...(dialect === 'tsx' ? [$._jsx_string_marker] : []),
             alias($.unescaped_single_jsx_string_fragment, $.string_fragment),
-            $.html_character_reference,
+            alias($._jsx_character_reference, $.html_character_reference),
             alias(token.immediate('&'), $.string_fragment),
           )),
-          '\'',
+          token.immediate('\''),
         ),
       ),
 
-      // Keep existing literal fragments, but never swallow the closing quote
-      // or the next '&', which could begin a complete character reference.
-      unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /([^"&]|&[^#A-Za-z"&])+/)),
-      unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /([^'&]|&[^#A-Za-z'&])+/)),
+      // Match the inherited entity pattern, but make every quoted-string
+      // content token and the closing quote immediate, so JavaScript comment
+      // extras cannot run anywhere inside the attribute value.
+      _jsx_character_reference: _ => token.immediate(/&(#([xX][0-9a-fA-F]{1,6}|[0-9]{1,5})|[A-Za-z]{1,30});/),
+
+      // End fragments before every ampersand. Looking one character past '&'
+      // can let a longer comment token win after that speculative match fails.
+      unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /[^"&]+/)),
+      unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /[^'&]+/)),
 
       export_specifier: (_, previous) => seq(
         optional(choice('type', 'typeof')),

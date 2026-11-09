@@ -27,6 +27,12 @@ const jsxAmpersandAttributes = [
   <a title="A & B" />,
   <a title="&amp; &#38; &#x26;" />,
   <a title="&&amp;" />,
+  <a title="&&amp;//&#38;" />,
+  <a title='&&amp;/*&#38;*/' />,
+  <a title="&amp;//&#38;" />,
+  <a title='&amp;/*&#38;*/' />,
+  <a title="&&amp;-->&#38;" />,
+  <a title='&&amp;<!--&#38;' />,
 ];
 const jsxAmpersandOperators = jsxAmpersandLeft & jsxAmpersandRight;
 const jsxAmpersandString = "A & B &amp;";
