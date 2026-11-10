@@ -29,10 +29,24 @@ const cases = [
   ['typeof as "s"', false, 'typeof', '"s"', 'e'],
 ];
 
-const statement = {
-  i: (spec) => `import { ${spec} } from './a';`,
-  e: (spec) => `export { ${spec} } from './a';`,
+// Each case also runs inside a type-only clause (`import type { ... }`,
+// `export type { ... }`); the specifier reading must not change there.
+const statements = {
+  i: [(spec) => `import { ${spec} } from './a';`, (spec) => `import type { ${spec} } from './a';`],
+  e: [(spec) => `export { ${spec} } from './a';`, (spec) => `export type { ${spec} } from './a';`],
 };
+const statement = { i: statements.i[0], e: statements.e[0] };
+
+// Flow's `typeof` modifier: tsc rejects these, but they parsed before #31
+// and must keep the modifier reading. [specifier, name, alias, kinds]
+const flowTypeofCases = [
+  ['typeof x', 'x', null, 'ie'],
+  ['typeof x as y', 'x', 'y', 'ie'],
+  ['typeof as', 'as', null, 'ie'],
+  ['typeof as as x', 'as', 'x', 'ie'],
+  ['typeof as as as', 'as', 'as', 'ie'],
+  ['typeof as as type', 'as', 'type', 'ie'],
+];
 const nodeType = { i: 'import_specifier', e: 'export_specifier' };
 
 for (const [dialect, language] of [['typescript', require('./typescript')], ['tsx', require('./tsx')]]) {
@@ -40,9 +54,10 @@ for (const [dialect, language] of [['typescript', require('./typescript')], ['ts
   parser.setLanguage(language);
 
   for (const [spec, typeOnly, name, alias, kinds] of cases) {
-    for (const kind of kinds) {
-      const source = statement[kind](spec);
-      test(`${dialect}: ${source}`, () => {
+    for (const source of [...kinds].flatMap((kind) => statements[kind].map((make) => [kind, make(spec)]))) {
+      const [kind, text] = source;
+      test(`${dialect}: ${text}`, () => {
+        const source = text;
         const tree = parser.parse(source);
         assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
         const specifiers = tree.rootNode.descendantsOfType(nodeType[kind]);
@@ -67,12 +82,23 @@ for (const [dialect, language] of [['typescript', require('./typescript')], ['ts
     });
   }
 
-  test(`${dialect}: Flow-style typeof modifier still parses`, () => {
-    for (const source of ["import { typeof x } from './a';", "import { typeof x as y } from './a';"]) {
-      const tree = parser.parse(source);
-      assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
-      assert.equal(tree.rootNode.descendantsOfType('import_specifier')[0].child(0).type, 'typeof');
+  for (const [spec, name, alias, kinds] of flowTypeofCases) {
+    for (const kind of kinds) {
+      const source = statement[kind](spec);
+      test(`${dialect}: Flow typeof modifier: ${source}`, () => {
+        const tree = parser.parse(source);
+        assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
+        const node = tree.rootNode.descendantsOfType(nodeType[kind])[0];
+        assert.equal(node.child(0).type, 'typeof');
+        assert.equal(node.childForFieldName('name').text, name);
+        assert.equal(node.childForFieldName('alias')?.text ?? null, alias);
+      });
     }
+  }
+
+  test(`${dialect}: an import cannot bind the reserved word typeof`, () => {
+    const tree = parser.parse("import { typeof } from './a';");
+    assert.equal(tree.rootNode.hasError, true, tree.rootNode.toString());
   });
 
   test(`${dialect}: local export of a binding named type`, () => {

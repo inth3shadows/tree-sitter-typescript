@@ -359,18 +359,8 @@ module.exports = function defineGrammar(dialect) {
 
       _import_identifier: $ => choice($.identifier, alias('type', $.identifier)),
 
-      import_specifier: $ => choice(
-        seq(
-          optional(choice('type', 'typeof')),
-          choice(
-            field('name', $.identifier),
-            seq(
-              field('name', $._module_export_name),
-              'as',
-              field('alias', $._import_identifier),
-            ),
-          ),
-        ),
+      import_specifier: ($, previous) => choice(
+        seq(optional(choice('type', 'typeof')), previous),
         ...keywordSpecifiers($, $.identifier, true),
       ),
 
@@ -1243,8 +1233,10 @@ module.exports = function defineGrammar(dialect) {
  * `typeof`, read as tsc's parseImportOrExportSpecifier reads them:
  * `{ type }`, `{ type as x }` and `{ type as as }` name `type`; `{ type as }`
  * and `{ type as as x }` are type-only specifiers of `as`; `{ typeof as x }`
- * names `typeof` (and `{ typeof }` too, for exports). After these keywords
- * `as` lexes as the keyword, so every such name is an aliased keyword token.
+ * names `typeof` (and `{ typeof }` too, for exports). Flow's `typeof`
+ * modifier mirrors `type`: `{ typeof as }` and `{ typeof as as x }` keep it on
+ * a name `as`. After these keywords `as` lexes as the keyword, so every such
+ * name is an aliased keyword token.
  * Specifiers with an ordinary first name stay in the caller's own rule.
  *
  * @param {GrammarSymbols<string>} $
@@ -1261,6 +1253,7 @@ function keywordSpecifiers($, aliasName, isImport) {
     seq(field('name', typeName), optional(aliasTail)),
     seq('type', field('name', asName), optional(aliasTail)),
     seq(field('name', typeofName), isImport ? aliasTail : optional(aliasTail)),
+    seq('typeof', field('name', asName), optional(aliasTail)),
   ];
 }
 
