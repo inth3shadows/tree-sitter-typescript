@@ -15,6 +15,8 @@ enum TokenType {
     ERROR_RECOVERY,
     MEMBER_SIGNATURE_MARKER,
     MEMBER_END_MARKER,
+    NO_ASI_MARKER,
+    FROM_MARKER,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -188,6 +190,27 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     if (!scan_whitespace_and_comments(lexer, scanned_comment)) {
         return false;
+    }
+
+    // NO_ASI_MARKER is never produced; the grammar makes it valid right after a
+    // keyword that tsc continues across a line break (`let`, `new`, `export`,
+    // `static`, `get`, `set`): `let\nx = 1` is one declaration. A `}` or EOF still
+    // ends a statement that used the word as a name.
+    if (valid_symbols[NO_ASI_MARKER] && lexer->lookahead != '}' && lexer->lookahead != 0) {
+        return false;
+    }
+
+    // FROM_MARKER is never produced; it is valid right after an export clause,
+    // where `export { a }\nfrom "m"` continues with the from clause.
+    if (valid_symbols[FROM_MARKER] && lexer->lookahead == 'f') {
+        *scanned_comment = true;
+        for (unsigned i = 0; i < 4; i++) {
+            if (lexer->lookahead != "from"[i]) {
+                return true;
+            }
+            skip(lexer);
+        }
+        return iswalnum(lexer->lookahead) || lexer->lookahead == '_' || lexer->lookahead == '$';
     }
 
     switch (lexer->lookahead) {

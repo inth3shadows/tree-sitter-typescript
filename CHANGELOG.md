@@ -7,6 +7,11 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A line break after `let`, `new`, `export`, `static`, `get` or `set`, or before `from`
+  after an export clause, no longer ends the statement or member: tsc reads
+  `let⏎x = 1`, `new⏎Foo()`, `export⏎const x = 1`, `export { a }⏎from "m"` and
+  `static⏎x` as one construct (#26). Node types are unchanged; the parse table grows
+  about 10%.
 - Export specifiers may name `type` (upstream #313): `export { type }`,
   `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
   a name `type`, while `export { type as }` and `export { type as as x }` are type-only

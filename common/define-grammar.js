@@ -27,6 +27,12 @@ module.exports = function defineGrammar(dialect) {
       // ends, so the scanner knows a member named `in` may start on the next
       // line (and not in a `for (var k\n in o)` header, where `in` is the operator).
       $._member_end_marker,
+      // never produced. Valid right after `let`, `new`, `export`, `static`, `get`
+      // and `set`, where tsc continues the construct across a line break.
+      $._no_asi_marker,
+      // never produced. Valid right after an export clause, so the scanner lets
+      // `from` on the next line continue the statement.
+      $._from_marker,
     ], dialect === 'tsx' ? [$._jsx_string_marker] : []),
 
     supertypes: ($, previous) => previous.concat([
@@ -176,7 +182,7 @@ module.exports = function defineGrammar(dialect) {
           seq($.accessibility_modifier, optional('declare')),
         )),
         choice(
-          seq(optional('static'), optional($.override_modifier), optional('readonly')),
+          seq(optional(seq('static', optional($._no_asi_marker))), optional($.override_modifier), optional('readonly')),
           seq(optional('abstract'), optional('readonly')),
           seq(optional('readonly'), optional('abstract')),
         ),
@@ -236,6 +242,7 @@ module.exports = function defineGrammar(dialect) {
 
       new_expression: $ => prec.right('new', seq(
         'new',
+        optional($._no_asi_marker),
         field('constructor', $.primary_expression),
         field('type_arguments', optional($.type_arguments)),
         field('arguments', optional($.arguments)),
@@ -387,13 +394,43 @@ module.exports = function defineGrammar(dialect) {
         $._semicolon,
       ),
 
-      export_statement: ($, previous) => choice(
-        previous,
+      // The JavaScript rule, with markers so a line break after `export` or before
+      // `from` does not end the statement (tsc reads both as one statement).
+      export_statement: $ => choice(
+        seq(
+          'export',
+          optional($._no_asi_marker),
+          choice(
+            seq('*', $._from_clause),
+            seq($.namespace_export, $._from_clause),
+            seq($.export_clause, $._from_clause),
+            seq($.export_clause, optional($._from_marker)),
+          ),
+          $._semicolon,
+        ),
+        seq(
+          repeat(field('decorator', $.decorator)),
+          'export',
+          optional($._no_asi_marker),
+          choice(
+            field('declaration', $.declaration),
+            seq(
+              'default',
+              choice(
+                field('declaration', $.declaration),
+                seq(
+                  field('value', $.expression),
+                  $._semicolon,
+                ),
+              ),
+            ),
+          ),
+        ),
         seq(
           'export',
           'type',
           $.export_clause,
-          optional($._from_clause),
+          choice($._from_clause, optional($._from_marker)),
           $._semicolon,
         ),
         seq(
@@ -417,6 +454,13 @@ module.exports = function defineGrammar(dialect) {
       non_null_expression: $ => prec.left('unary', seq(
         $.expression, '!',
       )),
+
+      lexical_declaration: $ => seq(
+        field('kind', choice('let', 'const')),
+        optional($._no_asi_marker),
+        commaSep1($.variable_declarator),
+        $._semicolon,
+      ),
 
       variable_declarator: $ => choice(
         seq(
@@ -1275,11 +1319,11 @@ function keywordName($, word) {
 function methodSignature($, name) {
   return seq(
     optional($.accessibility_modifier),
-    optional('static'),
+    optional(seq('static', optional($._no_asi_marker))),
     optional($.override_modifier),
     optional('readonly'),
     optional('async'),
-    optional(choice('get', 'set', '*')),
+    optional(choice(seq(choice('get', 'set'), optional($._no_asi_marker)), '*')),
     field('name', name),
     optional('?'),
     optional($._member_signature_marker),

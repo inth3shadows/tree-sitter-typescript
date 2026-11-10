@@ -785,3 +785,59 @@ type T = `\u`;
     name: (type_identifier)
     value: (template_literal_type
       (escape_sequence))))
+
+==================================================
+No ASI after keywords that continue across a line break
+==================================================
+
+let
+a = 1
+const b = new
+Foo()
+export
+const c = 1
+export { a }
+from "m"
+class C {
+  static
+  d = 1
+  get
+  e() { return 1 }
+}
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (number)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (new_expression
+        (identifier)
+        (arguments))))
+  (export_statement
+    (lexical_declaration
+      (variable_declarator
+        (identifier)
+        (number))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment)))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (return_statement
+            (number)))))))
