@@ -2,6 +2,8 @@
 
 # Keep the CRLF line continuation in these fixtures byte-exact.
 test/tsc-fixtures/tagged-template-invalid-escape.* -text
+# Raw lone CR and U+2028/U+2029 line terminators; keep them byte-exact.
+test/corpus/line-terminators.txt -text
 
 # Generated source files
 typescript/src/*.json linguist-generated

@@ -980,8 +980,6 @@ let t = a /* x
  */ ? b : c
 let /* x
  */ u = 1
-mn
-p q
 
 ---
 
@@ -1050,12 +1048,4 @@ p q
     (comment)
     (variable_declarator
       (identifier)
-      (number)))
-  (expression_statement
-    (identifier))
-  (expression_statement
-    (identifier))
-  (expression_statement
-    (identifier))
-  (expression_statement
-    (identifier)))
+      (number))))

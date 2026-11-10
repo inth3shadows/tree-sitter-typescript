@@ -1,0 +1,35 @@
+==================================================
+A lone CR, U+2028 or U+2029 ends a line for ASI
+==================================================
+
+mn
+p q
+r s
+t /* x */ u
+v /* x  */ w
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (comment)
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (comment)
+  (expression_statement
+    (identifier)))
