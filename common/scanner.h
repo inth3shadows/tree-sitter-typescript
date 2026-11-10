@@ -294,10 +294,11 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     // `new\nFoo()`, `export\nconst x = 1`: always one construct. In an object type
     // `export` may also be a member name (`export\n default: T` is two members), and
-    // there MEMBER_SIGNATURE_MARKER is valid too, so the usual rules apply. This relies
-    // on MEMBER_SIGNATURE_MARKER never being valid right after a statement-level
-    // `export` or `new` (see object_type in define-grammar.js).
-    if (valid_symbols[NO_ASI_MARKER] && !valid_symbols[MEMBER_SIGNATURE_MARKER] && !at_end) {
+    // there MEMBER_SIGNATURE_MARKER and MEMBER_END_MARKER are both valid, so the usual
+    // rules apply. Checking MEMBER_SIGNATURE_MARKER alone is not enough: the parse state
+    // after `new` in a bare block or arrow body is merged with one where it is valid
+    // (see object_type in define-grammar.js).
+    if (valid_symbols[NO_ASI_MARKER] && !(valid_symbols[MEMBER_SIGNATURE_MARKER] && valid_symbols[MEMBER_END_MARKER]) && !at_end) {
         return false;
     }
 
