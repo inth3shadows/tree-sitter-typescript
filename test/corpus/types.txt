@@ -585,6 +585,124 @@ export type { A, B, C as D } from 'mymodule';
       (string_fragment))))
 
 =======================================
+Import and export specifiers named type or typeof
+=======================================
+
+import { type } from './a';
+import { type as T } from './a';
+import { type as as } from './a';
+import { type as } from './a';
+import { type as as x } from './a';
+import { type as as as } from './a';
+import { type as as type } from './a';
+import { typeof as t } from './a';
+import { type, type as as, type x, y } from './a';
+export { typeof } from './a';
+export { typeof as t } from './a';
+export { typeof as "s" } from './a';
+
+---
+
+(program
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))))
+    source: (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier))
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))
+        (import_specifier
+          name: (identifier))
+        (import_specifier
+          name: (identifier))))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (string
+          (string_fragment))))
+    source: (string
+      (string_fragment))))
+
+=======================================
 Export specifiers named type
 =======================================
 
