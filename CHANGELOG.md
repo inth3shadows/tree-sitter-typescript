@@ -16,6 +16,8 @@ because editor queries match on node names.
   `import { type as as x }` are type-only imports of `as`. `typeof` may be a specifier
   name in both directions (`import { typeof as t }`, `export { typeof }`); the Flow-style
   `typeof x` modifier still parses. Both rules share one helper; node types are unchanged.
+  Like `import { x as default }`, an import may bind the reserved word `typeof`
+  (`import { typeof }`, `import { type typeof }`) without an error, although tsc rejects it.
 - TSX accepts literal ampersands in JSX text and quoted attributes, including URL
   query parameters and a trailing ampersand. Complete named and numeric character
   references retain their existing nodes; ordinary strings and operators are unchanged.

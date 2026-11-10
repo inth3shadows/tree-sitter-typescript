@@ -106,12 +106,28 @@ for (const [dialect, language] of [['typescript', require('./typescript')], ['ts
 
   // Known leniency, kept on purpose: tsc rejects an import that binds a
   // reserved word, but the grammar accepts it, as it does `x as default`.
-  test(`${dialect}: imports binding a reserved word are accepted`, () => {
-    for (const spec of ['typeof', 'type typeof', 'x as typeof', 'typeof as typeof', 'x as default']) {
-      const tree = parser.parse(`import { ${spec} } from './a';`);
+  // [specifier, typeOnly, name, alias]
+  const reservedBindings = [
+    ['typeof', false, 'typeof', null],
+    ['type typeof', true, 'typeof', null],
+    ['x as typeof', false, 'x', 'typeof'],
+    ['typeof as typeof', false, 'typeof', 'typeof'],
+    ['x as default', false, 'x', 'default'],
+  ];
+  for (const [spec, typeOnly, name, alias] of reservedBindings) {
+    const source = `import { ${spec} } from './a';`;
+    test(`${dialect}: accepted reserved-word binding: ${source}`, () => {
+      const tree = parser.parse(source);
       assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
-    }
-  });
+      const specifiers = tree.rootNode.descendantsOfType('import_specifier');
+      assert.equal(specifiers.length, 1);
+      const node = specifiers[0];
+      assert.equal(node.childForFieldName('name').text, name);
+      assert.equal(node.childForFieldName('alias')?.text ?? null, alias);
+      const first = node.child(0);
+      assert.equal(!first.isNamed && first.type === 'type', typeOnly);
+    });
+  }
 
   test(`${dialect}: local export of a binding named type`, () => {
     const tree = parser.parse('const type = 1;\nexport { type, type as default };');
