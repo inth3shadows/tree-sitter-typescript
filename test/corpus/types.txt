@@ -585,6 +585,96 @@ export type { A, B, C as D } from 'mymodule';
       (string_fragment))))
 
 =======================================
+Export specifiers named type
+=======================================
+
+export { type } from './a';
+export type { type } from './a';
+export { type as T } from './a';
+export { type as type } from './a';
+export { type as "s" } from './a';
+export { type as as } from './a';
+export { type as } from './a';
+export { type as as x } from './a';
+export { type as as as } from './a';
+export { type, type x, y } from './a';
+
+---
+
+(program
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (string
+          (string_fragment))))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier))
+      (export_specifier
+        name: (identifier))
+      (export_specifier
+        name: (identifier)))
+    source: (string
+      (string_fragment))))
+
+=======================================
 Flow Export Types
 =======================================
 

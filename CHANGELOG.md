@@ -7,6 +7,11 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- Export specifiers may name `type` (upstream #313): `export { type }`,
+  `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
+  a name `type`, while `export { type as }` and `export { type as as x }` are type-only
+  exports of `as`, matching tsc. The names keep the existing `identifier` node and the
+  `name`/`alias` fields; node types are unchanged.
 - TSX accepts literal ampersands in JSX text and quoted attributes, including URL
   query parameters and a trailing ampersand. Complete named and numeric character
   references retain their existing nodes; ordinary strings and operators are unchanged.
