@@ -10,6 +10,7 @@ on:
       - "*/src/**"
       - "bindings/**"
       - "binding.gyp"
+      - ".github/workflows/ci.yml"
   pull_request:
     paths:
       - "scripts.js"
@@ -18,6 +19,7 @@ on:
       - "*/src/**"
       - "bindings/**"
       - "binding.gyp"
+      - ".github/workflows/ci.yml"
 
 concurrency:
   group: ${{github.workflow}}-${{github.ref}}
@@ -30,10 +32,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Private burn-in: macOS runners are not available to this private repo, and
-        # windows-latest fails in node-gyp's Visual Studio detection. Restore both
-        # (windows-latest, macos-14) when the repo goes public.
-        os: [ubuntu-latest]
+        # windows-2022: node-gyp 11 does not detect the Visual Studio on windows-latest
+        # (Server 2025). macos-14 is no longer a supported runner label.
+        os: [ubuntu-latest, windows-2022, macos-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,4 +54,6 @@ jobs:
           test-node: true
           test-python: true
           test-go: true
-          test-swift: true
+          # The macos-latest image's Swift compiler rejects its own Xcode SDK ("this SDK
+          # is not supported by the compiler"); Swift still runs on Ubuntu and Windows.
+          test-swift: ${{ runner.os != 'macOS' }}
