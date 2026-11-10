@@ -597,7 +597,7 @@ export { type as as } from './a';
 export { type as } from './a';
 export { type as as x } from './a';
 export { type as as as } from './a';
-export { type, type type, x } from './a';
+export { type, type x, y } from './a';
 
 ---
 

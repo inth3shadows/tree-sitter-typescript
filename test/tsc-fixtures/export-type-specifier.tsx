@@ -16,3 +16,4 @@ declare module "m7" { export { type as as x } from "src"; }
 declare module "m8" { export { type as as as } from "src"; }
 declare module "m9" { export { type, type x } from "src"; }
 declare module "m10" { export type { type } from "src"; }
+declare module "m11" { export { type type, x } from "src"; }
