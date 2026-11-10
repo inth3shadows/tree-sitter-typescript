@@ -605,73 +605,73 @@ export { type, type type, x } from './a';
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)))
-    (string
+        name: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)))
-    (string
+        name: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)
-        (identifier)))
-    (string
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)
-        (identifier)))
-    (string
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)
-        (string
+        name: (identifier)
+        alias: (string
           (string_fragment))))
-    (string
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)
-        (identifier)))
-    (string
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)))
-    (string
+        name: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)
-        (identifier)))
-    (string
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier)
-        (identifier)))
-    (string
+        name: (identifier)
+        alias: (identifier)))
+    source: (string
       (string_fragment)))
   (export_statement
     (export_clause
       (export_specifier
-        (identifier))
+        name: (identifier))
       (export_specifier
-        (identifier))
+        name: (identifier))
       (export_specifier
-        (identifier)))
-    (string
+        name: (identifier)))
+    source: (string
       (string_fragment))))
 
 =======================================
