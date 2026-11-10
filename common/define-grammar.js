@@ -352,11 +352,11 @@ module.exports = function defineGrammar(dialect) {
       unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /[^"&]+/)),
       unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /[^'&]+/)),
 
-      export_specifier: ($, previous) => specifier($, previous, $._module_export_name, false),
+      export_specifier: ($, previous) => specifier($, previous, $._module_export_name),
 
       _import_identifier: $ => choice($.identifier, keywordName($, 'type')),
 
-      import_specifier: ($, previous) => specifier($, previous, $.identifier, true),
+      import_specifier: ($, previous) => specifier($, previous, $.identifier),
 
       import_attribute: $ => seq(choice('with', 'assert'), $.object),
 
@@ -815,12 +815,12 @@ module.exports = function defineGrammar(dialect) {
       // A tuple label may be a contextual keyword that also names a type:
       // [symbol: string], [string: number, number?: string].
       tuple_parameter: $ => seq(
-        field('name', choice($.identifier, ...TUPLE_LABEL_KEYWORDS.map((k) => alias(k, $.identifier)), $.rest_pattern)),
+        field('name', choice($.identifier, ...TUPLE_LABEL_KEYWORDS.map((k) => keywordName($, k)), $.rest_pattern)),
         field('type', $.type_annotation),
       ),
 
       optional_tuple_parameter: $ => seq(
-        field('name', choice($.identifier, ...TUPLE_LABEL_KEYWORDS.map((k) => alias(k, $.identifier)))),
+        field('name', choice($.identifier, ...TUPLE_LABEL_KEYWORDS.map((k) => keywordName($, k)))),
         '?',
         field('type', $.type_annotation),
       ),
@@ -957,7 +957,7 @@ module.exports = function defineGrammar(dialect) {
       // interpretation in competing type parses such as f<typeof abstract>(x).
       _type_query_identifier: $ => choice(
         $.identifier,
-        alias('abstract', $.identifier),
+        keywordName($, 'abstract'),
       ),
 
       _type_query_member_expression: $ => seq(
@@ -1223,11 +1223,12 @@ module.exports = function defineGrammar(dialect) {
 };
 
 /**
- * Import and export specifiers whose first word is the keyword `type` or
- * `typeof`, read as tsc's parseImportOrExportSpecifier reads them:
+ * The whole import or export specifier rule. Specifiers whose first word is
+ * the keyword `type` or `typeof` are read as tsc's
+ * parseImportOrExportSpecifier reads them:
  * `{ type }`, `{ type as x }` and `{ type as as }` name `type`; `{ type as }`
  * and `{ type as as x }` are type-only specifiers of `as`; `{ typeof as x }`
- * names `typeof` (and `{ typeof }` too, for exports). Flow's `typeof`
+ * and `{ typeof }` name `typeof`. Flow's `typeof`
  * modifier mirrors `type`: `{ typeof as }` and `{ typeof as as x }` keep it on
  * a name `as`. After these keywords `as` lexes as the keyword, so every such
  * name is an aliased keyword token.
@@ -1237,10 +1238,9 @@ module.exports = function defineGrammar(dialect) {
  * @param {GrammarSymbols<string>} $
  * @param {RuleOrLiteral} previous the JavaScript import/export specifier rule
  * @param {RuleOrLiteral} aliasName what may follow `as` besides `type`/`as`
- * @param {boolean} isImport an import binds its alias, so `typeof` needs one
  * @returns {ChoiceRule}
  */
-function specifier($, previous, aliasName, isImport) {
+function specifier($, previous, aliasName) {
   const typeName = keywordName($, 'type');
   const asName = keywordName($, 'as');
   const typeofName = keywordName($, 'typeof');
@@ -1249,7 +1249,7 @@ function specifier($, previous, aliasName, isImport) {
     seq(optional(choice('type', 'typeof')), previous),
     seq(field('name', typeName), optional(aliasTail)),
     seq('type', field('name', asName), optional(aliasTail)),
-    seq(field('name', typeofName), isImport ? aliasTail : optional(aliasTail)),
+    seq(field('name', typeofName), optional(aliasTail)),
     seq('typeof', field('name', asName), optional(aliasTail)),
   );
 }

@@ -20,11 +20,11 @@ const cases = [
   ['type x as type', true, 'x', 'type', 'ie'],
   ['type x as as', true, 'x', 'as', 'ie'],
   ['type "s" as x', true, '"s"', 'x', 'ie'],
-  ['type typeof', true, 'typeof', null, 'e'],
+  ['type typeof', true, 'typeof', null, 'e'], // imports: see the leniency test
   ['type typeof as x', true, 'typeof', 'x', 'ie'],
   ['x as type', false, 'x', 'type', 'ie'],
   ['as as as', false, 'as', 'as', 'ie'],
-  ['typeof', false, 'typeof', null, 'e'],
+  ['typeof', false, 'typeof', null, 'e'], // imports: see the leniency test
   ['typeof as x', false, 'typeof', 'x', 'ie'],
   ['typeof as as', false, 'typeof', 'as', 'ie'],
   ['typeof as type', false, 'typeof', 'type', 'ie'],
@@ -37,7 +37,6 @@ const statements = {
   i: [(spec) => `import { ${spec} } from './a';`, (spec) => `import type { ${spec} } from './a';`],
   e: [(spec) => `export { ${spec} } from './a';`, (spec) => `export type { ${spec} } from './a';`],
 };
-const statement = { i: statements.i[0], e: statements.e[0] };
 
 // Flow's `typeof` modifier: tsc rejects these, but they parsed before #31
 // and must keep the modifier reading in imports and exports, including
@@ -78,7 +77,7 @@ for (const [dialect, language] of [['typescript', require('./typescript')], ['ts
 
   for (const kind of 'ie') {
     test(`${dialect}: ${kind === 'i' ? 'import' : 'export'} keyword-named specifiers in a list`, () => {
-      const source = statement[kind]('type, type as as, type as, typeof as t, x');
+      const source = statements[kind][0]('type, type as as, type as, typeof as t, x');
       const tree = parser.parse(source);
       assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
       const names = tree.rootNode.descendantsOfType(nodeType[kind])
@@ -94,7 +93,9 @@ for (const [dialect, language] of [['typescript', require('./typescript')], ['ts
         test(`${dialect}: Flow typeof modifier: ${source}`, () => {
           const tree = parser.parse(source);
           assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
-          const node = tree.rootNode.descendantsOfType(nodeType[kind])[0];
+          const specifiers = tree.rootNode.descendantsOfType(nodeType[kind]);
+          assert.equal(specifiers.length, 1);
+          const node = specifiers[0];
           assert.equal(node.child(0).type, 'typeof');
           assert.equal(node.childForFieldName('name').text, name);
           assert.equal(node.childForFieldName('alias')?.text ?? null, alias);
@@ -103,9 +104,13 @@ for (const [dialect, language] of [['typescript', require('./typescript')], ['ts
     }
   }
 
-  test(`${dialect}: an import cannot bind the reserved word typeof`, () => {
-    const tree = parser.parse("import { typeof } from './a';");
-    assert.equal(tree.rootNode.hasError, true, tree.rootNode.toString());
+  // Known leniency, kept on purpose: tsc rejects an import that binds a
+  // reserved word, but the grammar accepts it, as it does `x as default`.
+  test(`${dialect}: imports binding a reserved word are accepted`, () => {
+    for (const spec of ['typeof', 'type typeof', 'x as typeof', 'typeof as typeof', 'x as default']) {
+      const tree = parser.parse(`import { ${spec} } from './a';`);
+      assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
+    }
   });
 
   test(`${dialect}: local export of a binding named type`, () => {
