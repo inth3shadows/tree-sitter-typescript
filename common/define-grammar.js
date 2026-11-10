@@ -352,10 +352,24 @@ module.exports = function defineGrammar(dialect) {
       unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /[^"&]+/)),
       unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /[^'&]+/)),
 
-      export_specifier: (_, previous) => seq(
-        optional(choice('type', 'typeof')),
-        previous,
-      ),
+      // A specifier that starts with `type` follows tsc's
+      // parseImportOrExportSpecifier: `{ type }`, `{ type as x }` and
+      // `{ type as as }` export a name `type`; `{ type as }` and
+      // `{ type as as x }` are type-only exports of `as`. After `type`, `as`
+      // lexes as the keyword, so both names are aliased keyword tokens.
+      export_specifier: ($, previous) => {
+        const typeName = alias('type', $.identifier);
+        const asName = alias('as', $.identifier);
+        const optionalAlias = optional(seq(
+          'as',
+          field('alias', choice($._module_export_name, typeName, asName)),
+        ));
+        return choice(
+          seq(optional(choice('type', 'typeof')), previous),
+          seq(field('name', typeName), optionalAlias),
+          seq('type', field('name', asName), optionalAlias),
+        );
+      },
 
       _import_identifier: $ => choice($.identifier, alias('type', $.identifier)),
 
