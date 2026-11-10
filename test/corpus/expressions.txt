@@ -841,3 +841,79 @@ class C {
         (statement_block
           (return_statement
             (number)))))))
+
+==================================================
+ASI still applies where tsc does not continue the keyword
+==================================================
+
+let
+if (x) {}
+export { a }
+fromage()
+class C {
+  static
+}
+class D {
+  static
+  @dec x
+}
+interface I {
+  export
+  default: number
+}
+f(() => {
+  get
+  x
+})
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments)))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (decorator
+          (identifier))
+        (property_identifier))))
+  (interface_declaration
+    (type_identifier)
+    (interface_body
+      (property_signature
+        (property_identifier))
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (identifier))
+            (expression_statement
+              (identifier))))))))
