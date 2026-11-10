@@ -843,6 +843,52 @@ class C {
             (number)))))))
 
 ==================================================
+No ASI after new or export inside blocks
+==================================================
+
+() => { new
+Foo() }
+{ new /*
+*/ Foo() }
+if (x) { new
+Foo() }
+{ export /*
+*/ const c = 1 }
+
+---
+
+(program
+  (expression_statement
+    (arrow_function
+      (formal_parameters)
+      (statement_block
+        (expression_statement
+          (new_expression
+            (identifier)
+            (arguments))))))
+  (statement_block
+    (expression_statement
+      (new_expression
+        (comment)
+        (identifier)
+        (arguments))))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block
+      (expression_statement
+        (new_expression
+          (identifier)
+          (arguments)))))
+  (statement_block
+    (export_statement
+      (comment)
+      (lexical_declaration
+        (variable_declarator
+          (identifier)
+          (number))))))
+
+==================================================
 ASI still applies where tsc does not continue the keyword
 ==================================================
 
