@@ -28,6 +28,8 @@ static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 
+static bool is_line_terminator(int32_t c) { return c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029; }
+
 static bool scan_template_chars(TSLexer *lexer) {
     lexer->result_symbol = TEMPLATE_CHARS;
     for (bool has_content = false;; has_content = true) {
@@ -234,16 +236,51 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             }
             return true;
         }
+        // A block comment that contains a line terminator is a line break for ASI
+        // (`a /* x\n */ b` is two statements). The parser would otherwise consume the
+        // comment as an extra and call this scanner after it, past the line break.
+        // Other comments keep the old path: the next call starts at their newline.
+        if (lexer->lookahead == '/') {
+            // The lexer moves from here on, so the caller's `?` fallback must not run.
+            *scanned_comment = true;
+            skip(lexer);
+            if (lexer->lookahead != '*') {
+                return false;
+            }
+            skip(lexer);
+            bool line_break = false;
+            for (;;) {
+                if (lexer->eof(lexer)) {
+                    return false;
+                }
+                if (lexer->lookahead == '*') {
+                    skip(lexer);
+                    if (lexer->lookahead == '/') {
+                        skip(lexer);
+                        break;
+                    }
+                    continue;
+                }
+                if (is_line_terminator(lexer->lookahead)) {
+                    line_break = true;
+                }
+                skip(lexer);
+            }
+            if (!line_break) {
+                return false;
+            }
+            break;
+        }
+        // `\r` alone, U+2028 and U+2029 end a line as `\n` does.
+        if (is_line_terminator(lexer->lookahead)) {
+            skip(lexer);
+            break;
+        }
         if (!iswspace(lexer->lookahead)) {
             return false;
         }
-        if (lexer->lookahead == '\n') {
-            break;
-        }
         skip(lexer);
     }
-
-    skip(lexer);
 
     if (!scan_whitespace_and_comments(lexer, scanned_comment)) {
         return false;

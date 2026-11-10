@@ -954,3 +954,108 @@ let
     (parenthesized_expression
       (identifier))
     (statement_block)))
+
+==================================================
+ASI after a block comment that spans a line break
+==================================================
+
+let a = b /* x
+ */ c
+x /* a
+ */ ++y
+abstract class C {
+  abstract /* x
+  */ y: number
+  readonly /* x
+  */ z: number
+}
+let d = e /* same line */ + f
+g /* x
+ */ .h()
+function r() {
+  return /* x
+  */ 1
+}
+let t = a /* x
+ */ ? b : c
+let /* x
+ */ u = 1
+mn
+p q
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (identifier)))
+  (comment)
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (comment)
+  (expression_statement
+    (update_expression
+      (identifier)))
+  (abstract_class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (comment)
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (property_identifier))
+      (comment)
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (binary_expression
+        (identifier)
+        (comment)
+        (identifier))))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (comment)
+        (property_identifier))
+      (arguments)))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement)
+      (comment)
+      (expression_statement
+        (number))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (comment)
+        (identifier)
+        (identifier))))
+  (lexical_declaration
+    (comment)
+    (variable_declarator
+      (identifier)
+      (number)))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier)))
