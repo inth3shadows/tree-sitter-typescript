@@ -34,7 +34,8 @@ module.exports = function defineGrammar(dialect) {
       // across a line break only before a binding identifier, `[` or `{`.
       $._let_marker,
       // never produced. Valid right after a class or interface member's `static`,
-      // `get` or `set`: tsc continues the member before a property name.
+      // `get` or `set` (also `abstract get`/`set`): tsc continues the member before a
+      // property name.
       $._modifier_marker,
       // never produced. Valid right after an export clause, so the scanner lets
       // `from` on the next line continue the statement.
@@ -487,7 +488,7 @@ module.exports = function defineGrammar(dialect) {
         optional($.accessibility_modifier),
         'abstract',
         optional($.override_modifier),
-        optional(choice('get', 'set', '*')),
+        optional(choice(seq('get', optional($._modifier_marker)), seq('set', optional($._modifier_marker)), '*')),
         field('name', $._class_member_name),
         optional('?'),
         optional($._member_signature_marker),
@@ -1131,6 +1132,9 @@ module.exports = function defineGrammar(dialect) {
           sepBy1(
             choice(',', seq(optional($._member_end_marker), $._semicolon)),
             choice(
+              // `export` may be a member name here: the scanner ignores the
+              // export statement's _no_asi_marker where _member_signature_marker
+              // is valid too.
               $.export_statement,
               $.property_signature,
               $.call_signature,

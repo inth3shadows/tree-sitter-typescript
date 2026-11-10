@@ -917,3 +917,40 @@ f(() => {
               (identifier))
             (expression_statement
               (identifier))))))))
+
+==================================================
+ASI markers with abstract accessors and Unicode spaces
+==================================================
+
+abstract class A {
+  abstract get
+  x(): number
+}
+export { a }
+from "m"
+let
+　if (x) {}
+
+---
+
+(program
+  (abstract_class_declaration
+    (type_identifier)
+    (class_body
+      (abstract_method_signature
+        (property_identifier)
+        (formal_parameters)
+        (type_annotation
+          (predefined_type)))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment)))
+  (expression_statement
+    (identifier))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block)))

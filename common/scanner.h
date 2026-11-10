@@ -159,8 +159,15 @@ static bool scan_method_parameters(TSLexer *lexer) {
     return false;
 }
 
+// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
+// iswspace does not report in the C locale.
+static bool is_unicode_space(int32_t c) {
+    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
+           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
+}
+
 static bool is_identifier_start(int32_t c) {
-    return iswalpha(c) || c == '_' || c == '$' || c == '\\' || (c >= 0x80 && c != 0x2028 && c != 0x2029 && c != 0xA0 && c != 0xFEFF);
+    return iswalpha(c) || c == '_' || c == '$' || c == '\\' || (c >= 0x80 && !is_unicode_space(c));
 }
 
 static bool is_identifier_part(int32_t c) { return is_identifier_start(c) || iswdigit(c); }
@@ -190,13 +197,14 @@ static bool word_in(const char *word, const char *const *list) {
     return false;
 }
 
-// tsc's reserved words (isReservedWord): after `let` they make `let` an identifier.
+// tsc's reserved words (isReservedWord): after `let` they make `let` an identifier
+// and end the statement. `in` and `instanceof` are left out: they continue `let`
+// as an operand, as on main.
 static const char *const RESERVED_WORDS[] = {
-    "break",  "case",     "catch",  "class",  "const",  "continue", "debugger", "default", "delete",
-    "do",     "else",     "enum",   "export", "extends", "false",   "finally",  "for",     "function",
-    "if",     "import",   "in",     "instanceof", "new", "null",    "return",   "super",   "switch",
-    "this",   "throw",    "true",   "try",    "typeof", "var",      "void",     "while",   "with",
-    NULL,
+    "break", "case",  "catch",  "class",   "const",    "continue", "debugger", "default", "delete",
+    "do",    "else",  "enum",   "export",  "extends",  "false",    "finally",  "for",     "function",
+    "if",    "import", "new",   "null",    "return",   "super",    "switch",   "this",    "throw",
+    "true",  "try",   "typeof", "var",     "void",     "while",    "with",     NULL,
 };
 
 // Modifiers the grammar does not accept after `static`, `get` or `set`: before them
@@ -249,7 +257,9 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     // `new\nFoo()`, `export\nconst x = 1`: always one construct. In an object type
     // `export` may also be a member name (`export\n default: T` is two members), and
-    // there MEMBER_SIGNATURE_MARKER is valid too, so the usual rules apply.
+    // there MEMBER_SIGNATURE_MARKER is valid too, so the usual rules apply. This relies
+    // on MEMBER_SIGNATURE_MARKER never being valid right after a statement-level
+    // `export` or `new` (see object_type in define-grammar.js).
     if (valid_symbols[NO_ASI_MARKER] && !valid_symbols[MEMBER_SIGNATURE_MARKER] && !at_end) {
         return false;
     }
@@ -257,17 +267,13 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     // `let\nx = 1`, `let\n[a] = b`: a declaration only before a binding identifier
     // or a destructuring pattern; `let\nif (x) {}` is the identifier `let`.
     if (valid_symbols[LET_MARKER] && !at_end) {
-        if (lexer->lookahead == '[' || lexer->lookahead == '{' || lexer->lookahead == '\\') {
+        if (lexer->lookahead == '[' || lexer->lookahead == '{') {
             return false;
         }
         if (is_identifier_start(lexer->lookahead)) {
             *scanned_comment = true;
             scan_word(lexer, word, sizeof word);
-            if (!word_in(word, RESERVED_WORDS)) {
-                return false;
-            }
-            // `in` and `instanceof` continue `let` as an operand, as on main.
-            return strcmp(word, "in") != 0 && strcmp(word, "instanceof") != 0;
+            return word_in(word, RESERVED_WORDS);
         }
     }
 
@@ -275,7 +281,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     // before a decorator or a modifier the grammar cannot place after the keyword.
     if (valid_symbols[MODIFIER_MARKER] && !at_end) {
         if (lexer->lookahead == '[' || lexer->lookahead == '#' || lexer->lookahead == '"' ||
-            lexer->lookahead == '\'' || lexer->lookahead == '\\' || iswdigit(lexer->lookahead)) {
+            lexer->lookahead == '\'' || iswdigit(lexer->lookahead)) {
             return false;
         }
         if (is_identifier_start(lexer->lookahead)) {
@@ -286,15 +292,15 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     }
 
     // FROM_MARKER is valid right after an export clause: `export { a }\nfrom "m"`
-    // continues with the from clause; `export { a }\nfromage()` does not.
+    // continues with the from clause (tsc reads `from` there as the keyword whatever
+    // follows); `export { a }\nfromage()` does not.
     if (valid_symbols[FROM_MARKER] && lexer->lookahead == 'f') {
         *scanned_comment = true;
         scan_word(lexer, word, sizeof word);
         if (strcmp(word, "from") != 0) {
             return true;
         }
-        return !(iswspace(lexer->lookahead) || lexer->lookahead == '"' || lexer->lookahead == '\'' ||
-                 lexer->lookahead == '/');
+        return is_identifier_part(lexer->lookahead);
     }
 
     switch (lexer->lookahead) {
