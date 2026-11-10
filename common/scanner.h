@@ -1,5 +1,6 @@
 #include "tree_sitter/parser.h"
 
+#include <string.h>
 #include <wctype.h>
 
 enum TokenType {
@@ -15,6 +16,10 @@ enum TokenType {
     ERROR_RECOVERY,
     MEMBER_SIGNATURE_MARKER,
     MEMBER_END_MARKER,
+    NO_ASI_MARKER,
+    LET_MARKER,
+    MODIFIER_MARKER,
+    FROM_MARKER,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -154,6 +159,60 @@ static bool scan_method_parameters(TSLexer *lexer) {
     return false;
 }
 
+// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
+// iswspace does not report in the C locale.
+static bool is_unicode_space(int32_t c) {
+    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
+           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
+}
+
+static bool is_identifier_start(int32_t c) {
+    return iswalpha(c) || c == '_' || c == '$' || c == '\\' || (c >= 0x80 && !is_unicode_space(c));
+}
+
+static bool is_identifier_part(int32_t c) { return is_identifier_start(c) || iswdigit(c); }
+
+// Skips the word at the lookahead and copies it into `word` when it is short and
+// ASCII lowercase (every keyword is); otherwise `word` is left empty.
+static void scan_word(TSLexer *lexer, char *word, unsigned size) {
+    unsigned length = 0;
+    bool keyword_like = true;
+    while (is_identifier_part(lexer->lookahead)) {
+        if (lexer->lookahead < 'a' || lexer->lookahead > 'z' || length + 1 >= size) {
+            keyword_like = false;
+        } else if (keyword_like) {
+            word[length++] = (char)lexer->lookahead;
+        }
+        skip(lexer);
+    }
+    word[keyword_like ? length : 0] = '\0';
+}
+
+static bool word_in(const char *word, const char *const *list) {
+    for (; *list; list++) {
+        if (strcmp(word, *list) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// tsc's reserved words (isReservedWord): after `let` they make `let` an identifier
+// and end the statement. `in` and `instanceof` are left out: they continue `let`
+// as an operand, as on main.
+static const char *const RESERVED_WORDS[] = {
+    "break", "case",  "catch",  "class",   "const",    "continue", "debugger", "default", "delete",
+    "do",    "else",  "enum",   "export",  "extends",  "false",    "finally",  "for",     "function",
+    "if",    "import", "new",   "null",    "return",   "super",    "switch",   "this",    "throw",
+    "true",  "try",   "typeof", "var",     "void",     "while",    "with",     NULL,
+};
+
+// Modifiers the grammar does not accept after `static`, `get` or `set`: before them
+// the keyword stays a member name, as on main.
+static const char *const NON_FOLLOWING_MODIFIERS[] = {
+    "public", "private", "protected", "declare", "abstract", NULL,
+};
+
 static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
@@ -188,6 +247,60 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     if (!scan_whitespace_and_comments(lexer, scanned_comment)) {
         return false;
+    }
+
+    // The markers below are never produced; the grammar makes each valid right
+    // after a keyword that tsc may continue across a line break. A `}` or EOF still
+    // ends a statement or member that used the keyword as a name.
+    bool at_end = lexer->lookahead == '}' || lexer->eof(lexer);
+    char word[16];
+
+    // `new\nFoo()`, `export\nconst x = 1`: always one construct. In an object type
+    // `export` may also be a member name (`export\n default: T` is two members), and
+    // there MEMBER_SIGNATURE_MARKER is valid too, so the usual rules apply. This relies
+    // on MEMBER_SIGNATURE_MARKER never being valid right after a statement-level
+    // `export` or `new` (see object_type in define-grammar.js).
+    if (valid_symbols[NO_ASI_MARKER] && !valid_symbols[MEMBER_SIGNATURE_MARKER] && !at_end) {
+        return false;
+    }
+
+    // `let\nx = 1`, `let\n[a] = b`: a declaration only before a binding identifier
+    // or a destructuring pattern; `let\nif (x) {}` is the identifier `let`.
+    if (valid_symbols[LET_MARKER] && !at_end) {
+        if (lexer->lookahead == '[' || lexer->lookahead == '{') {
+            return false;
+        }
+        if (is_identifier_start(lexer->lookahead)) {
+            *scanned_comment = true;
+            scan_word(lexer, word, sizeof word);
+            return word_in(word, RESERVED_WORDS);
+        }
+    }
+
+    // `static\nx = 1`, `get\nx() {}`: one member before a property name, but not
+    // before a decorator or a modifier the grammar cannot place after the keyword.
+    if (valid_symbols[MODIFIER_MARKER] && !at_end) {
+        if (lexer->lookahead == '[' || lexer->lookahead == '#' || lexer->lookahead == '"' ||
+            lexer->lookahead == '\'' || iswdigit(lexer->lookahead)) {
+            return false;
+        }
+        if (is_identifier_start(lexer->lookahead)) {
+            *scanned_comment = true;
+            scan_word(lexer, word, sizeof word);
+            return word_in(word, NON_FOLLOWING_MODIFIERS);
+        }
+    }
+
+    // FROM_MARKER is valid right after an export clause: `export { a }\nfrom "m"`
+    // continues with the from clause (tsc reads `from` there as the keyword whatever
+    // follows); `export { a }\nfromage()` does not.
+    if (valid_symbols[FROM_MARKER] && lexer->lookahead == 'f') {
+        *scanned_comment = true;
+        scan_word(lexer, word, sizeof word);
+        if (strcmp(word, "from") != 0) {
+            return true;
+        }
+        return is_identifier_part(lexer->lookahead);
     }
 
     switch (lexer->lookahead) {
