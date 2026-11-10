@@ -352,37 +352,26 @@ module.exports = function defineGrammar(dialect) {
       unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /[^"&]+/)),
       unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /[^'&]+/)),
 
-      // A specifier that starts with `type` follows tsc's
-      // parseImportOrExportSpecifier: `{ type }`, `{ type as x }` and
-      // `{ type as as }` export a name `type`; `{ type as }` and
-      // `{ type as as x }` are type-only exports of `as`. After `type`, `as`
-      // lexes as the keyword, so both names are aliased keyword tokens.
-      export_specifier: ($, previous) => {
-        const typeName = alias('type', $.identifier);
-        const asName = alias('as', $.identifier);
-        const optionalAlias = optional(seq(
-          'as',
-          field('alias', choice($._module_export_name, typeName, asName)),
-        ));
-        return choice(
-          seq(optional(choice('type', 'typeof')), previous),
-          seq(field('name', typeName), optionalAlias),
-          seq('type', field('name', asName), optionalAlias),
-        );
-      },
+      export_specifier: ($, previous) => choice(
+        seq(optional(choice('type', 'typeof')), previous),
+        ...keywordSpecifiers($, $._module_export_name, false),
+      ),
 
       _import_identifier: $ => choice($.identifier, alias('type', $.identifier)),
 
-      import_specifier: $ => seq(
-        optional(choice('type', 'typeof')),
-        choice(
-          field('name', $._import_identifier),
-          seq(
-            field('name', choice($._module_export_name, alias('type', $.identifier))),
-            'as',
-            field('alias', $._import_identifier),
+      import_specifier: $ => choice(
+        seq(
+          optional(choice('type', 'typeof')),
+          choice(
+            field('name', $.identifier),
+            seq(
+              field('name', $._module_export_name),
+              'as',
+              field('alias', $._import_identifier),
+            ),
           ),
         ),
+        ...keywordSpecifiers($, $.identifier, true),
       ),
 
       import_attribute: $ => seq(choice('with', 'assert'), $.object),
@@ -1248,6 +1237,32 @@ module.exports = function defineGrammar(dialect) {
     },
   });
 };
+
+/**
+ * Import and export specifiers whose first word is the keyword `type` or
+ * `typeof`, read as tsc's parseImportOrExportSpecifier reads them:
+ * `{ type }`, `{ type as x }` and `{ type as as }` name `type`; `{ type as }`
+ * and `{ type as as x }` are type-only specifiers of `as`; `{ typeof as x }`
+ * names `typeof` (and `{ typeof }` too, for exports). After these keywords
+ * `as` lexes as the keyword, so every such name is an aliased keyword token.
+ * Specifiers with an ordinary first name stay in the caller's own rule.
+ *
+ * @param {GrammarSymbols<string>} $
+ * @param {RuleOrLiteral} aliasName what may follow `as` besides `type`/`as`
+ * @param {boolean} isImport an import binds its alias, so `typeof` needs one
+ * @returns {Rule[]}
+ */
+function keywordSpecifiers($, aliasName, isImport) {
+  const typeName = alias('type', $.identifier);
+  const asName = alias('as', $.identifier);
+  const typeofName = alias('typeof', $.identifier);
+  const aliasTail = seq('as', field('alias', choice(aliasName, typeName, asName)));
+  return [
+    seq(field('name', typeName), optional(aliasTail)),
+    seq('type', field('name', asName), optional(aliasTail)),
+    seq(field('name', typeofName), isImport ? aliasTail : optional(aliasTail)),
+  ];
+}
 
 /**
  * Share method syntax while keeping contextual keyword names local to classes.

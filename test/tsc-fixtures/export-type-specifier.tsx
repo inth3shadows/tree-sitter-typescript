@@ -4,7 +4,7 @@ declare module "src" {
   export const type: number, as: number, x: number;
   export type x = number;
   const s: number;
-  export { s as "s" };
+  export { s as "s", s as typeof };
 }
 declare module "m1" { export { type } from "src"; }
 declare module "m2" { export { type as T } from "src"; }
@@ -17,3 +17,5 @@ declare module "m8" { export { type as as as } from "src"; }
 declare module "m9" { export { type, type x } from "src"; }
 declare module "m10" { export type { type } from "src"; }
 declare module "m11" { export { type type, x } from "src"; }
+declare module "m12" { export { typeof } from "src"; }
+declare module "m13" { export { typeof as t } from "src"; }
