@@ -112,6 +112,23 @@ the differential. The job summary lists per-corpus counts and the first 20 new d
 (`actions/cache` rejects a `path` containing `..`), is restored up front, and is saved with
 `if: always()` once a corpus has finished fetching, so a failing run still keeps the downloads.
 
+## Known leniency
+
+The gate fails only when tsc accepts a file and the grammar rejects it. The reverse, where
+the grammar accepts something tsc rejects, is counted (`tsc-only-err`) but never fails:
+an editor grammar has to parse half-typed code, so accepting slightly more than the
+compiler is intended. These cases are deliberate and pinned by tests, so a later change
+should not "fix" them by accident:
+
+| Accepted, tsc rejects | Why it is kept | Test |
+| --- | --- | --- |
+| `<T>(x: T) => x` in `.tsx` (tsc requires `<T,>`) | Valid JSX such as `<b>(x)</b>` still parses as JSX | `bindings/node/leniency_test.js` |
+| Imports binding a reserved word: `import { x as default }`, `import { typeof }` | Same class as upstream; rejecting them needs reserved-word sets | `bindings/node/specifier_test.js` |
+| Flow's `typeof` specifier modifier: `import { typeof x }` | Upstream supported Flow; kept for compatibility | `bindings/node/specifier_test.js` |
+
+The `<Type>value` prefix assertion is the opposite case: valid in `.ts`, rejected in
+`.tsx` by both tsc and this grammar, because `.tsx` reads it as a JSX tag.
+
 ## Adding a fixture
 
 Add one small file to `test/tsc-fixtures/` for **one** construct tsc accepts, and
