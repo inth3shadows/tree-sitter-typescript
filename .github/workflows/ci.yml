@@ -54,4 +54,6 @@ jobs:
           test-node: true
           test-python: true
           test-go: true
-          test-swift: true
+          # The macos-latest image's Swift compiler rejects its own Xcode SDK ("this SDK
+          # is not supported by the compiler"); Swift still runs on Ubuntu and Windows.
+          test-swift: ${{ runner.os != 'macOS' }}
