@@ -360,7 +360,27 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         if (is_identifier_start(lexer->lookahead)) {
             *scanned_comment = true;
             scan_word(lexer, word, sizeof word);
-            return word_in(word, NON_FOLLOWING_MODIFIERS);
+            if (!word_in(word, NON_FOLLOWING_MODIFIERS)) {
+                return false;
+            }
+            // `static\ndeclare = 1`, `static\nprivate() {}`: the word is the member's
+            // name, not a modifier, so the member continues.
+            while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                skip(lexer);
+            }
+            switch (lexer->lookahead) {
+                case '=':
+                case '(':
+                case ':':
+                case ';':
+                case '?':
+                case '!':
+                case '<':
+                case '}':
+                    return false;
+                default:
+                    return true;
+            }
         }
     }
 

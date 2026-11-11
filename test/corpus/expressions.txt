@@ -787,6 +787,37 @@ type T = `\u`;
       (escape_sequence))))
 
 ==================================================
+A modifier word after static on the next line can be the member name
+==================================================
+
+class C {
+  static
+  declare = 1
+  static
+  private() {}
+  static
+  public: number
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type))))))
+
+==================================================
 ASI before a non-ASCII identifier starting with in or instanceof
 ==================================================
 
