@@ -1656,16 +1656,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "identifier"
-                  },
-                  {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "STRING",
-                      "value": "as"
-                    },
-                    "named": true,
-                    "value": "identifier"
+                    "name": "_binding_identifier"
                   },
                   {
                     "type": "SYMBOL",
@@ -1714,22 +1705,8 @@
                 "type": "FIELD",
                 "name": "name",
                 "content": {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "identifier"
-                    },
-                    {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "STRING",
-                        "value": "as"
-                      },
-                      "named": true,
-                      "value": "identifier"
-                    }
-                  ]
+                  "type": "SYMBOL",
+                  "name": "_binding_identifier"
                 }
               },
               {
@@ -2061,7 +2038,7 @@
                     "members": [
                       {
                         "type": "SYMBOL",
-                        "name": "identifier"
+                        "name": "_binding_identifier"
                       },
                       {
                         "type": "SYMBOL",
@@ -2112,16 +2089,7 @@
                     "members": [
                       {
                         "type": "SYMBOL",
-                        "name": "identifier"
-                      },
-                      {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "STRING",
-                          "value": "as"
-                        },
-                        "named": true,
-                        "value": "identifier"
+                        "name": "_binding_identifier"
                       },
                       {
                         "type": "SYMBOL",
@@ -8505,6 +8473,24 @@
           }
         ]
       }
+    },
+    "_binding_identifier": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "as"
+          },
+          "named": true,
+          "value": "identifier"
+        }
+      ]
     },
     "method_signature": {
       "type": "SEQ",

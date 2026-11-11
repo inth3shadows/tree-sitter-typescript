@@ -476,22 +476,25 @@ module.exports = function defineGrammar(dialect) {
 
       variable_declarator: $ => choice(
         seq(
-          // `as` is a keyword token wherever `as T` may follow, which includes right
-          // after `let` (`let as T` with `let` as an identifier): accept it as the
-          // name there, as tsc does (`let as = 1`).
-          field('name', choice($.identifier, alias('as', $.identifier), $._destructuring_pattern)),
+          field('name', choice($._binding_identifier, $._destructuring_pattern)),
           field('type', optional($.type_annotation)),
           optional($._initializer),
         ),
         prec('declaration', seq(
-          field('name', choice($.identifier, alias('as', $.identifier))),
+          field('name', $._binding_identifier),
           '!',
           field('type', $.type_annotation),
         )),
       ),
 
-      // The JavaScript rule, taking `as` as the name after `let`/`const` as
-      // variable_declarator does (`for (let as of x)`).
+      // A declared name. `as` is a keyword token wherever `as T` may follow, which
+      // includes right after `let` (`let as T`, with `let` as an identifier), and
+      // accepting it in one declaration position changes which states share a lexer
+      // mode elsewhere (`for (var as of x)`), so every declared-name position uses
+      // this rule: `let as = 1`, `let as!: T`, `for (var as of x)`, `for (let as in x)`.
+      _binding_identifier: $ => choice($.identifier, alias('as', $.identifier)),
+
+      // The JavaScript rule, with _binding_identifier for the declared name.
       _for_header: $ => seq(
         '(',
         choice(
@@ -502,7 +505,7 @@ module.exports = function defineGrammar(dialect) {
           seq(
             field('kind', 'var'),
             field('left', choice(
-              $.identifier,
+              $._binding_identifier,
               $._destructuring_pattern,
             )),
             optional($._initializer),
@@ -510,8 +513,7 @@ module.exports = function defineGrammar(dialect) {
           seq(
             field('kind', choice('let', 'const')),
             field('left', choice(
-              $.identifier,
-              alias('as', $.identifier),
+              $._binding_identifier,
               $._destructuring_pattern,
             )),
             optional($._automatic_semicolon),
