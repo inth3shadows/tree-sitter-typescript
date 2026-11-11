@@ -322,6 +322,18 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         return false;
     }
 
+    // `({a\n}: {a: number}) => number`: as before a `}` on the same line, a typed
+    // object pattern must not get a semicolon.
+    if (lexer->lookahead == '}') {
+        do {
+            skip(lexer);
+        } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
+        if (lexer->lookahead == ':') {
+            return valid_symbols[LOGICAL_OR];
+        }
+        return true;
+    }
+
     // The markers below are never produced; the grammar makes each valid right
     // after a keyword that tsc may continue across a line break. A `}` or EOF still
     // ends a statement or member that used the keyword as a name.
