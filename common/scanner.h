@@ -53,10 +53,11 @@ static bool scan_template_chars(TSLexer *lexer) {
     }
 }
 
-// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
-// iswspace does not report in the C locale.
+// Whitespace and line terminators above ASCII that tsc skips (Zs, U+200B, U+FEFF,
+// U+2028/9), which iswspace does not report in the C locale. U+0085 is left out:
+// tsc skips it too, but the grammar's identifier token accepts it.
 static bool is_unicode_space(int32_t c) {
-    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
+    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200B) || c == 0x2028 || c == 0x2029 ||
            c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
 }
 

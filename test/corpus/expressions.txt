@@ -976,6 +976,10 @@ export { a }
 from "m"
 let
 　if (x) {}
+let
+​if (x) {}
+class C { static
+​@dec x }
 
 ---
 
@@ -999,7 +1003,22 @@ let
   (if_statement
     (parenthesized_expression
       (identifier))
-    (statement_block)))
+    (statement_block))
+  (expression_statement
+    (identifier))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (decorator
+          (identifier))
+        (property_identifier)))))
 
 ==================================================
 ASI after a block comment that spans a line break
