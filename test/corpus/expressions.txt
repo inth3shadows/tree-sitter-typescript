@@ -1449,3 +1449,202 @@ class B { y = c ? class {
                 (type_annotation
                   (predefined_type)))))
           (identifier))))))
+
+==================================================
+A typed object pattern in a function type, with its brace on the next line
+==================================================
+
+type F = ({a
+}: {a: number}) => number
+let x: ({a
+}: T) => R
+const f = c ? () => { let a } : b
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (type_annotation
+            (object_type
+              (property_signature
+                (property_identifier)
+                (type_annotation
+                  (predefined_type)))))))
+      (predefined_type)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (function_type
+          (formal_parameters
+            (required_parameter
+              (object_pattern
+                (shorthand_property_identifier_pattern))
+              (type_annotation
+                (type_identifier))))
+          (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (lexical_declaration
+              (variable_declarator
+                (identifier)))))
+        (identifier)))))
+
+==================================================
+A comment before a typed pattern's colon, and ternary arms ending in a block
+==================================================
+
+type A = ({a} /* c */: T) => R
+type B = ({a
+} // c
+: T) => R
+const g = c ? class { x } : e
+const h = c ? () => { let a: {b: T} } : e
+const i = c ? () => { type A = {b: T} } : e
+let j = c ? f<{a}>(y) : z
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (comment)
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (comment)
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (class
+          (class_body
+            (public_field_definition
+              (property_identifier))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (lexical_declaration
+              (variable_declarator
+                (identifier)
+                (type_annotation
+                  (object_type
+                    (property_signature
+                      (property_identifier)
+                      (type_annotation
+                        (type_identifier)))))))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (type_alias_declaration
+              (type_identifier)
+              (object_type
+                (property_signature
+                  (property_identifier)
+                  (type_annotation
+                    (type_identifier)))))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (call_expression
+          (identifier)
+          (type_arguments
+            (object_type
+              (property_signature
+                (property_identifier))))
+          (arguments
+            (identifier)))
+        (identifier)))))
+
+==================================================
+No ASI before an object-type brace followed by a colon, in other positions
+==================================================
+
+const v = c ? a < {b
+} : z
+type X = A extends B ? ({a
+}: T) => R : C
+type F = ({a // c
+}: T) => R
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (binary_expression
+          (identifier)
+          (object
+            (shorthand_property_identifier)))
+        (identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (conditional_type
+      (type_identifier)
+      (type_identifier)
+      (function_type
+        (formal_parameters
+          (required_parameter
+            (object_pattern
+              (shorthand_property_identifier_pattern))
+            (type_annotation
+              (type_identifier))))
+        (type_identifier))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern)
+            (comment))
+          (type_annotation
+            (type_identifier))))
+      (type_identifier))))
