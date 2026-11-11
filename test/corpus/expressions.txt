@@ -1449,3 +1449,55 @@ class B { y = c ? class {
                 (type_annotation
                   (predefined_type)))))
           (identifier))))))
+
+==================================================
+A typed object pattern in a function type, with its brace on the next line
+==================================================
+
+type F = ({a
+}: {a: number}) => number
+let x: ({a
+}: T) => R
+const f = c ? () => { let a } : b
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (type_annotation
+            (object_type
+              (property_signature
+                (property_identifier)
+                (type_annotation
+                  (predefined_type)))))))
+      (predefined_type)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (function_type
+          (formal_parameters
+            (required_parameter
+              (object_pattern
+                (shorthand_property_identifier_pattern))
+              (type_annotation
+                (type_identifier))))
+          (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (lexical_declaration
+              (variable_declarator
+                (identifier)))))
+        (identifier)))))

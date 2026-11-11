@@ -21,6 +21,7 @@ enum TokenType {
     MODIFIER_MARKER,
     FROM_MARKER,
     ACCESSOR_MARKER,
+    TYPE_MEMBER_END_MARKER,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -219,6 +220,22 @@ static const char *const NON_FOLLOWING_MODIFIERS[] = {
     "public", "private", "protected", "declare", "abstract", NULL,
 };
 
+// At a `}` where a semicolon may be inserted. In a function type's parameters
+// (`type F = ({a}: T) => R`, also with `a\n}`) the parser cannot yet tell the object
+// pattern from an object type, whose member `a` would take the semicolon and end
+// the pattern. An object type's last member needs no semicolon, so there it is
+// left out before `}:`. Elsewhere it stays: `c ? () => { let a\n} : b` and
+// `c ? class { x\n} : e` need it.
+static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols) {
+    if (!valid_symbols[TYPE_MEMBER_END_MARKER]) {
+        return true;
+    }
+    do {
+        skip(lexer);
+    } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
+    return lexer->lookahead != ':';
+}
+
 static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
@@ -228,17 +245,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             return true;
         }
         if (lexer->lookahead == '}') {
-            // Automatic semicolon insertion breaks detection of object patterns
-            // in a typed context:
-            //   type F = ({a}: {a: number}) => number;
-            // Therefore, disable automatic semicolons when followed by typing
-            do {
-                skip(lexer);
-            } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
-            if (lexer->lookahead == ':') {
-                return valid_symbols[LOGICAL_OR]; // Don't return false if we're in a ternary by checking if || is valid
-            }
-            return true;
+            return scan_closing_brace(lexer, valid_symbols);
         }
         // A block comment that contains a line terminator is a line break for ASI
         // (`a /* x\n */ b` is two statements). The parser would otherwise consume the
@@ -322,6 +329,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     if (!scan_whitespace_and_comments(lexer, scanned_comment)) {
         return false;
+    }
+
+    if (lexer->lookahead == '}') {
+        return scan_closing_brace(lexer, valid_symbols);
     }
 
     // The markers below are never produced; the grammar makes each valid right

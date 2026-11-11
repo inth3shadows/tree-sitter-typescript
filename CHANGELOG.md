@@ -31,6 +31,11 @@ because editor queries match on node names.
   `x⏎instanceofä = 1` get a semicolon before the identifier, where they were an
   ERROR. U+200B and U+2060 count as whitespace in the scanner, as in the grammar's
   extras, so `let⏎<U+200B>if (x) {}` is two statements. Node types are unchanged.
+- A typed object pattern in a function type no longer gets a semicolon before its
+  `}`: `type F = ({a⏎}: T) => R` (also after a lone `\r`) parses, where it was an
+  ERROR (#42). A block that ends a ternary arm keeps its semicolon before `}:`, so
+  `c ? () => { let a } : b` now parses too. Node types are unchanged; the parse
+  table grows about 5%.
 - Export specifiers may name `type` (upstream #313): `export { type }`,
   `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
   a name `type`, while `export { type as }` and `export { type as as x }` are type-only
