@@ -219,6 +219,50 @@ static const char *const NON_FOLLOWING_MODIFIERS[] = {
     "public", "private", "protected", "declare", "abstract", NULL,
 };
 
+// After a modifier word: whether the next token is on the same line and can follow
+// a modifier (tsc's canFollowModifier: `[`, `{`, `*`, `...`, `#` or a property name).
+// Spaces and comments on the same line are skipped.
+static bool modifier_word_is_modifier(TSLexer *lexer) {
+    for (;;) {
+        while (!is_line_terminator(lexer->lookahead) &&
+               (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead))) {
+            skip(lexer);
+        }
+        if (lexer->lookahead != '/') {
+            break;
+        }
+        skip(lexer);
+        if (lexer->lookahead != '*') {
+            // A line comment runs to the end of the line; a lone `/` cannot follow.
+            return false;
+        }
+        skip(lexer);
+        for (;;) {
+            if (lexer->eof(lexer)) {
+                return false;
+            }
+            if (is_line_terminator(lexer->lookahead)) {
+                return false;
+            }
+            if (lexer->lookahead == '*') {
+                skip(lexer);
+                if (lexer->lookahead == '/') {
+                    skip(lexer);
+                    break;
+                }
+                continue;
+            }
+            skip(lexer);
+        }
+    }
+    int32_t c = lexer->lookahead;
+    if (lexer->eof(lexer) || is_line_terminator(c)) {
+        return false;
+    }
+    return c == '[' || c == '{' || c == '*' || c == '.' || c == '#' || c == '"' || c == '\'' ||
+           iswdigit(c) || is_identifier_start(c);
+}
+
 static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
@@ -371,24 +415,13 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             if (!word_in(word, NON_FOLLOWING_MODIFIERS)) {
                 return false;
             }
-            // `static\ndeclare = 1`, `static\nprivate() {}`, `get\nprivate() {}`: the
-            // word is the member's name, not a modifier, so the member continues.
-            while (lexer->lookahead == ' ' || lexer->lookahead == '\t' || is_unicode_space(lexer->lookahead)) {
-                skip(lexer);
-            }
-            switch (lexer->lookahead) {
-                case '=':
-                case '(':
-                case ':':
-                case ';':
-                case '?':
-                case '!':
-                case '<':
-                case '}':
-                    return false;
-                default:
-                    return true;
-            }
+            // As in tsc's nextTokenIsOnSameLineAndCanFollowModifier, the word is a
+            // modifier only if the next token is on the same line and can follow one;
+            // the grammar has no modifier after `static`, so that ends the member
+            // (`static\nprivate x`). Otherwise the word is the member's name and the
+            // member continues: `static\ndeclare = 1`, `static\nprivate() {}`,
+            // `static\nprivate\n= 1`, `get\nprivate() {}`.
+            return modifier_word_is_modifier(lexer);
         }
     }
 

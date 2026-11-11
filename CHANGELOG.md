@@ -31,6 +31,11 @@ because editor queries match on node names.
   `x⏎instanceofä = 1` get a semicolon before the identifier, where they were an
   ERROR. U+200B and U+2060 count as whitespace in the scanner, as in the grammar's
   extras, so `let⏎<U+200B>if (x) {}` is two statements. Node types are unchanged.
+- After `static` on one line, a modifier word on the next line (`private`, `declare`
+  and so on) is the member's name unless the token after it is on the same line and
+  can follow a modifier, as in tsc: `static⏎private⏎x` is a member `static private`
+  and then `x`, and `static⏎private /* c */ = 1` is one member (#43).
+  `static⏎private x` still reads as two members.
 - Export specifiers may name `type` (upstream #313): `export { type }`,
   `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
   a name `type`, while `export { type as }` and `export { type as as x }` are type-only

@@ -823,6 +823,58 @@ class C {
         (statement_block)))))
 
 ==================================================
+A modifier word after static is the name unless a same-line token can follow it
+==================================================
+
+class C {
+  static
+  private
+  x
+  static
+  declare
+  = 1
+  static
+  protected /* c */ = 2
+  static
+  public // c
+  = 3
+  static
+  private /*
+  */ y
+  static
+  abstract
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (comment)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (comment)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (comment)
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)))))
+
+==================================================
 A modifier word after static or get on the next line can be the member name
 ==================================================
 
