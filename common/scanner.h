@@ -22,6 +22,7 @@ enum TokenType {
     FROM_MARKER,
     ACCESSOR_MARKER,
     TYPE_MEMBER_END_MARKER,
+    GLOBAL_KEYWORD,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -758,12 +759,44 @@ static bool scan_jsx_text(TSLexer *lexer) {
     return saw_text;
 }
 
+// `global` at the start of a statement, only when `{` follows (across any line
+// break, as in tsc). Anywhere else `global` is an identifier, so it never has to
+// be a keyword token in expression or type positions (`x<global>()`).
+static bool scan_global_keyword(TSLexer *lexer) {
+    while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
+        skip(lexer);
+    }
+    for (const char *c = "global"; *c; c++) {
+        if (lexer->lookahead != *c) {
+            return false;
+        }
+        advance(lexer);
+    }
+    int32_t next = lexer->lookahead;
+    if (iswalnum(next) || next == '_' || next == '$' || next == '\\' || next > 0x7f) {
+        return false;
+    }
+    lexer->mark_end(lexer);
+    while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
+        advance(lexer);
+    }
+    if (lexer->lookahead != '{') {
+        return false;
+    }
+    lexer->result_symbol = GLOBAL_KEYWORD;
+    return true;
+}
+
 static inline bool external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     if (valid_symbols[TEMPLATE_CHARS]) {
         if (valid_symbols[AUTOMATIC_SEMICOLON]) {
             return false;
         }
         return scan_template_chars(lexer);
+    }
+
+    if (valid_symbols[GLOBAL_KEYWORD] && !valid_symbols[AUTOMATIC_SEMICOLON] && scan_global_keyword(lexer)) {
+        return true;
     }
 
     if (valid_symbols[JSX_TEXT] && scan_jsx_text(lexer)) {

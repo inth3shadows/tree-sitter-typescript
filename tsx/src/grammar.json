@@ -7991,10 +7991,6 @@
         },
         {
           "type": "STRING",
-          "value": "global"
-        },
-        {
-          "type": "STRING",
           "value": "any"
         },
         {
@@ -9519,8 +9515,17 @@
               "name": "declaration"
             },
             {
-              "type": "SYMBOL",
-              "name": "_global_augmentation"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "global"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "statement_block"
+                }
+              ]
             },
             {
               "type": "SEQ",
@@ -9564,7 +9569,12 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_global_keyword"
+          },
+          "named": false,
           "value": "global"
         },
         {
@@ -13658,6 +13668,10 @@
     {
       "type": "SYMBOL",
       "name": "_type_member_end_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_global_keyword"
     },
     {
       "type": "SYMBOL",

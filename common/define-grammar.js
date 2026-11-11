@@ -47,6 +47,8 @@ module.exports = function defineGrammar(dialect) {
       // so the scanner knows a `}` closes an object type (whose last member needs
       // no semicolon), not a class body (whose last field does).
       $._type_member_end_marker,
+      // `global` at a statement start when `{` follows: a global augmentation.
+      $._global_keyword,
     ], dialect === 'tsx' ? [$._jsx_string_marker] : []),
 
     supertypes: ($, previous) => previous.concat([
@@ -706,21 +708,23 @@ module.exports = function defineGrammar(dialect) {
         'declare',
         choice(
           $.declaration,
-          $._global_augmentation,
+          seq('global', $.statement_block),
           seq('module', '.', alias($.identifier, $.property_identifier), ':', $.type, $._semicolon),
         ),
       ),
 
-      _global_augmentation: $ => seq('global', $.statement_block),
-
       // A global augmentation needs no `declare` inside an ambient module
       // (`declare module "m" { global { ... } }`), and tsc parses one in any
-      // statement position. It is a statement, not a declaration, so
-      // `export default global {}` stays an error as in tsc.
+      // statement position. The scanner produces the keyword only before `{`,
+      // so `global` stays a plain identifier everywhere else. It is a
+      // statement, not a declaration, so `export default global {}` stays an
+      // error as in tsc.
       statement: ($, previous) => choice(
         previous,
         alias($._global_augmentation, $.ambient_declaration),
       ),
+
+      _global_augmentation: $ => seq(alias($._global_keyword, 'global'), $.statement_block),
 
       class: $ => prec('literal', seq(
         repeat(field('decorator', $.decorator)),
@@ -1320,7 +1324,6 @@ module.exports = function defineGrammar(dialect) {
         'override',
         'readonly',
         'module',
-        'global',
         'any',
         'number',
         'boolean',

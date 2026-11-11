@@ -308,6 +308,8 @@ declare global { }
 function f() { global { } }
 declare
 global { }
+global
+{ }
 
 ---
 
@@ -335,6 +337,8 @@ global { }
   (expression_statement
     (identifier))
   (ambient_declaration
+    (statement_block))
+  (ambient_declaration
     (statement_block)))
 
 ==================================
@@ -352,6 +356,8 @@ global: for (;;) {}
 function global() {}
 import { global } from "m";
 export default global;
+x<global>(y);
+let a: (global)[];
 
 ---
 
@@ -408,7 +414,21 @@ export default global;
     (string
       (string_fragment)))
   (export_statement
-    (identifier)))
+    (identifier))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_identifier))
+      (arguments
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (array_type
+          (parenthesized_type
+            (type_identifier)))))))
 
 ==================================
 export default global with a block stays an error
@@ -420,7 +440,8 @@ export default global {}
 
 (program
   (export_statement
-    (ERROR)
+    (ERROR
+      (identifier))
     (object)))
 
 ==================================
