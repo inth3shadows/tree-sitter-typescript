@@ -787,6 +787,36 @@ type T = `\u`;
       (escape_sequence))))
 
 ==================================================
+Unicode spaces after a line break do not end a construct
+==================================================
+
+let
+　x = 1
+class C { static
+ y }
+export { a }
+　from "m"
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (number)))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment))))
+
+==================================================
 No ASI after keywords that continue across a line break
 ==================================================
 
