@@ -2062,6 +2062,10 @@ let as: number, b = 3
 let as!: number
 for (let as of x) {}
 for (const as in x) {}
+for (const as of x) {}
+for (var as of x) {}
+for (var as in x) ;
+for (var as = 1 in x) {}
 let c = as as T
 
 ---
@@ -2094,6 +2098,23 @@ let c = as as T
     (statement_block))
   (for_in_statement
     (identifier)
+    (identifier)
+    (statement_block))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (statement_block))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (statement_block))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (identifier)
+    (number)
     (identifier)
     (statement_block))
   (lexical_declaration

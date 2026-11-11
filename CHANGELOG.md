@@ -7,11 +7,12 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
-- `as` may name a variable right after `let`, as tsc allows: `let as = 1`,
-  `let⏎as = 2`, `let as!: number` and `for (let as of x) {}` parse, where they were
-  an ERROR (#45). After `let` the parser also allows `let` as an identifier followed
-  by `as T`, so `as` lexed as that keyword. `const as` and `var as` already parsed.
-  Node types are unchanged; the parse table grows by 17 states.
+- `as` may name a declared variable wherever tsc allows: `let as = 1`, `let⏎as = 2`,
+  `let as!: number`, `for (let as of x) {}` and `for (const as of x) {}` parse,
+  where they were an ERROR (#45). After `let` the parser also allows `let` as an
+  identifier followed by `as T`, so `as` lexed as that keyword. `let as T`, which
+  tsc rejects, is now a declaration with an ERROR instead of an `as` expression.
+  Node types are unchanged; the parse table grows by 2 states.
 - A block comment that spans a line break counts as a line break for automatic
   semicolon insertion, as in tsc: `let a = b /* x⏎ */ c` is two statements, and
   `abstract /* x⏎ */ y: number` is a field named `abstract` followed by `y`. A lone
