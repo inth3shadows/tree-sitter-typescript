@@ -7,6 +7,12 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- `global { ... }` without `declare`, as `@types/node` writes it inside
+  `declare module "m" { ... }`, is an `ambient_declaration` like `declare global`,
+  where it was an ERROR (#54). `global` stays an ordinary identifier elsewhere
+  (`global.foo = 1`). `global⏎{` is still an expression and a block, as before,
+  though tsc reads it as an augmentation. The parse table grows by 12 states
+  (tsx 13).
 - `as` may name a declared variable wherever tsc allows: `let as = 1`, `let⏎as = 2`,
   `let as!: number`, `for (let as of x) {}` and `for (const as of x) {}` parse,
   where they were an ERROR (#45). After `let` the parser also allows `let` as an

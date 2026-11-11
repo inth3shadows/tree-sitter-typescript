@@ -702,13 +702,19 @@ module.exports = function defineGrammar(dialect) {
         commaSep1($.type),
       ),
 
-      ambient_declaration: $ => seq(
-        'declare',
-        choice(
-          $.declaration,
-          seq('global', $.statement_block),
-          seq('module', '.', alias($.identifier, $.property_identifier), ':', $.type, $._semicolon),
+      ambient_declaration: $ => choice(
+        seq(
+          'declare',
+          choice(
+            $.declaration,
+            seq('global', $.statement_block),
+            seq('module', '.', alias($.identifier, $.property_identifier), ':', $.type, $._semicolon),
+          ),
         ),
+        // A global augmentation inside an ambient module needs no `declare`:
+        // `declare module "m" { global { ... } }`. The lower precedence keeps
+        // `declare global {}` one ambient_declaration rather than two.
+        prec(-1, seq('global', $.statement_block)),
       ),
 
       class: $ => prec('literal', seq(
@@ -1309,6 +1315,7 @@ module.exports = function defineGrammar(dialect) {
         'override',
         'readonly',
         'module',
+        'global',
         'any',
         'number',
         'boolean',

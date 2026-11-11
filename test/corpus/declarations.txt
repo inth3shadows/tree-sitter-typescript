@@ -296,6 +296,47 @@ declare module.exports: {
           (predefined_type))))))
 
 ==================================
+Global augmentation inside an ambient module
+==================================
+
+declare module "m" {
+  global {
+    var x: number;
+  }
+}
+declare global { }
+global.foo = 1;
+let g = global;
+
+---
+
+(program
+  (ambient_declaration
+    (module
+      (string
+        (string_fragment))
+      (statement_block
+        (ambient_declaration
+          (statement_block
+            (variable_declaration
+              (variable_declarator
+                (identifier)
+                (type_annotation
+                  (predefined_type)))))))))
+  (ambient_declaration
+    (statement_block))
+  (expression_statement
+    (assignment_expression
+      (member_expression
+        (identifier)
+        (property_identifier))
+      (number)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (identifier))))
+
+==================================
 Ambient exports
 ==================================
 
