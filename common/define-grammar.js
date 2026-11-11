@@ -487,12 +487,17 @@ module.exports = function defineGrammar(dialect) {
         )),
       ),
 
-      // A declared name. `as` is a keyword token wherever `as T` may follow, which
+      // The name of a variable declarator or a for-in/of head. `as` and `satisfies`
+      // are keyword tokens wherever `as T` or `satisfies T` may follow, which
       // includes right after `let` (`let as T`, with `let` as an identifier), and
-      // accepting it in one declaration position changes which states share a lexer
-      // mode elsewhere (`for (var as of x)`), so every declared-name position uses
-      // this rule: `let as = 1`, `let as!: T`, `for (var as of x)`, `for (let as in x)`.
-      _binding_identifier: $ => choice($.identifier, alias('as', $.identifier)),
+      // accepting one in a single declaration position changes which states share a
+      // lexer mode elsewhere (`for (var as of x)`), so all of these positions use
+      // this rule: `let as = 1`, `let satisfies!: T`, `for (var as of x)`.
+      _binding_identifier: $ => choice(
+        $.identifier,
+        keywordName($, 'as'),
+        keywordName($, 'satisfies'),
+      ),
 
       // The JavaScript rule, with _binding_identifier for the declared name.
       _for_header: $ => seq(
