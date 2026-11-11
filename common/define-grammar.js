@@ -43,6 +43,10 @@ module.exports = function defineGrammar(dialect) {
       // get`/`set`): as `_modifier_marker`, but `*` on the next line starts a new
       // member (tsc's canFollowGetOrSetKeyword does not take `*`).
       $._accessor_marker,
+      // never produced. Valid after an object-type member that may be the last one,
+      // so the scanner knows a `}` closes an object type (whose last member needs
+      // no semicolon), not a class body (whose last field does).
+      $._type_member_end_marker,
     ], dialect === 'tsx' ? [$._jsx_string_marker] : []),
 
     supertypes: ($, previous) => previous.concat([
@@ -1146,7 +1150,7 @@ module.exports = function defineGrammar(dialect) {
               $.method_signature,
             ),
           ),
-          optional(choice(',', seq(optional($._member_end_marker), $._semicolon))),
+          optional(choice(',', seq(optional($._member_end_marker), optional($._type_member_end_marker), $._semicolon))),
         )),
         choice('}', '|}'),
       ),

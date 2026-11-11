@@ -12024,6 +12024,18 @@
                               ]
                             },
                             {
+                              "type": "CHOICE",
+                              "members": [
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "_type_member_end_marker"
+                                },
+                                {
+                                  "type": "BLANK"
+                                }
+                              ]
+                            },
+                            {
                               "type": "SYMBOL",
                               "name": "_semicolon"
                             }
@@ -13581,6 +13593,10 @@
     {
       "type": "SYMBOL",
       "name": "_accessor_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_type_member_end_marker"
     }
   ],
   "inline": [

@@ -31,6 +31,14 @@ because editor queries match on node names.
   `x⏎instanceofä = 1` get a semicolon before the identifier, where they were an
   ERROR. U+200B and U+2060 count as whitespace in the scanner, as in the grammar's
   extras, so `let⏎<U+200B>if (x) {}` is two statements. Node types are unchanged.
+- No semicolon is inserted after an object type's last member before a `}` that is
+  followed by `:` (comments may come between). So a typed object pattern in a
+  function type parses: `type F = ({a⏎}: T) => R` (also after a lone `\r`, or as a
+  conditional type's branch), where it was an ERROR (#42), and so does
+  `c ? a < {b⏎} : z`. This applies wherever an object type can end, including
+  interface bodies. A block that ends a ternary arm keeps its semicolon before
+  `}:`, so `c ? () => { let a } : b` now parses too. Node types are unchanged; the
+  parse table grows about 5%.
 - After `static` on one line, a modifier word on the next line (`private`, `declare`
   and so on) is the member's name unless the token after it is on the same line and
   can follow a modifier, as in tsc: `static⏎private⏎x` is a member `static private`

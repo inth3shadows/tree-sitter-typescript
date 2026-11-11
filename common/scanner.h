@@ -21,6 +21,7 @@ enum TokenType {
     MODIFIER_MARKER,
     FROM_MARKER,
     ACCESSOR_MARKER,
+    TYPE_MEMBER_END_MARKER,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -219,6 +220,29 @@ static const char *const NON_FOLLOWING_MODIFIERS[] = {
     "public", "private", "protected", "declare", "abstract", NULL,
 };
 
+// At a `}` where a semicolon may be inserted. In a function type's parameters
+// (`type F = ({a}: T) => R`, also with `a\n}` or a comment before the `:`) the parser
+// cannot yet tell the object pattern from an object type, whose member `a` would
+// take the semicolon and end the pattern. An object type's last member needs no
+// semicolon, so it is left out there before `}:`. TYPE_MEMBER_END_MARKER is valid
+// only after an object-type member, so elsewhere the semicolon stays:
+// `c ? () => { let a\n} : b` and `c ? class { x\n} : e` need it. Only `:` is
+// checked: leaving the semicolon out before other followers changes trees, e.g.
+// `c ? f<{a}>(y) : z` would become a comparison.
+static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
+    if (!valid_symbols[TYPE_MEMBER_END_MARKER]) {
+        return true;
+    }
+    // The lexer moves from here on, so the caller's `?` fallback must not run.
+    *scanned_comment = true;
+    skip(lexer);
+    bool comment = false;
+    if (!scan_whitespace_and_comments(lexer, &comment)) {
+        return true;
+    }
+    return lexer->lookahead != ':';
+}
+
 // After a modifier word: whether the next token is on the same line and can follow
 // a modifier (tsc's canFollowModifier: `[`, `{`, `*`, `...`, `#` or a property name,
 // which includes a number such as `.5`, hence a single `.`).
@@ -273,17 +297,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             return true;
         }
         if (lexer->lookahead == '}') {
-            // Automatic semicolon insertion breaks detection of object patterns
-            // in a typed context:
-            //   type F = ({a}: {a: number}) => number;
-            // Therefore, disable automatic semicolons when followed by typing
-            do {
-                skip(lexer);
-            } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
-            if (lexer->lookahead == ':') {
-                return valid_symbols[LOGICAL_OR]; // Don't return false if we're in a ternary by checking if || is valid
-            }
-            return true;
+            return scan_closing_brace(lexer, valid_symbols, scanned_comment);
         }
         // A block comment that contains a line terminator is a line break for ASI
         // (`a /* x\n */ b` is two statements). The parser would otherwise consume the
@@ -369,10 +383,15 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         return false;
     }
 
+    if (lexer->lookahead == '}') {
+        return scan_closing_brace(lexer, valid_symbols, scanned_comment);
+    }
+
     // The markers below are never produced; the grammar makes each valid right
-    // after a keyword that tsc may continue across a line break. A `}` or EOF still
-    // ends a statement or member that used the keyword as a name.
-    bool at_end = lexer->lookahead == '}' || lexer->eof(lexer);
+    // after a keyword that tsc may continue across a line break. EOF, like a `}`
+    // (handled above), still ends a statement or member that used the keyword as
+    // a name.
+    bool at_end = lexer->eof(lexer);
     char word[16];
 
     // `new\nFoo()`, `export\nconst x = 1`: always one construct. In an object type
