@@ -54,12 +54,13 @@ static bool scan_template_chars(TSLexer *lexer) {
     }
 }
 
-// Whitespace and line terminators above ASCII that tsc skips (Zs, U+200B, U+FEFF,
-// U+2028/9), which iswspace does not report in the C locale. U+0085 is left out:
-// tsc skips it too, but the grammar's identifier token accepts it.
+// Whitespace and line terminators above ASCII that the grammar's extras skip (Zs,
+// U+200B, U+2060, U+FEFF, U+2028/9), which iswspace does not report in the C
+// locale. U+0085 is left out: tsc skips it, but the grammar's identifier token
+// accepts it.
 static bool is_unicode_space(int32_t c) {
     return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200B) || c == 0x2028 || c == 0x2029 ||
-           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
+           c == 0x202F || c == 0x205F || c == 0x2060 || c == 0x3000 || c == 0xFEFF;
 }
 
 static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) {
@@ -211,8 +212,9 @@ static const char *const RESERVED_WORDS[] = {
     "true",  "try",   "typeof", "var",     "void",     "while",    "with",     NULL,
 };
 
-// Modifiers the grammar does not accept after `static`, `get` or `set`: before them
-// the keyword stays a member name, as on main.
+// Modifiers the grammar does not accept after `static`, `get` or `set`. On the next
+// line, one of them ends the member that used the keyword as a name, unless what
+// follows it makes it the name itself (see the MODIFIER_MARKER block).
 static const char *const NON_FOLLOWING_MODIFIERS[] = {
     "public", "private", "protected", "declare", "abstract", NULL,
 };
@@ -369,8 +371,8 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             if (!word_in(word, NON_FOLLOWING_MODIFIERS)) {
                 return false;
             }
-            // `static\ndeclare = 1`, `static\nprivate() {}`: the word is the member's
-            // name, not a modifier, so the member continues.
+            // `static\ndeclare = 1`, `static\nprivate() {}`, `get\nprivate() {}`: the
+            // word is the member's name, not a modifier, so the member continues.
             while (lexer->lookahead == ' ' || lexer->lookahead == '\t' || is_unicode_space(lexer->lookahead)) {
                 skip(lexer);
             }
