@@ -230,7 +230,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             // Therefore, disable automatic semicolons when followed by typing
             do {
                 skip(lexer);
-            } while (iswspace(lexer->lookahead));
+            } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
             if (lexer->lookahead == ':') {
                 return valid_symbols[LOGICAL_OR]; // Don't return false if we're in a ternary by checking if || is valid
             }
@@ -282,11 +282,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
                     break;
                 }
                 skip(lexer);
-                if (lexer->lookahead == '/') {
-                    return false;
-                }
+                // `//` is a line comment; a lone `/` is division, which continues the
+                // statement across the line break as in tsc (`a /* x\n */ / 2`).
                 if (lexer->lookahead != '*') {
-                    break;
+                    return false;
                 }
                 skip(lexer);
                 while (!lexer->eof(lexer)) {
@@ -578,8 +577,7 @@ static bool scan_closing_comment(TSLexer *lexer) {
         return false;
     }
 
-    while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != 0x2028 &&
-           lexer->lookahead != 0x2029) {
+    while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
         advance(lexer);
     }
 

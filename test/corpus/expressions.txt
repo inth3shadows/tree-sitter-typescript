@@ -1115,6 +1115,8 @@ switch (k) { case 1: l /* x
  */ }
 type F = ({m /* x
  */}: {m: number}) => number
+let n = o /* x
+ */ / 2
 
 ---
 
@@ -1174,4 +1176,11 @@ type F = ({m /* x
                 (property_identifier)
                 (type_annotation
                   (predefined_type)))))))
-      (predefined_type))))
+      (predefined_type)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (binary_expression
+        (identifier)
+        (comment)
+        (number)))))

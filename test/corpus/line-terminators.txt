@@ -59,3 +59,35 @@ a // c .b()
         (comment)
         (property_identifier))
       (arguments))))
+
+==================================================
+A lone CR ends an HTML close comment; U+2028 before a typed pattern's colon
+==================================================
+
+x = a--> fooy
+type F = ({a} : {a: number}) => number
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (identifier)))
+  (html_comment)
+  (expression_statement
+    (identifier))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (type_annotation
+            (object_type
+              (property_signature
+                (property_identifier)
+                (type_annotation
+                  (predefined_type)))))))
+      (predefined_type))))
