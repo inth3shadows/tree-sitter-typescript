@@ -452,8 +452,8 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             }
             skip(lexer);
 
-            if (!iswalnum(lexer->lookahead) && lexer->lookahead != '_' && lexer->lookahead != '$') {
-                // `in` itself, not an identifier such as `in2` or `in$x` (those get ASI below).
+            if (!is_identifier_part(lexer->lookahead)) {
+                // `in` itself, not an identifier such as `in2`, `in$x` or `inä` (those get ASI below).
                 // `in:` is a property name.
                 if (lexer->lookahead == ':') {
                     return true;
@@ -499,7 +499,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
                 skip(lexer);
             }
 
-            if (!iswalnum(lexer->lookahead) && lexer->lookahead != '_' && lexer->lookahead != '$') {
+            if (!is_identifier_part(lexer->lookahead)) {
                 return false;
             }
             break;

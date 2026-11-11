@@ -787,6 +787,31 @@ type T = `\u`;
       (escape_sequence))))
 
 ==================================================
+ASI before a non-ASCII identifier starting with in or instanceof
+==================================================
+
+x
+inä = 1
+y
+instanceofä = 1
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (number))))
+
+==================================================
 Unicode spaces after a line break do not end a construct
 ==================================================
 
