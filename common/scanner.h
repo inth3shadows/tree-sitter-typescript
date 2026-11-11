@@ -373,7 +373,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         if (strcmp(word, "from") != 0) {
             return true;
         }
-        return is_identifier_part(lexer->lookahead);
+        return false;
     }
 
     switch (lexer->lookahead) {
