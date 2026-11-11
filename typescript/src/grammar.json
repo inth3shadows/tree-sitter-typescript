@@ -8481,6 +8481,15 @@
           },
           "named": true,
           "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "satisfies"
+          },
+          "named": true,
+          "value": "identifier"
         }
       ]
     },

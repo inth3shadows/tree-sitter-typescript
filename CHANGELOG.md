@@ -13,6 +13,10 @@ because editor queries match on node names.
   identifier followed by `as T`, so `as` lexed as that keyword. `let as T`, which
   tsc rejects, is now a declaration with an ERROR instead of an `as` expression.
   Node types are unchanged; the parse table grows by 2 states.
+- `satisfies` may name a declared variable in the same positions, for the same
+  reason: `let satisfies = 1`, `let satisfies!: number` and
+  `for (var satisfies of x) {}` parse, where they were an ERROR (#51). Node types
+  and the parse table size are unchanged.
 - A block comment that spans a line break counts as a line break for automatic
   semicolon insertion, as in tsc: `let a = b /* x⏎ */ c` is two statements, and
   `abstract /* x⏎ */ y: number` is a field named `abstract` followed by `y`. A lone
