@@ -39,6 +39,11 @@ because editor queries match on node names.
   interface bodies. A block that ends a ternary arm keeps its semicolon before
   `}:`, so `c ? () => { let a } : b` now parses too. Node types are unchanged; the
   parse table grows about 5%.
+- The same holds before the other tokens that can end a parameter, `?`, `,`, `=`,
+  `)`, `}` and `]`: `type F = ({a}?: T) => R`, `({a}, b: number) => R`,
+  `({a}) => R`, `({a: {b}}: T) => R` and `([{a}]: T) => R` parse, where they were
+  an ERROR (#47). A pattern that binds a type keyword (`({a: string}: T) => R`)
+  still does not.
 - After `static` on one line, a modifier word on the next line (`private`, `declare`
   and so on) is the member's name unless the token after it is on the same line and
   can follow a modifier, as in tsc: `static⏎private⏎x` is a member `static private`

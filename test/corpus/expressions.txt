@@ -1855,3 +1855,119 @@ type F = ({a // c
           (type_annotation
             (type_identifier))))
       (type_identifier))))
+
+==================================================
+Object patterns in function-type parameters before other parameter ends
+==================================================
+
+type A = ({a}?: T) => R
+type B = ({a}, b: number) => R
+type C = ({a} = {}) => R
+type D = ({a: {b}}: T) => R
+type F = ([{a}]: T) => R
+type G = ({a}) => R
+type H = ({a: {b}, c}: T) => R
+let w = f<{a}, B>(y)
+type K = A extends {a} ? X : Y
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (optional_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern)))
+        (required_parameter
+          (identifier)
+          (type_annotation
+            (predefined_type))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (object)))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (pair_pattern
+              (property_identifier)
+              (object_pattern
+                (shorthand_property_identifier_pattern))))
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (array_pattern
+            (object_pattern
+              (shorthand_property_identifier_pattern)))
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (pair_pattern
+              (property_identifier)
+              (object_pattern
+                (shorthand_property_identifier_pattern)))
+            (shorthand_property_identifier_pattern))
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (call_expression
+        (identifier)
+        (type_arguments
+          (object_type
+            (property_signature
+              (property_identifier)))
+          (type_identifier))
+        (arguments
+          (identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (conditional_type
+      (type_identifier)
+      (object_type
+        (property_signature
+          (property_identifier)))
+      (type_identifier)
+      (type_identifier))))
