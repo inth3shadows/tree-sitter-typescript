@@ -23,6 +23,13 @@ because editor queries match on node names.
   reads as two members: the grammar has no modifier after `static`. `abstract get⏎x:
   number` is now an ERROR, as it is in tsc. Node types are unchanged; the parse table
   grows about 9%.
+- More ASI cases follow tsc (#40). `get⏎*g() {}` (also `set`) is a field `get` followed
+  by a generator, where it was an ERROR; `static⏎*g() {}` stays one member.
+  `static⏎declare = 1`, `static⏎private() {}` and `static⏎public: number` are one
+  member named after the word, where they were two. `x⏎inä = 1` and
+  `x⏎instanceofä = 1` get a semicolon before the identifier, where they were an
+  ERROR. U+200B counts as whitespace before a keyword check, so `let⏎<U+200B>if (x) {}`
+  is two statements. Node types are unchanged.
 - Export specifiers may name `type` (upstream #313): `export { type }`,
   `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
   a name `type`, while `export { type as }` and `export { type as as x }` are type-only
