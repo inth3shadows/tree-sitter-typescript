@@ -17,8 +17,8 @@ because editor queries match on node names.
   including types (`x<global>()`, `(global)[]`). It is a statement rather than a
   declaration, so `export default global {}`, which tsc rejects, stays an ERROR.
   Still unlike tsc: `export global {}` is an ERROR, and `global {}` on the same
-  line right after a block (`{} global {}`) is still an expression and a block,
-  where it was an ERROR. The parse table grows by 343
+  line right after a block (`{} global {}`) is still an expression and a block
+  with a missing `;`, as before. The parse table grows by 343
   states (tsx 343).
 - `as` may name a declared variable wherever tsc allows: `let as = 1`, `let⏎as = 2`,
   `let as!: number`, `for (let as of x) {}` and `for (const as of x) {}` parse,
