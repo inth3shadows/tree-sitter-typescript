@@ -35,7 +35,9 @@ because editor queries match on node names.
   and so on) is the member's name unless the token after it is on the same line and
   can follow a modifier, as in tsc: `static⏎private⏎x` is a member `static private`
   and then `x`, and `static⏎private /* c */ = 1` is one member (#43).
-  `static⏎private x` still reads as two members.
+  `static⏎private x` still reads as two members. After a bare member name, a next
+  line starting with `*`, `.`, `in` or `instanceof` starts a new member:
+  `x⏎*g() {}` and `x⏎in = 1` are two members, where they were an ERROR.
 - Export specifiers may name `type` (upstream #313): `export { type }`,
   `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
   a name `type`, while `export { type as }` and `export { type as as x }` are type-only
