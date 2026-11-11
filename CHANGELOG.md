@@ -10,12 +10,15 @@ because editor queries match on node names.
 - `global { ... }` without `declare`, as `@types/node` writes it inside
   `declare module "m" { ... }`, is an `ambient_declaration` like `declare global`,
   where it was an ERROR (#54). As in tsc's parser, it is accepted in any statement
-  position (`function f() { global {} }`) and across a line break (`global⏎{}`), and
+  position (`function f() { global {} }`), across line breaks and comments
+  (`global⏎{}`, `global /* c */ {}`), and
   `declare⏎global {}` is `declare` followed by an augmentation. The scanner emits
   the keyword only when `{` follows, so `global` stays an identifier everywhere else,
   including types (`x<global>()`, `(global)[]`). It is a statement rather than a
   declaration, so `export default global {}`, which tsc rejects, stays an ERROR.
-  Still unlike tsc: `export global {}` is an ERROR. The parse table grows by 343
+  Still unlike tsc: `export global {}` is an ERROR, and `global {}` on the same
+  line right after a block (`{} global {}`) is still an expression and a block,
+  where it was an ERROR. The parse table grows by 343
   states (tsx 343).
 - `as` may name a declared variable wherever tsc allows: `let as = 1`, `let⏎as = 2`,
   `let as!: number`, `for (let as of x) {}` and `for (const as of x) {}` parse,

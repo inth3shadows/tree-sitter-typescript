@@ -431,6 +431,40 @@ let a: (global)[];
             (type_identifier)))))))
 
 ==================================
+global scanner: comments before the block, and words starting with g
+==================================
+
+global /* c */ { }
+global // c
+{ }
+g-->0;
+glob <!-- x
+y
+
+---
+
+(program
+  (ambient_declaration
+    (comment)
+    (statement_block))
+  (ambient_declaration
+    (comment)
+    (statement_block))
+  (expression_statement
+    (binary_expression
+      (update_expression
+        (identifier))
+      (number)))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (unary_expression
+        (update_expression
+          (identifier)))))
+  (expression_statement
+    (identifier)))
+
+==================================
 export default global with a block stays an error
 ==================================
 

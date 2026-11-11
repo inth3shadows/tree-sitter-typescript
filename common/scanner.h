@@ -759,13 +759,12 @@ static bool scan_jsx_text(TSLexer *lexer) {
     return saw_text;
 }
 
-// `global` at the start of a statement, only when `{` follows (across any line
-// break, as in tsc). Anywhere else `global` is an identifier, so it never has to
-// be a keyword token in expression or type positions (`x<global>()`).
+// `global` at the start of a statement, only when `{` follows (across line
+// breaks and comments, as in tsc). Anywhere else `global` is an identifier, so it
+// never has to be a keyword token in expression or type positions (`x<global>()`).
+// The caller has skipped leading whitespace and seen `g`. The token ends after
+// `global`; everything after it is lookahead only.
 static bool scan_global_keyword(TSLexer *lexer) {
-    while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
-        skip(lexer);
-    }
     for (const char *c = "global"; *c; c++) {
         if (lexer->lookahead != *c) {
             return false;
@@ -773,12 +772,42 @@ static bool scan_global_keyword(TSLexer *lexer) {
         advance(lexer);
     }
     int32_t next = lexer->lookahead;
-    if (iswalnum(next) || next == '_' || next == '$' || next == '\\' || next > 0x7f) {
+    if (iswalnum(next) || next == '_' || next == '$' || next == '\\' ||
+        (next > 0x7f && !is_unicode_space(next))) {
         return false;
     }
     lexer->mark_end(lexer);
-    while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
+    for (;;) {
+        while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
+            advance(lexer);
+        }
+        if (lexer->lookahead != '/') {
+            break;
+        }
         advance(lexer);
+        if (lexer->lookahead == '*') {
+            advance(lexer);
+            for (;;) {
+                if (lexer->eof(lexer)) {
+                    return false;
+                }
+                if (lexer->lookahead == '*') {
+                    advance(lexer);
+                    if (lexer->lookahead == '/') {
+                        advance(lexer);
+                        break;
+                    }
+                } else {
+                    advance(lexer);
+                }
+            }
+        } else if (lexer->lookahead == '/') {
+            while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
+                advance(lexer);
+            }
+        } else {
+            return false;
+        }
     }
     if (lexer->lookahead != '{') {
         return false;
@@ -795,8 +824,15 @@ static inline bool external_scanner_scan(void *payload, TSLexer *lexer, const bo
         return scan_template_chars(lexer);
     }
 
-    if (valid_symbols[GLOBAL_KEYWORD] && !valid_symbols[AUTOMATIC_SEMICOLON] && scan_global_keyword(lexer)) {
-        return true;
+    if (valid_symbols[GLOBAL_KEYWORD] && !valid_symbols[AUTOMATIC_SEMICOLON]) {
+        while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
+            skip(lexer);
+        }
+        // Once past a `g`, a failed scan must not fall through: the later scans
+        // would start mid-identifier (`g-->0` read as an HTML comment).
+        if (lexer->lookahead == 'g') {
+            return scan_global_keyword(lexer);
+        }
     }
 
     if (valid_symbols[JSX_TEXT] && scan_jsx_text(lexer)) {
