@@ -1340,6 +1340,14 @@ type F = ({a
 }: {a: number}) => number
 const h = c ? () => { d
 } : e
+const i = c ? () => {
+  let j
+} : k
+const C = c ? class {
+  l: string
+} : D
+type T = A extends B ? {m
+} : E
 
 ---
 
@@ -1368,4 +1376,37 @@ const h = c ? () => { d
           (statement_block
             (expression_statement
               (identifier))))
-        (identifier)))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (lexical_declaration
+              (variable_declarator
+                (identifier)))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (class
+          (class_body
+            (public_field_definition
+              (property_identifier)
+              (type_annotation
+                (predefined_type)))))
+        (identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (conditional_type
+      (type_identifier)
+      (type_identifier)
+      (object_type
+        (property_signature
+          (property_identifier)))
+      (type_identifier))))

@@ -322,22 +322,25 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         return false;
     }
 
-    // `({a\n}: {a: number}) => number`: as before a `}` on the same line, a typed
-    // object pattern must not get a semicolon.
+    // `({a\n}: {a: number}) => number`: the parser cannot yet tell the object pattern
+    // from an object type, whose member `a` would take the semicolon. Only an
+    // object-type member end has both member markers valid; a statement before `}`
+    // (`c ? () => {\n let a\n} : b`) does not, and keeps its semicolon.
     if (lexer->lookahead == '}') {
+        if (!valid_symbols[MEMBER_SIGNATURE_MARKER] || !valid_symbols[MEMBER_END_MARKER]) {
+            return true;
+        }
         do {
             skip(lexer);
         } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
-        if (lexer->lookahead == ':') {
-            return valid_symbols[LOGICAL_OR];
-        }
-        return true;
+        return lexer->lookahead != ':';
     }
 
     // The markers below are never produced; the grammar makes each valid right
-    // after a keyword that tsc may continue across a line break. A `}` or EOF still
-    // ends a statement or member that used the keyword as a name.
-    bool at_end = lexer->lookahead == '}' || lexer->eof(lexer);
+    // after a keyword that tsc may continue across a line break. EOF, like a `}`
+    // (handled above), still ends a statement or member that used the keyword as
+    // a name.
+    bool at_end = lexer->eof(lexer);
     char word[16];
 
     // `new\nFoo()`, `export\nconst x = 1`: always one construct. In an object type
