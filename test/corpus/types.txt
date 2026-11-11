@@ -3198,3 +3198,70 @@ namespace RuntimeOptionalNested {
                     (string_fragment)))))
             (parenthesized_expression
               (identifier))))))))
+
+==================================
+Parenthesized import types
+==================================
+
+let x: (import("m").A)[];
+type T = (import("m").A | B)[];
+let f: (a: import("m").A) => void;
+let y = (import("m").a);
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (array_type
+          (parenthesized_type
+            (member_expression
+              (call_expression
+                (import)
+                (arguments
+                  (string
+                    (string_fragment))))
+              (property_identifier)))))))
+  (type_alias_declaration
+    (type_identifier)
+    (array_type
+      (parenthesized_type
+        (union_type
+          (member_expression
+            (call_expression
+              (import)
+              (arguments
+                (string
+                  (string_fragment))))
+            (property_identifier))
+          (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (function_type
+          (formal_parameters
+            (required_parameter
+              (identifier)
+              (type_annotation
+                (member_expression
+                  (call_expression
+                    (import)
+                    (arguments
+                      (string
+                        (string_fragment))))
+                  (property_identifier)))))
+          (predefined_type)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (parenthesized_expression
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier))))))

@@ -7,6 +7,12 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- An import type inside parentheses parses: `let x: (import("m").A)[]` and
+  `type T = (import("m").A | B)[]`, which `tsc --declaration` emits, were an ERROR
+  (#56). After `(` in a type, the parser now keeps both the import-type and the
+  expression reading (a function type's parameter pattern) until one fails, where
+  a static precedence used to drop the import type. The parse table shrinks by
+  225 states (tsx 95).
 - A default-exported function signature may omit its name, as `tsc --declaration`
   emits for every anonymous default export: `export default function (a: string):
   void;` and `export default async function <T>(a: T): Promise<T>;` are a
