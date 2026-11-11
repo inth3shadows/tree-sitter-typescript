@@ -7,6 +7,13 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A default-exported function signature may omit its name, as `tsc --declaration`
+  emits for every anonymous default export: `export default function (a: string):
+  void;` and `export default async function <T>(a: T): Promise<T>;` are a
+  `function_signature` with no `name`, where they were an ERROR (#55). Generator
+  signatures parse too (`function* g(): Iterator<number>;`,
+  `export default function* (): Iterator<number>;`). The parse table grows by 86
+  states (tsx 86).
 - `global { ... }` without `declare`, as `@types/node` writes it inside
   `declare module "m" { ... }`, is an `ambient_declaration` like `declare global`,
   where it was an ERROR (#54). As in tsc's parser, it is accepted in any statement
@@ -157,6 +164,7 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- `function_signature.name` is optional: absent in `export default function (…): T;` (#55).
 - `ambient_declaration` is now also a direct subtype of `statement` (for `global { ... }`
   without `declare`, #54).
 - `instantiation_expression.function` no longer lists `subscript_expression`: indexed

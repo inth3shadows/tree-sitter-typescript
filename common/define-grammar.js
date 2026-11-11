@@ -433,6 +433,7 @@ module.exports = function defineGrammar(dialect) {
               'default',
               choice(
                 field('declaration', $.declaration),
+                field('declaration', alias($._default_function_signature, $.function_signature)),
                 seq(
                   field('value', $.expression),
                   $._semicolon,
@@ -563,7 +564,18 @@ module.exports = function defineGrammar(dialect) {
       function_signature: $ => seq(
         optional('async'),
         'function',
+        optional('*'),
         field('name', $.identifier),
+        $._call_signature,
+        choice($._semicolon, $._function_signature_automatic_semicolon),
+      ),
+
+      // `export default function (a: T): R;`, which tsc --declaration emits for
+      // every anonymous default-exported function.
+      _default_function_signature: $ => seq(
+        optional('async'),
+        'function',
+        optional('*'),
         $._call_signature,
         choice($._semicolon, $._function_signature_automatic_semicolon),
       ),
