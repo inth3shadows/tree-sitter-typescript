@@ -20,6 +20,7 @@ enum TokenType {
     LET_MARKER,
     MODIFIER_MARKER,
     FROM_MARKER,
+    ACCESSOR_MARKER,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -352,7 +353,12 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     // `static\nx = 1`, `get\nx() {}`: one member before a property name, but not
     // before a decorator or a modifier the grammar cannot place after the keyword.
-    if (valid_symbols[MODIFIER_MARKER] && !at_end) {
+    // `get\n*g() {}` is a field `get` and a generator; `static\n*g() {}` is one member.
+    if (valid_symbols[ACCESSOR_MARKER] && !valid_symbols[MODIFIER_MARKER] && !at_end &&
+        lexer->lookahead == '*') {
+        return true;
+    }
+    if ((valid_symbols[MODIFIER_MARKER] || valid_symbols[ACCESSOR_MARKER]) && !at_end) {
         if (lexer->lookahead == '[' || lexer->lookahead == '#' || lexer->lookahead == '"' ||
             lexer->lookahead == '\'' || iswdigit(lexer->lookahead)) {
             return false;

@@ -33,13 +33,16 @@ module.exports = function defineGrammar(dialect) {
       // never produced. Valid right after `let`: tsc continues the declaration
       // across a line break only before a binding identifier, `[` or `{`.
       $._let_marker,
-      // never produced. Valid right after a class or interface member's `static`,
-      // `get` or `set` (also `abstract get`/`set`): tsc continues the member before a
-      // property name.
+      // never produced. Valid right after a class or interface member's `static`:
+      // tsc continues the member before a property name.
       $._modifier_marker,
       // never produced. Valid right after an export clause, so the scanner lets
       // `from` on the next line continue the statement.
       $._from_marker,
+      // never produced. Valid right after a member's `get` or `set` (also `abstract
+      // get`/`set`): as `_modifier_marker`, but `*` on the next line starts a new
+      // member (tsc's canFollowGetOrSetKeyword does not take `*`).
+      $._accessor_marker,
     ], dialect === 'tsx' ? [$._jsx_string_marker] : []),
 
     supertypes: ($, previous) => previous.concat([
@@ -488,7 +491,7 @@ module.exports = function defineGrammar(dialect) {
         optional($.accessibility_modifier),
         'abstract',
         optional($.override_modifier),
-        optional(choice(seq('get', optional($._modifier_marker)), seq('set', optional($._modifier_marker)), '*')),
+        optional(choice(seq('get', optional($._accessor_marker)), seq('set', optional($._accessor_marker)), '*')),
         field('name', $._class_member_name),
         optional('?'),
         optional($._member_signature_marker),
@@ -1327,14 +1330,14 @@ function keywordName($, word) {
  * @returns {SeqRule}
  */
 function methodSignature($, name, markers = true) {
-  const modifier = word => markers ? seq(word, optional($._modifier_marker)) : word;
+  const modifier = (word, marker = $._modifier_marker) => markers ? seq(word, optional(marker)) : word;
   return seq(
     optional($.accessibility_modifier),
     optional(modifier('static')),
     optional($.override_modifier),
     optional('readonly'),
     optional('async'),
-    optional(choice(modifier('get'), modifier('set'), '*')),
+    optional(choice(modifier('get', $._accessor_marker), modifier('set', $._accessor_marker), '*')),
     field('name', name),
     optional('?'),
     optional($._member_signature_marker),

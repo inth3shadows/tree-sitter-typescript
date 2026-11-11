@@ -787,6 +787,42 @@ type T = `\u`;
       (escape_sequence))))
 
 ==================================================
+A generator on the line after get or set is a new member
+==================================================
+
+class C {
+  get
+  *g() {}
+  set
+  *h() {}
+  static
+  *i() {}
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block)))))
+
+==================================================
 A modifier word after static on the next line can be the member name
 ==================================================
 
