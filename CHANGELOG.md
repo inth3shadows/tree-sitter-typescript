@@ -9,10 +9,13 @@ because editor queries match on node names.
 ### Fixes
 - `global { ... }` without `declare`, as `@types/node` writes it inside
   `declare module "m" { ... }`, is an `ambient_declaration` like `declare global`,
-  where it was an ERROR (#54). `global` stays an ordinary identifier elsewhere
-  (`global.foo = 1`). `global⏎{` is still an expression and a block, as before,
-  though tsc reads it as an augmentation. The parse table grows by 12 states
-  (tsx 13).
+  where it was an ERROR (#54). As in tsc's parser, it is accepted in any statement
+  position (`function f() { global {} }`), and `declare⏎global {}` is now `declare`
+  followed by an augmentation. It is a statement rather than a declaration, so
+  `export default global {}`, which tsc rejects, stays an ERROR. `global` stays an
+  ordinary identifier elsewhere (`global.foo = 1`, `global(1)`, `global: for …`).
+  Still unlike tsc: `global⏎{` is an expression and a block, and `export global {}`
+  is an ERROR. The parse table grows by 7 states (tsx 8).
 - `as` may name a declared variable wherever tsc allows: `let as = 1`, `let⏎as = 2`,
   `let as!: number`, `for (let as of x) {}` and `for (const as of x) {}` parse,
   where they were an ERROR (#45). After `let` the parser also allows `let` as an
@@ -150,6 +153,8 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- `ambient_declaration` is now also a direct subtype of `statement` (for `global { ... }`
+  without `declare`, #54).
 - `instantiation_expression.function` no longer lists `subscript_expression`: indexed
   values cannot continue as instantiated type queries.
 - In the tree, `unique symbol` is now one anonymous token under `predefined_type` (it was

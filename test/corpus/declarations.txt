@@ -296,7 +296,7 @@ declare module.exports: {
           (predefined_type))))))
 
 ==================================
-Global augmentation inside an ambient module
+Global augmentation without declare
 ==================================
 
 declare module "m" {
@@ -305,8 +305,9 @@ declare module "m" {
   }
 }
 declare global { }
-global.foo = 1;
-let g = global;
+function f() { global { } }
+declare
+global { }
 
 ---
 
@@ -325,6 +326,36 @@ let g = global;
                   (predefined_type)))))))))
   (ambient_declaration
     (statement_block))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (ambient_declaration
+        (statement_block))))
+  (expression_statement
+    (identifier))
+  (ambient_declaration
+    (statement_block)))
+
+==================================
+global as an identifier
+==================================
+
+global.foo = 1;
+let g = global;
+global[0];
+global(1);
+global<T>();
+global`t`;
+global => 1;
+global: for (;;) {}
+function global() {}
+import { global } from "m";
+export default global;
+
+---
+
+(program
   (expression_statement
     (assignment_expression
       (member_expression
@@ -334,7 +365,63 @@ let g = global;
   (lexical_declaration
     (variable_declarator
       (identifier)
-      (identifier))))
+      (identifier)))
+  (expression_statement
+    (subscript_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (type_identifier))
+      (arguments)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (string_fragment))))
+  (expression_statement
+    (arrow_function
+      (identifier)
+      (number)))
+  (labeled_statement
+    (statement_identifier)
+    (for_statement
+      (empty_statement)
+      (empty_statement)
+      (statement_block)))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          (identifier))))
+    (string
+      (string_fragment)))
+  (export_statement
+    (identifier)))
+
+==================================
+export default global with a block stays an error
+==================================
+
+export default global {}
+
+---
+
+(program
+  (export_statement
+    (ERROR)
+    (object)))
 
 ==================================
 Ambient exports

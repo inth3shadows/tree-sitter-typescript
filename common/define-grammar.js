@@ -702,19 +702,24 @@ module.exports = function defineGrammar(dialect) {
         commaSep1($.type),
       ),
 
-      ambient_declaration: $ => choice(
-        seq(
-          'declare',
-          choice(
-            $.declaration,
-            seq('global', $.statement_block),
-            seq('module', '.', alias($.identifier, $.property_identifier), ':', $.type, $._semicolon),
-          ),
+      ambient_declaration: $ => seq(
+        'declare',
+        choice(
+          $.declaration,
+          $._global_augmentation,
+          seq('module', '.', alias($.identifier, $.property_identifier), ':', $.type, $._semicolon),
         ),
-        // A global augmentation inside an ambient module needs no `declare`:
-        // `declare module "m" { global { ... } }`. The lower precedence keeps
-        // `declare global {}` one ambient_declaration rather than two.
-        prec(-1, seq('global', $.statement_block)),
+      ),
+
+      _global_augmentation: $ => seq('global', $.statement_block),
+
+      // A global augmentation needs no `declare` inside an ambient module
+      // (`declare module "m" { global { ... } }`), and tsc parses one in any
+      // statement position. It is a statement, not a declaration, so
+      // `export default global {}` stays an error as in tsc.
+      statement: ($, previous) => choice(
+        previous,
+        alias($._global_augmentation, $.ambient_declaration),
       ),
 
       class: $ => prec('literal', seq(

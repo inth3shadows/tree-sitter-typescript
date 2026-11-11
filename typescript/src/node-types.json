@@ -362,6 +362,10 @@
     "named": true,
     "subtypes": [
       {
+        "type": "ambient_declaration",
+        "named": true
+      },
+      {
         "type": "break_statement",
         "named": true
       },

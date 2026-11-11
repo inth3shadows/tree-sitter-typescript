@@ -20,6 +20,7 @@
 [ "abstract"
   "declare"
   "enum"
+  "global"
   "export"
   "implements"
   "interface"
