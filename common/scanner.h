@@ -220,17 +220,20 @@ static const char *const NON_FOLLOWING_MODIFIERS[] = {
     "public", "private", "protected", "declare", "abstract", NULL,
 };
 
-// At a `}` where a semicolon may be inserted. In a function type's parameters
-// (`type F = ({a}: T) => R`, `({a}?: T) => R`, `({a}, b) => R`, `({a: {b}}: T) => R`,
-// `([{a}]: T) => R`, also with `a\n}`) the parser cannot yet tell the object pattern
-// from an object type, whose member `a` would take the semicolon: the pattern cannot,
-// so the semicolon decides for the object type. An object type's last member needs
-// no semicolon, so it is left out before a `}` followed by a token that can end a
-// parameter (`:`, `?`, `,`, `=`, `)`, `}`, `]`; comments may come between). Before
-// any other token it stays, and still decides: `c ? f<{a}>(y) : z` is a generic
-// call, not a comparison. TYPE_MEMBER_END_MARKER is valid only after an object-type
-// member, so elsewhere the semicolon stays: `c ? () => { let a\n} : b` and
-// `c ? class { x\n} : e` need it.
+// At a `}` where a semicolon may be inserted, after a member that may be an object
+// type's last (TYPE_MEMBER_END_MARKER). Where the parser cannot yet tell an object
+// type from something else that `{` opens, the semicolon decides: only the object
+// type can take it. Two such places:
+// - a function type's parameters, object type or object pattern: `({a}?: T) => R`,
+//   `({a}, b) => R`, `({a: {b}}: T) => R`, `([{a}]: T) => R`, also with `a\n}`;
+// - after `<` in an expression, type arguments or a comparison with an object:
+//   `f<{a}>(y)` is a generic call, `f(a < {b}, e)` and `x = a < {b} ? c : d` compare.
+// An object type's last member needs no semicolon, so it is left out before a `}`
+// followed by `:`, `?`, `,`, `=`, `)`, `}` or `]` (comments may come between), which
+// keeps the pattern or the comparison alive. Before any other token (`>`, `|`, `&`,
+// `[`, `.`...) it stays and decides for the type. Without TYPE_MEMBER_END_MARKER the
+// semicolon always stays: `c ? () => { let a\n} : b` and `c ? class { x\n} : e` need
+// it.
 static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     if (!valid_symbols[TYPE_MEMBER_END_MARKER]) {
         return true;

@@ -42,8 +42,14 @@ because editor queries match on node names.
 - The same holds before the other tokens that can end a parameter, `?`, `,`, `=`,
   `)`, `}` and `]`: `type F = ({a}?: T) => R`, `({a}, b: number) => R`,
   `({a}) => R`, `({a: {b}}: T) => R` and `([{a}]: T) => R` parse, where they were
-  an ERROR (#47). A pattern that binds a type keyword (`({a: string}: T) => R`)
-  still does not.
+  an ERROR (#47), also with a line break or a comment before the token, and so do
+  `({a}?) => R` and `({a}?, b?) => R`. A pattern that binds a type keyword
+  (`({a: string}: T) => R`) still does not. The same rule settles `a < {b}` in
+  expressions: `f(a < {b}, e)`, `if (a < {b}) {}` and `x = {k: a < {b}}` are now
+  comparisons, as in tsc, where they were type arguments
+  (`instantiation_expression`), and `x = a < {b} ? c : d` and `a < {b} ?? c`
+  parse, where they were an ERROR. `f<{a}>(y)` and `f<{a}, B>(y)` stay generic
+  calls.
 - After `static` on one line, a modifier word on the next line (`private`, `declare`
   and so on) is the member's name unless the token after it is on the same line and
   can follow a modifier, as in tsc: `static⏎private⏎x` is a member `static private`
