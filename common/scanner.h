@@ -221,18 +221,23 @@ static const char *const NON_FOLLOWING_MODIFIERS[] = {
 };
 
 // At a `}` where a semicolon may be inserted. In a function type's parameters
-// (`type F = ({a}: T) => R`, also with `a\n}`) the parser cannot yet tell the object
-// pattern from an object type, whose member `a` would take the semicolon and end
-// the pattern. An object type's last member needs no semicolon, so there it is
-// left out before `}:`. Elsewhere it stays: `c ? () => { let a\n} : b` and
-// `c ? class { x\n} : e` need it.
+// (`type F = ({a}: T) => R`, also with `a\n}` or a comment before the `:`) the parser
+// cannot yet tell the object pattern from an object type, whose member `a` would
+// take the semicolon and end the pattern. An object type's last member needs no
+// semicolon, so it is left out there before `}:`. TYPE_MEMBER_END_MARKER is valid
+// only after an object-type member, so elsewhere the semicolon stays:
+// `c ? () => { let a\n} : b` and `c ? class { x\n} : e` need it. Only `:` is
+// checked: leaving the semicolon out before other followers changes trees, e.g.
+// `c ? f<{a}>(y) : z` would become a comparison.
 static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols) {
     if (!valid_symbols[TYPE_MEMBER_END_MARKER]) {
         return true;
     }
-    do {
-        skip(lexer);
-    } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
+    skip(lexer);
+    bool comment = false;
+    if (!scan_whitespace_and_comments(lexer, &comment)) {
+        return true;
+    }
     return lexer->lookahead != ':';
 }
 
@@ -336,9 +341,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     }
 
     // The markers below are never produced; the grammar makes each valid right
-    // after a keyword that tsc may continue across a line break. A `}` or EOF still
-    // ends a statement or member that used the keyword as a name.
-    bool at_end = lexer->lookahead == '}' || lexer->eof(lexer);
+    // after a keyword that tsc may continue across a line break. EOF, like a `}`
+    // (handled above), still ends a statement or member that used the keyword as
+    // a name.
+    bool at_end = lexer->eof(lexer);
     char word[16];
 
     // `new\nFoo()`, `export\nconst x = 1`: always one construct. In an object type

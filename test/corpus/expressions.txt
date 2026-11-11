@@ -1501,3 +1501,100 @@ const f = c ? () => { let a } : b
               (variable_declarator
                 (identifier)))))
         (identifier)))))
+
+==================================================
+A comment before a typed pattern's colon, and ternary arms ending in a block
+==================================================
+
+type A = ({a} /* c */: T) => R
+type B = ({a
+} // c
+: T) => R
+const g = c ? class { x } : e
+const h = c ? () => { let a: {b: T} } : e
+const i = c ? () => { type A = {b: T} } : e
+let j = c ? f<{a}>(y) : z
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (comment)
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern))
+          (comment)
+          (type_annotation
+            (type_identifier))))
+      (type_identifier)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (class
+          (class_body
+            (public_field_definition
+              (property_identifier))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (lexical_declaration
+              (variable_declarator
+                (identifier)
+                (type_annotation
+                  (object_type
+                    (property_signature
+                      (property_identifier)
+                      (type_annotation
+                        (type_identifier)))))))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (type_alias_declaration
+              (type_identifier)
+              (object_type
+                (property_signature
+                  (property_identifier)
+                  (type_annotation
+                    (type_identifier)))))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (call_expression
+          (identifier)
+          (type_arguments
+            (object_type
+              (property_signature
+                (property_identifier))))
+          (arguments
+            (identifier)))
+        (identifier)))))
