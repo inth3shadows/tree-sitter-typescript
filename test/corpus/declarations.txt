@@ -479,6 +479,99 @@ export default global {}
     (object)))
 
 ==================================
+Anonymous default function signatures
+==================================
+
+export default function (a: string): void;
+export default async function <T>(a: T): Promise<T>;
+function* g(): Iterator<number>;
+export default function (a: string) {}
+export default function* (): Iterator<number>;
+declare module "m" { export default function (a: string): void; }
+export default function (): void
+(x)
+export default function ()
+{ }
+
+---
+
+(program
+  (export_statement
+    (function_signature
+      (formal_parameters
+        (required_parameter
+          (identifier)
+          (type_annotation
+            (predefined_type))))
+      (type_annotation
+        (predefined_type))))
+  (export_statement
+    (function_signature
+      (type_parameters
+        (type_parameter
+          (type_identifier)))
+      (formal_parameters
+        (required_parameter
+          (identifier)
+          (type_annotation
+            (type_identifier))))
+      (type_annotation
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier))))))
+  (function_signature
+    (identifier)
+    (formal_parameters)
+    (type_annotation
+      (generic_type
+        (type_identifier)
+        (type_arguments
+          (predefined_type)))))
+  (export_statement
+    (function_expression
+      (formal_parameters
+        (required_parameter
+          (identifier)
+          (type_annotation
+            (predefined_type))))
+      (statement_block)))
+  (export_statement
+    (function_signature
+      (formal_parameters)
+      (type_annotation
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (predefined_type))))))
+  (ambient_declaration
+    (module
+      (string
+        (string_fragment))
+      (statement_block
+        (export_statement
+          (function_signature
+            (formal_parameters
+              (required_parameter
+                (identifier)
+                (type_annotation
+                  (predefined_type))))
+            (type_annotation
+              (predefined_type)))))))
+  (export_statement
+    (function_signature
+      (formal_parameters)
+      (type_annotation
+        (predefined_type))))
+  (expression_statement
+    (parenthesized_expression
+      (identifier)))
+  (export_statement
+    (function_expression
+      (formal_parameters)
+      (statement_block))))
+
+==================================
 Ambient exports
 ==================================
 
