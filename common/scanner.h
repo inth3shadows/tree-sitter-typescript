@@ -229,10 +229,12 @@ static const char *const NON_FOLLOWING_MODIFIERS[] = {
 // `c ? () => { let a\n} : b` and `c ? class { x\n} : e` need it. Only `:` is
 // checked: leaving the semicolon out before other followers changes trees, e.g.
 // `c ? f<{a}>(y) : z` would become a comparison.
-static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols) {
+static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     if (!valid_symbols[TYPE_MEMBER_END_MARKER]) {
         return true;
     }
+    // The lexer moves from here on, so the caller's `?` fallback must not run.
+    *scanned_comment = true;
     skip(lexer);
     bool comment = false;
     if (!scan_whitespace_and_comments(lexer, &comment)) {
@@ -250,7 +252,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             return true;
         }
         if (lexer->lookahead == '}') {
-            return scan_closing_brace(lexer, valid_symbols);
+            return scan_closing_brace(lexer, valid_symbols, scanned_comment);
         }
         // A block comment that contains a line terminator is a line break for ASI
         // (`a /* x\n */ b` is two statements). The parser would otherwise consume the
@@ -337,7 +339,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     }
 
     if (lexer->lookahead == '}') {
-        return scan_closing_brace(lexer, valid_symbols);
+        return scan_closing_brace(lexer, valid_symbols, scanned_comment);
     }
 
     // The markers below are never produced; the grammar makes each valid right

@@ -1598,3 +1598,53 @@ let j = c ? f<{a}>(y) : z
           (arguments
             (identifier)))
         (identifier)))))
+
+==================================================
+No ASI before an object-type brace followed by a colon, in other positions
+==================================================
+
+const v = c ? a < {b
+} : z
+type X = A extends B ? ({a
+}: T) => R : C
+type F = ({a // c
+}: T) => R
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (binary_expression
+          (identifier)
+          (object
+            (shorthand_property_identifier)))
+        (identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (conditional_type
+      (type_identifier)
+      (type_identifier)
+      (function_type
+        (formal_parameters
+          (required_parameter
+            (object_pattern
+              (shorthand_property_identifier_pattern))
+            (type_annotation
+              (type_identifier))))
+        (type_identifier))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern)
+            (comment))
+          (type_annotation
+            (type_identifier))))
+      (type_identifier))))

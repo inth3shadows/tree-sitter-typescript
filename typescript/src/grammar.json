@@ -11957,18 +11957,6 @@
                                     ]
                                   },
                                   {
-                                    "type": "CHOICE",
-                                    "members": [
-                                      {
-                                        "type": "SYMBOL",
-                                        "name": "_type_member_end_marker"
-                                      },
-                                      {
-                                        "type": "BLANK"
-                                      }
-                                    ]
-                                  },
-                                  {
                                     "type": "SYMBOL",
                                     "name": "_semicolon"
                                   }
