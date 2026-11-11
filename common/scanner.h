@@ -269,6 +269,15 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             if (!line_break) {
                 return false;
             }
+            // Nothing else on the comment's last line: let the parser take the comment
+            // as an extra, so it stays inside the statement (a trailing comment, not a
+            // doc comment for the next declaration); the next call sees the line break.
+            while (iswspace(lexer->lookahead) && !is_line_terminator(lexer->lookahead)) {
+                skip(lexer);
+            }
+            if (lexer->eof(lexer) || is_line_terminator(lexer->lookahead)) {
+                return false;
+            }
             break;
         }
         // `\r` alone, U+2028 and U+2029 end a line as `\n` does.

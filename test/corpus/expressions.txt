@@ -1095,3 +1095,29 @@ let /* x
     (variable_declarator
       (identifier)
       (number))))
+
+==================================================
+A trailing block comment that spans a line break stays in its statement
+==================================================
+
+let a = b /* trailing
+ note */
+function f() {}
+c /* x
+ */
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (identifier))
+    (comment))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block))
+  (expression_statement
+    (identifier)
+    (comment)))
