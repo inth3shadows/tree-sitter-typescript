@@ -39,16 +39,14 @@ because editor queries match on node names.
   interface bodies. A block that ends a ternary arm keeps its semicolon before
   `}:`, so `c ? () => { let a } : b` now parses too. Node types are unchanged; the
   parse table grows about 5%.
-- The same holds before `?`, `=`, `)`, `}` and `]`: `type F = ({a}?: T) => R`,
-  `({a}) => R`, `({a}?) => R`, `({a: {b}}: T) => R` and `([{a}]: T) => R` parse,
-  where they were an ERROR (#47), also with a line break or a comment before the
-  token. Before `,` the semicolon stays, so `g(e, f<{b}, c>(d))` remains a generic
-  call; `({a}, b) => R` and `f(a < {b}, e)` are still misread. A pattern that binds
-  a type keyword (`({a: string}: T) => R`) still does not parse. The same rule
-  settles `a < {b}` in expressions: `if (a < {b}) {}` and `x = {k: a < {b}}` are
-  now comparisons, as in tsc, where they were type arguments
-  (`instantiation_expression`), and `x = a < {b} ? c : d` and `a < {b} ?? c`
-  parse, where they were an ERROR.
+- The same holds before `?` and `=`: `type F = ({a}?: T) => R`, `({a}?) => R` and
+  `({a} = {}) => R` parse, where they were an ERROR (#47), also with a line break
+  or a comment before the token, and so do `x = a < {b} ? c : d` and
+  `a < {b} ?? c`. Before `,`, `)`, `}` and `]` the semicolon stays, because there
+  the parser would pick the wrong reading of `g(e, f<{b}, c>(d))` or
+  `x = <T>f<[{b}]>(d)`; so `({a}, b) => R`, `({a}) => R`, `({a: {b}}: T) => R`,
+  `([{a}]: T) => R` and `({a: string}: T) => R` are still an ERROR, and
+  `if (a < {b}) {}` is still read as type arguments with a missing `>`.
 - After `static` on one line, a modifier word on the next line (`private`, `declare`
   and so on) is the member's name unless the token after it is on the same line and
   can follow a modifier, as in tsc: `static⏎private⏎x` is a member `static private`
