@@ -823,6 +823,213 @@ class C {
         (statement_block)))))
 
 ==================================================
+A modifier word after static is the name unless a same-line token can follow it
+==================================================
+
+class C {
+  static
+  private
+  x
+  static
+  declare
+  = 1
+  static
+  protected /* c */ = 2
+  static
+  public // c
+  = 3
+  static
+  private /*
+  */ y
+  static
+  abstract
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (comment)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (comment)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (comment)
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)))))
+
+==================================================
+A member after a bare name or a modifier-word name can start with * . in or instanceof
+==================================================
+
+class C {
+  static
+  private
+  *g() {}
+  static
+  declare
+  *[k]() {}
+  static
+  private
+  .5 = 1
+  static
+  private
+  in = 1
+  static
+  public
+  instanceof = 2
+  x
+  *h() {}
+  y = a
+  *b
+  z = a
+  in b
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (computed_property_name
+          (identifier))
+        (formal_parameters)
+        (statement_block))
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (number)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (public_field_definition
+        (property_identifier)
+        (binary_expression
+          (identifier)
+          (identifier)))
+      (public_field_definition
+        (property_identifier)
+        (binary_expression
+          (identifier)
+          (identifier))))))
+
+==================================================
+A type name continues across a line break before a dot
+==================================================
+
+class C {
+  x: A
+  .B
+  f(a: A): A
+  .B {}
+  y
+  .5 = 1
+  z
+  *g() {}
+}
+interface I {
+  x: import("a")
+  .B<T>
+  y: number
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters
+          (required_parameter
+            (identifier)
+            (type_annotation
+              (type_identifier))))
+        (type_annotation
+          (nested_type_identifier
+            (identifier)
+            (type_identifier)))
+        (statement_block))
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (number)
+        (number))
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))))
+  (interface_declaration
+    (type_identifier)
+    (interface_body
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (generic_type
+            (member_expression
+              (call_expression
+                (import)
+                (arguments
+                  (string
+                    (string_fragment))))
+              (property_identifier))
+            (type_arguments
+              (type_identifier)))))
+      (property_signature
+        (property_identifier)
+        (type_annotation
+          (predefined_type))))))
+
+==================================================
 A modifier word after static or get on the next line can be the member name
 ==================================================
 

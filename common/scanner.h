@@ -243,6 +243,51 @@ static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols, bool *
     return lexer->lookahead != ':';
 }
 
+// After a modifier word: whether the next token is on the same line and can follow
+// a modifier (tsc's canFollowModifier: `[`, `{`, `*`, `...`, `#` or a property name,
+// which includes a number such as `.5`, hence a single `.`).
+// Spaces and comments on the same line are skipped.
+static bool modifier_word_is_modifier(TSLexer *lexer) {
+    for (;;) {
+        while (!is_line_terminator(lexer->lookahead) &&
+               (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead))) {
+            skip(lexer);
+        }
+        if (lexer->lookahead != '/') {
+            break;
+        }
+        skip(lexer);
+        if (lexer->lookahead != '*') {
+            // A line comment runs to the end of the line; a lone `/` cannot follow.
+            return false;
+        }
+        skip(lexer);
+        for (;;) {
+            if (lexer->eof(lexer)) {
+                return false;
+            }
+            if (is_line_terminator(lexer->lookahead)) {
+                return false;
+            }
+            if (lexer->lookahead == '*') {
+                skip(lexer);
+                if (lexer->lookahead == '/') {
+                    skip(lexer);
+                    break;
+                }
+                continue;
+            }
+            skip(lexer);
+        }
+    }
+    int32_t c = lexer->lookahead;
+    if (lexer->eof(lexer) || is_line_terminator(c)) {
+        return false;
+    }
+    return c == '[' || c == '{' || c == '*' || c == '.' || c == '#' || c == '"' || c == '\'' ||
+           iswdigit(c) || is_identifier_start(c);
+}
+
 static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
@@ -390,8 +435,17 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             if (!word_in(word, NON_FOLLOWING_MODIFIERS)) {
                 return false;
             }
-            // `static\ndeclare = 1`, `static\nprivate() {}`, `get\nprivate() {}`: the
-            // word is the member's name, not a modifier, so the member continues.
+            // As in tsc's nextTokenIsOnSameLineAndCanFollowModifier, the word is a
+            // modifier only if the next token is on the same line and can follow one;
+            // the grammar has no modifier after `static`, so that ends the member
+            // (`static\nprivate x`). Otherwise the word is the member's name and the
+            // member continues: `static\ndeclare = 1`, `static\nprivate() {}`,
+            // `static\nprivate\n= 1`.
+            if (valid_symbols[MODIFIER_MARKER]) {
+                return modifier_word_is_modifier(lexer);
+            }
+            // After `get`/`set`, tsc's canFollowGetOrSetKeyword ignores line breaks;
+            // keep the word as the accessor's name before these followers.
             while (lexer->lookahead == ' ' || lexer->lookahead == '\t' || is_unicode_space(lexer->lookahead)) {
                 skip(lexer);
             }
@@ -424,11 +478,25 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     }
 
     switch (lexer->lookahead) {
+        // After a member that cannot continue (a bare name: no `||`), a `*` or a `.5`
+        // on the next line starts a member: `x\n*g() {}`, `x\n.5 = 1`. Right after
+        // `static`, `get` or `set` they continue it (`static\n*g() {}`). Any other `.`
+        // continues a type name: `x: A\n.B`.
+        case '*':
+        case '.': {
+            if (!valid_symbols[MEMBER_END_MARKER] || valid_symbols[LOGICAL_OR] ||
+                valid_symbols[MODIFIER_MARKER] || valid_symbols[ACCESSOR_MARKER]) {
+                return false;
+            }
+            if (lexer->lookahead == '*') {
+                return true;
+            }
+            skip(lexer);
+            return iswdigit(lexer->lookahead);
+        }
         case '`':
         case ',':
-        case '.':
         case ';':
-        case '*':
         case '%':
         case '>':
         case '=':
@@ -520,10 +588,9 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
                 if (lexer->lookahead == '?') {
                     return true;
                 }
-                // After a member that cannot continue (no `||`: a typed member, a method),
-                // `in(`, `in<` and `in!` start a member named `in`.
-                if (!valid_symbols[LOGICAL_OR] &&
-                    (lexer->lookahead == '(' || lexer->lookahead == '<' || lexer->lookahead == '!')) {
+                // After a member that cannot continue (no `||`: a bare name, a typed
+                // member, a method), `in` starts a member: `in(`, `in<`, `in!`, `in = 1`.
+                if (!valid_symbols[LOGICAL_OR]) {
                     return true;
                 }
                 // After an initializer `||` is valid, and tsc reads `a = x\n in(b)` as the
@@ -547,7 +614,8 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             }
 
             if (!is_identifier_part(lexer->lookahead)) {
-                return false;
+                // `x\ninstanceof = 1` between members: a member named `instanceof`.
+                return valid_symbols[MEMBER_END_MARKER] && !valid_symbols[LOGICAL_OR];
             }
             break;
     }
