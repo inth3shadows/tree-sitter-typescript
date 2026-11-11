@@ -459,13 +459,22 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     }
 
     switch (lexer->lookahead) {
-        // After a member that cannot continue (a bare name: no `||`), a `*` or `.` on
-        // the next line starts a member: `x\n*g() {}`, `x\n.5 = 1`. Right after
-        // `static`, `get` or `set` they continue it (`static\n*g() {}`).
+        // After a member that cannot continue (a bare name: no `||`), a `*` or a `.5`
+        // on the next line starts a member: `x\n*g() {}`, `x\n.5 = 1`. Right after
+        // `static`, `get` or `set` they continue it (`static\n*g() {}`). Any other `.`
+        // continues a type name: `x: A\n.B`.
         case '*':
-        case '.':
-            return valid_symbols[MEMBER_END_MARKER] && !valid_symbols[LOGICAL_OR] &&
-                   !valid_symbols[MODIFIER_MARKER] && !valid_symbols[ACCESSOR_MARKER];
+        case '.': {
+            if (!valid_symbols[MEMBER_END_MARKER] || valid_symbols[LOGICAL_OR] ||
+                valid_symbols[MODIFIER_MARKER] || valid_symbols[ACCESSOR_MARKER]) {
+                return false;
+            }
+            if (lexer->lookahead == '*') {
+                return true;
+            }
+            skip(lexer);
+            return iswdigit(lexer->lookahead);
+        }
         case '`':
         case ',':
         case ';':
