@@ -20,6 +20,7 @@ enum TokenType {
     LET_MARKER,
     MODIFIER_MARKER,
     FROM_MARKER,
+    ACCESSOR_MARKER,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -53,11 +54,13 @@ static bool scan_template_chars(TSLexer *lexer) {
     }
 }
 
-// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
-// iswspace does not report in the C locale.
+// Whitespace and line terminators above ASCII that the grammar's extras skip (Zs,
+// U+200B, U+2060, U+FEFF, U+2028/9), which iswspace does not report in the C
+// locale. U+0085 is left out: tsc skips it, but the grammar's identifier token
+// accepts it.
 static bool is_unicode_space(int32_t c) {
-    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
-           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
+    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200B) || c == 0x2028 || c == 0x2029 ||
+           c == 0x202F || c == 0x205F || c == 0x2060 || c == 0x3000 || c == 0xFEFF;
 }
 
 static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) {
@@ -209,8 +212,9 @@ static const char *const RESERVED_WORDS[] = {
     "true",  "try",   "typeof", "var",     "void",     "while",    "with",     NULL,
 };
 
-// Modifiers the grammar does not accept after `static`, `get` or `set`: before them
-// the keyword stays a member name, as on main.
+// Modifiers the grammar does not accept after `static`, `get` or `set`. On the next
+// line, one of them ends the member that used the keyword as a name, unless what
+// follows it makes it the name itself (see the MODIFIER_MARKER block).
 static const char *const NON_FOLLOWING_MODIFIERS[] = {
     "public", "private", "protected", "declare", "abstract", NULL,
 };
@@ -351,7 +355,12 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     // `static\nx = 1`, `get\nx() {}`: one member before a property name, but not
     // before a decorator or a modifier the grammar cannot place after the keyword.
-    if (valid_symbols[MODIFIER_MARKER] && !at_end) {
+    // `get\n*g() {}` is a field `get` and a generator; `static\n*g() {}` is one member.
+    if (valid_symbols[ACCESSOR_MARKER] && !valid_symbols[MODIFIER_MARKER] && !at_end &&
+        lexer->lookahead == '*') {
+        return true;
+    }
+    if ((valid_symbols[MODIFIER_MARKER] || valid_symbols[ACCESSOR_MARKER]) && !at_end) {
         if (lexer->lookahead == '[' || lexer->lookahead == '#' || lexer->lookahead == '"' ||
             lexer->lookahead == '\'' || iswdigit(lexer->lookahead)) {
             return false;
@@ -359,7 +368,27 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         if (is_identifier_start(lexer->lookahead)) {
             *scanned_comment = true;
             scan_word(lexer, word, sizeof word);
-            return word_in(word, NON_FOLLOWING_MODIFIERS);
+            if (!word_in(word, NON_FOLLOWING_MODIFIERS)) {
+                return false;
+            }
+            // `static\ndeclare = 1`, `static\nprivate() {}`, `get\nprivate() {}`: the
+            // word is the member's name, not a modifier, so the member continues.
+            while (lexer->lookahead == ' ' || lexer->lookahead == '\t' || is_unicode_space(lexer->lookahead)) {
+                skip(lexer);
+            }
+            switch (lexer->lookahead) {
+                case '=':
+                case '(':
+                case ':':
+                case ';':
+                case '?':
+                case '!':
+                case '<':
+                case '}':
+                    return false;
+                default:
+                    return true;
+            }
         }
     }
 
@@ -372,7 +401,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         if (strcmp(word, "from") != 0) {
             return true;
         }
-        return is_identifier_part(lexer->lookahead);
+        return false;
     }
 
     switch (lexer->lookahead) {
@@ -451,8 +480,8 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             }
             skip(lexer);
 
-            if (!iswalnum(lexer->lookahead) && lexer->lookahead != '_' && lexer->lookahead != '$') {
-                // `in` itself, not an identifier such as `in2` or `in$x` (those get ASI below).
+            if (!is_identifier_part(lexer->lookahead)) {
+                // `in` itself, not an identifier such as `in2`, `in$x` or `inä` (those get ASI below).
                 // `in:` is a property name.
                 if (lexer->lookahead == ':') {
                     return true;
@@ -498,7 +527,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
                 skip(lexer);
             }
 
-            if (!iswalnum(lexer->lookahead) && lexer->lookahead != '_' && lexer->lookahead != '$') {
+            if (!is_identifier_part(lexer->lookahead)) {
                 return false;
             }
             break;

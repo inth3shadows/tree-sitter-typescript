@@ -19,9 +19,18 @@ because editor queries match on node names.
   `let⏎x = 1`, `new⏎Foo()`, `export⏎const x = 1`, `export { a }⏎from "m"` and
   `static⏎x` as one construct (#26). As in tsc, `let` continues only before a binding
   name, `[` or `{` (`let⏎if (x) {}` stays two statements), and `static`, `get` and `set`
-  (also `abstract get`/`set`) only before a property name. `static⏎private x` still reads as two members: the
-  grammar has no modifier after `static`. Node types are unchanged; the parse table
+  (also `abstract get`/`set`) only before a property name. `static⏎private x` still
+  reads as two members: the grammar has no modifier after `static`. `abstract get⏎x:
+  number` is now an ERROR, as it is in tsc. Node types are unchanged; the parse table
   grows about 9%.
+- More ASI cases follow tsc (#40). `get⏎*g() {}` (also `set`) is a field `get` followed
+  by a generator, where it was an ERROR; `static⏎*g() {}` stays one member.
+  `static⏎declare = 1`, `static⏎private() {}` and `static⏎public: number` are one
+  member named after the word, where they were two; `get⏎private() {}` is a getter
+  named `private`, where it was a field `get` and a method. `x⏎inä = 1` and
+  `x⏎instanceofä = 1` get a semicolon before the identifier, where they were an
+  ERROR. U+200B and U+2060 count as whitespace in the scanner, as in the grammar's
+  extras, so `let⏎<U+200B>if (x) {}` is two statements. Node types are unchanged.
 - Export specifiers may name `type` (upstream #313): `export { type }`,
   `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
   a name `type`, while `export { type as }` and `export { type as as x }` are type-only

@@ -787,6 +787,174 @@ type T = `\u`;
       (escape_sequence))))
 
 ==================================================
+A generator on the line after get or set is a new member
+==================================================
+
+class C {
+  get
+  *g() {}
+  set
+  *h() {}
+  static
+  *i() {}
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (public_field_definition
+        (property_identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block)))))
+
+==================================================
+A modifier word after static or get on the next line can be the member name
+==================================================
+
+class C {
+  static
+  declare = 1
+  static
+  private() {}
+  static
+  public: number
+  static /*
+  */ declare = 2
+  static
+  private​= 3
+  get
+  private() { return 1 }
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (comment)
+        (property_identifier)
+        (number))
+      (public_field_definition
+        (property_identifier)
+        (number))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (return_statement
+            (number)))))))
+
+==================================================
+U+2060 is whitespace for ASI, as in the grammar's extras
+==================================================
+
+a
+in⁠b
+x
+instanceof⁠y
+c⁠
+d
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier)))
+
+==================================================
+ASI before a non-ASCII identifier starting with in or instanceof
+==================================================
+
+x
+inä = 1
+y
+instanceofä = 1
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (number))))
+
+==================================================
+Unicode spaces after a line break do not end a construct
+==================================================
+
+let
+　x = 1
+class C { static
+ y }
+export { a }
+　from "m"
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (number)))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment))))
+
+==================================================
 No ASI after keywords that continue across a line break
 ==================================================
 
@@ -976,6 +1144,10 @@ export { a }
 from "m"
 let
 　if (x) {}
+let
+​if (x) {}
+class C { static
+​@dec x }
 
 ---
 
@@ -999,7 +1171,22 @@ let
   (if_statement
     (parenthesized_expression
       (identifier))
-    (statement_block)))
+    (statement_block))
+  (expression_statement
+    (identifier))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (public_field_definition
+        (decorator
+          (identifier))
+        (property_identifier)))))
 
 ==================================================
 ASI after a block comment that spans a line break
@@ -1184,3 +1371,81 @@ let n = o /* x
         (identifier)
         (comment)
         (number)))))
+
+==================================================
+ASI before a next-line brace that ends a ternary arm
+==================================================
+
+const h = c ? () => { d
+} : e
+const i = c ? () => {
+  let j
+} : k
+const f = c ? () => { return
+} : g
+const C = c ? class { x
+} : D
+class B { y = c ? class {
+  z: string
+} : D }
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (identifier))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (lexical_declaration
+              (variable_declarator
+                (identifier)))))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (return_statement)))
+        (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (class
+          (class_body
+            (public_field_definition
+              (property_identifier))))
+        (identifier))))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (ternary_expression
+          (identifier)
+          (class
+            (class_body
+              (public_field_definition
+                (property_identifier)
+                (type_annotation
+                  (predefined_type)))))
+          (identifier))))))
