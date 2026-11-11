@@ -476,15 +476,50 @@ module.exports = function defineGrammar(dialect) {
 
       variable_declarator: $ => choice(
         seq(
-          field('name', choice($.identifier, $._destructuring_pattern)),
+          // `as` is a keyword token wherever `as T` may follow, which includes right
+          // after `let` (`let as T` with `let` as an identifier): accept it as the
+          // name there, as tsc does (`let as = 1`).
+          field('name', choice($.identifier, alias('as', $.identifier), $._destructuring_pattern)),
           field('type', optional($.type_annotation)),
           optional($._initializer),
         ),
         prec('declaration', seq(
-          field('name', $.identifier),
+          field('name', choice($.identifier, alias('as', $.identifier))),
           '!',
           field('type', $.type_annotation),
         )),
+      ),
+
+      // The JavaScript rule, taking `as` as the name after `let`/`const` as
+      // variable_declarator does (`for (let as of x)`).
+      _for_header: $ => seq(
+        '(',
+        choice(
+          field('left', choice(
+            $._lhs_expression,
+            $.parenthesized_expression,
+          )),
+          seq(
+            field('kind', 'var'),
+            field('left', choice(
+              $.identifier,
+              $._destructuring_pattern,
+            )),
+            optional($._initializer),
+          ),
+          seq(
+            field('kind', choice('let', 'const')),
+            field('left', choice(
+              $.identifier,
+              alias('as', $.identifier),
+              $._destructuring_pattern,
+            )),
+            optional($._automatic_semicolon),
+          ),
+        ),
+        field('operator', choice('in', 'of')),
+        field('right', $._expressions),
+        ')',
       ),
 
       method_signature: $ => methodSignature($, $._property_name),

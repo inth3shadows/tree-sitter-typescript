@@ -1659,6 +1659,15 @@
                     "name": "identifier"
                   },
                   {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "STRING",
+                      "value": "as"
+                    },
+                    "named": true,
+                    "value": "identifier"
+                  },
+                  {
                     "type": "SYMBOL",
                     "name": "_destructuring_pattern"
                   }
@@ -1705,8 +1714,22 @@
                 "type": "FIELD",
                 "name": "name",
                 "content": {
-                  "type": "SYMBOL",
-                  "name": "identifier"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "identifier"
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "as"
+                      },
+                      "named": true,
+                      "value": "identifier"
+                    }
+                  ]
                 }
               },
               {
@@ -2090,6 +2113,15 @@
                       {
                         "type": "SYMBOL",
                         "name": "identifier"
+                      },
+                      {
+                        "type": "ALIAS",
+                        "content": {
+                          "type": "STRING",
+                          "value": "as"
+                        },
+                        "named": true,
+                        "value": "identifier"
                       },
                       {
                         "type": "SYMBOL",
