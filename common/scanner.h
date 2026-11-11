@@ -225,13 +225,15 @@ static const char *const NON_FOLLOWING_MODIFIERS[] = {
 // type from something else that `{` opens, the semicolon decides: only the object
 // type can take it. Two such places:
 // - a function type's parameters, object type or object pattern: `({a}?: T) => R`,
-//   `({a}, b) => R`, `({a: {b}}: T) => R`, `([{a}]: T) => R`, also with `a\n}`;
+//   `({a}) => R`, `({a: {b}}: T) => R`, `([{a}]: T) => R`, also with `a\n}`;
 // - after `<` in an expression, type arguments or a comparison with an object:
 //   `f<{a}>(y)` is a generic call, `f(a < {b}, e)` and `x = a < {b} ? c : d` compare.
 // An object type's last member needs no semicolon, so it is left out before a `}`
-// followed by `:`, `?`, `,`, `=`, `)`, `}` or `]` (comments may come between), which
-// keeps the pattern or the comparison alive. Before any other token (`>`, `|`, `&`,
-// `[`, `.`...) it stays and decides for the type. Without TYPE_MEMBER_END_MARKER the
+// followed by `:`, `?`, `=`, `)`, `}` or `]` (comments may come between), which
+// keeps the pattern or the comparison alive. Before any other token (`>`, `,`, `|`,
+// `&`, `[`, `.`...) it stays and decides for the type. `,` is not in the list:
+// leaving the semicolon out there makes `g(e, f<{b}, c>(d))` two comparisons, so
+// `({a}, b) => R` stays an ERROR. Without TYPE_MEMBER_END_MARKER the
 // semicolon always stays: `c ? () => { let a\n} : b` and `c ? class { x\n} : e` need
 // it.
 static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
@@ -252,7 +254,6 @@ static bool scan_closing_brace(TSLexer *lexer, const bool *valid_symbols, bool *
         case '=':
         case '}':
         case ']':
-        case ',':
             return false;
         default:
             return true;

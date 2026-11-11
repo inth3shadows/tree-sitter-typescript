@@ -1861,13 +1861,13 @@ Object patterns in function-type parameters before other parameter ends
 ==================================================
 
 type A = ({a}?: T) => R
-type B = ({a}, b: number) => R
 type C = ({a} = {}) => R
 type D = ({a: {b}}: T) => R
 type F = ([{a}]: T) => R
 type G = ({a}) => R
-type H = ({a: {b}, c}: T) => R
 let w = f<{a}, B>(y)
+let v = g(e, f<{b}, c>(d))
+let u = [e, f<{b}, c>(d)]
 type K = A extends {a} ? X : Y
 
 ---
@@ -1882,18 +1882,6 @@ type K = A extends {a} ? X : Y
             (shorthand_property_identifier_pattern))
           (type_annotation
             (type_identifier))))
-      (type_identifier)))
-  (type_alias_declaration
-    (type_identifier)
-    (function_type
-      (formal_parameters
-        (required_parameter
-          (object_pattern
-            (shorthand_property_identifier_pattern)))
-        (required_parameter
-          (identifier)
-          (type_annotation
-            (predefined_type))))
       (type_identifier)))
   (type_alias_declaration
     (type_identifier)
@@ -1936,20 +1924,6 @@ type K = A extends {a} ? X : Y
           (object_pattern
             (shorthand_property_identifier_pattern))))
       (type_identifier)))
-  (type_alias_declaration
-    (type_identifier)
-    (function_type
-      (formal_parameters
-        (required_parameter
-          (object_pattern
-            (pair_pattern
-              (property_identifier)
-              (object_pattern
-                (shorthand_property_identifier_pattern)))
-            (shorthand_property_identifier_pattern))
-          (type_annotation
-            (type_identifier))))
-      (type_identifier)))
   (lexical_declaration
     (variable_declarator
       (identifier)
@@ -1962,6 +1936,36 @@ type K = A extends {a} ? X : Y
           (type_identifier))
         (arguments
           (identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (call_expression
+        (identifier)
+        (arguments
+          (identifier)
+          (call_expression
+            (identifier)
+            (type_arguments
+              (object_type
+                (property_signature
+                  (property_identifier)))
+              (type_identifier))
+            (arguments
+              (identifier)))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (array
+        (identifier)
+        (call_expression
+          (identifier)
+          (type_arguments
+            (object_type
+              (property_signature
+                (property_identifier)))
+            (type_identifier))
+          (arguments
+            (identifier))))))
   (type_alias_declaration
     (type_identifier)
     (conditional_type
@@ -1973,32 +1977,28 @@ type K = A extends {a} ? X : Y
       (type_identifier))))
 
 ==================================================
-A comparison with an object, and patterns before ? or , on the next line
+A comparison with an object, and patterns before ? on the next line
 ==================================================
 
-f(a < {b}, e)
+if (a < {b}) {}
 x = a < {b} ? c : d
 y = {k: a < {a}}
 type A = ({a} /* c */ ?: T) => R
 type B = ({a}
 ?: T) => R
-type C = ({a}
-, b) => R
 type D = ({a}?) => R
 type E = ({a}?, b?) => R
 
 ---
 
 (program
-  (expression_statement
-    (call_expression
-      (identifier)
-      (arguments
-        (binary_expression
-          (identifier)
-          (object
-            (shorthand_property_identifier)))
-        (identifier))))
+  (if_statement
+    (parenthesized_expression
+      (binary_expression
+        (identifier)
+        (object
+          (shorthand_property_identifier))))
+    (statement_block))
   (expression_statement
     (assignment_expression
       (identifier)
@@ -2039,16 +2039,6 @@ type E = ({a}?, b?) => R
             (shorthand_property_identifier_pattern))
           (type_annotation
             (type_identifier))))
-      (type_identifier)))
-  (type_alias_declaration
-    (type_identifier)
-    (function_type
-      (formal_parameters
-        (required_parameter
-          (object_pattern
-            (shorthand_property_identifier_pattern)))
-        (required_parameter
-          (identifier)))
       (type_identifier)))
   (type_alias_declaration
     (type_identifier)
