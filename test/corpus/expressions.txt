@@ -833,6 +833,8 @@ class C {
   private() {}
   static
   public: number
+  static /*
+  */ declare = 2
 }
 
 ---
@@ -851,7 +853,11 @@ class C {
       (public_field_definition
         (property_identifier)
         (type_annotation
-          (predefined_type))))))
+          (predefined_type)))
+      (public_field_definition
+        (comment)
+        (property_identifier)
+        (number)))))
 
 ==================================================
 ASI before a non-ASCII identifier starting with in or instanceof
