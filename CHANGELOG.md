@@ -7,6 +7,13 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A block comment that spans a line break counts as a line break for automatic
+  semicolon insertion, as in tsc: `let a = b /* x⏎ */ c` is two statements, and
+  `abstract /* x⏎ */ y: number` is a field named `abstract` followed by `y`. A lone
+  `\r`, U+2028 or U+2029 now ends a line too (`a\rb` is two statements), and ends a
+  `//` comment. When code follows such a comment on its last line, the comment is a
+  sibling between the two statements; a trailing one stays the statement's last
+  child (#26).
 - A line break after `let`, `new`, `export`, `static`, `get` or `set`, or before `from`
   after an export clause, no longer ends the statement or member: tsc reads
   `let⏎x = 1`, `new⏎Foo()`, `export⏎const x = 1`, `export { a }⏎from "m"` and

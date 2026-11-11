@@ -28,6 +28,8 @@ static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 
+static bool is_line_terminator(int32_t c) { return c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029; }
+
 static bool scan_template_chars(TSLexer *lexer) {
     lexer->result_symbol = TEMPLATE_CHARS;
     for (bool has_content = false;; has_content = true) {
@@ -51,9 +53,16 @@ static bool scan_template_chars(TSLexer *lexer) {
     }
 }
 
+// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
+// iswspace does not report in the C locale.
+static bool is_unicode_space(int32_t c) {
+    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
+           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
+}
+
 static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) {
     for (;;) {
-        while (iswspace(lexer->lookahead)) {
+        while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
             skip(lexer);
         }
 
@@ -62,7 +71,7 @@ static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) 
 
             if (lexer->lookahead == '/') {
                 skip(lexer);
-                while (lexer->lookahead != 0 && lexer->lookahead != '\n') {
+                while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
                     skip(lexer);
                 }
                 *scanned_comment = true;
@@ -119,7 +128,7 @@ static bool scan_method_parameters(TSLexer *lexer) {
         if (c == '/') {
             skip(lexer);
             if (lexer->lookahead == '/') {
-                while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
+                while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
                     skip(lexer);
                 }
             } else if (lexer->lookahead == '*') {
@@ -157,13 +166,6 @@ static bool scan_method_parameters(TSLexer *lexer) {
         skip(lexer);
     }
     return false;
-}
-
-// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
-// iswspace does not report in the C locale.
-static bool is_unicode_space(int32_t c) {
-    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
-           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
 }
 
 static bool is_identifier_start(int32_t c) {
@@ -228,22 +230,91 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             // Therefore, disable automatic semicolons when followed by typing
             do {
                 skip(lexer);
-            } while (iswspace(lexer->lookahead));
+            } while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead));
             if (lexer->lookahead == ':') {
                 return valid_symbols[LOGICAL_OR]; // Don't return false if we're in a ternary by checking if || is valid
             }
             return true;
         }
-        if (!iswspace(lexer->lookahead)) {
-            return false;
-        }
-        if (lexer->lookahead == '\n') {
+        // A block comment that contains a line terminator is a line break for ASI
+        // (`a /* x\n */ b` is two statements). The parser would otherwise consume the
+        // comment as an extra and call this scanner after it, past the line break.
+        // Other comments keep the old path: the next call starts at their newline.
+        if (lexer->lookahead == '/') {
+            // The lexer moves from here on, so the caller's `?` fallback must not run.
+            *scanned_comment = true;
+            skip(lexer);
+            if (lexer->lookahead != '*') {
+                return false;
+            }
+            skip(lexer);
+            bool line_break = false;
+            for (;;) {
+                if (lexer->eof(lexer)) {
+                    return false;
+                }
+                if (lexer->lookahead == '*') {
+                    skip(lexer);
+                    if (lexer->lookahead == '/') {
+                        skip(lexer);
+                        break;
+                    }
+                    continue;
+                }
+                if (is_line_terminator(lexer->lookahead)) {
+                    line_break = true;
+                }
+                skip(lexer);
+            }
+            if (!line_break) {
+                return false;
+            }
+            // Only spaces and comments left on the comment's last line, or a `}`: let the
+            // parser take the comment as an extra, so it stays inside the statement (a
+            // trailing comment, not a doc comment for the next declaration), and the
+            // next call decides from the line break or the `}` as main does.
+            for (;;) {
+                while (!is_line_terminator(lexer->lookahead) &&
+                       (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead))) {
+                    skip(lexer);
+                }
+                if (lexer->lookahead != '/') {
+                    break;
+                }
+                skip(lexer);
+                // `//` is a line comment; a lone `/` is division, which continues the
+                // statement across the line break as in tsc (`a /* x\n */ / 2`).
+                if (lexer->lookahead != '*') {
+                    return false;
+                }
+                skip(lexer);
+                while (!lexer->eof(lexer)) {
+                    if (lexer->lookahead == '*') {
+                        skip(lexer);
+                        if (lexer->lookahead == '/') {
+                            skip(lexer);
+                            break;
+                        }
+                        continue;
+                    }
+                    skip(lexer);
+                }
+            }
+            if (lexer->eof(lexer) || is_line_terminator(lexer->lookahead) || lexer->lookahead == '}') {
+                return false;
+            }
             break;
+        }
+        // `\r` alone, U+2028 and U+2029 end a line as `\n` does.
+        if (is_line_terminator(lexer->lookahead)) {
+            skip(lexer);
+            break;
+        }
+        if (!iswspace(lexer->lookahead) && !is_unicode_space(lexer->lookahead)) {
+            return false;
         }
         skip(lexer);
     }
-
-    skip(lexer);
 
     if (!scan_whitespace_and_comments(lexer, scanned_comment)) {
         return false;
@@ -257,10 +328,11 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     // `new\nFoo()`, `export\nconst x = 1`: always one construct. In an object type
     // `export` may also be a member name (`export\n default: T` is two members), and
-    // there MEMBER_SIGNATURE_MARKER is valid too, so the usual rules apply. This relies
-    // on MEMBER_SIGNATURE_MARKER never being valid right after a statement-level
-    // `export` or `new` (see object_type in define-grammar.js).
-    if (valid_symbols[NO_ASI_MARKER] && !valid_symbols[MEMBER_SIGNATURE_MARKER] && !at_end) {
+    // there MEMBER_SIGNATURE_MARKER and MEMBER_END_MARKER are both valid, so the usual
+    // rules apply. Checking MEMBER_SIGNATURE_MARKER alone is not enough: the parse state
+    // after `new` in a bare block or arrow body is merged with one where it is valid
+    // (see object_type in define-grammar.js).
+    if (valid_symbols[NO_ASI_MARKER] && !(valid_symbols[MEMBER_SIGNATURE_MARKER] && valid_symbols[MEMBER_END_MARKER]) && !at_end) {
         return false;
     }
 
@@ -505,8 +577,7 @@ static bool scan_closing_comment(TSLexer *lexer) {
         return false;
     }
 
-    while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != 0x2028 &&
-           lexer->lookahead != 0x2029) {
+    while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
         advance(lexer);
     }
 

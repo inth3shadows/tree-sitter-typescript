@@ -843,6 +843,52 @@ class C {
             (number)))))))
 
 ==================================================
+No ASI after new or export inside blocks
+==================================================
+
+() => { new
+Foo() }
+{ new /*
+*/ Foo() }
+if (x) { new
+Foo() }
+{ export /*
+*/ const c = 1 }
+
+---
+
+(program
+  (expression_statement
+    (arrow_function
+      (formal_parameters)
+      (statement_block
+        (expression_statement
+          (new_expression
+            (identifier)
+            (arguments))))))
+  (statement_block
+    (expression_statement
+      (new_expression
+        (comment)
+        (identifier)
+        (arguments))))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block
+      (expression_statement
+        (new_expression
+          (identifier)
+          (arguments)))))
+  (statement_block
+    (export_statement
+      (comment)
+      (lexical_declaration
+        (variable_declarator
+          (identifier)
+          (number))))))
+
+==================================================
 ASI still applies where tsc does not continue the keyword
 ==================================================
 
@@ -954,3 +1000,187 @@ let
     (parenthesized_expression
       (identifier))
     (statement_block)))
+
+==================================================
+ASI after a block comment that spans a line break
+==================================================
+
+let a = b /* x
+ */ c
+x /* a
+ */ ++y
+abstract class C {
+  abstract /* x
+  */ y: number
+  readonly /* x
+  */ z: number
+}
+let d = e /* same line */ + f
+g /* x
+ */ .h()
+function r() {
+  return /* x
+  */ 1
+}
+let t = a /* x
+ */ ? b : c
+let /* x
+ */ u = 1
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (identifier)))
+  (comment)
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (comment)
+  (expression_statement
+    (update_expression
+      (identifier)))
+  (abstract_class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (comment)
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (property_identifier))
+      (comment)
+      (public_field_definition
+        (property_identifier)
+        (type_annotation
+          (predefined_type)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (binary_expression
+        (identifier)
+        (comment)
+        (identifier))))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (comment)
+        (property_identifier))
+      (arguments)))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement)
+      (comment)
+      (expression_statement
+        (number))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (comment)
+        (identifier)
+        (identifier))))
+  (lexical_declaration
+    (comment)
+    (variable_declarator
+      (identifier)
+      (number))))
+
+==================================================
+A trailing block comment that spans a line break stays in its statement
+==================================================
+
+let a = b /* trailing
+ note */
+function f() {}
+c /* x
+ */
+let d = e /* x
+ */ // trailing
+function g() {}
+let h = i /* x
+ */ /* y */ 
+function j() {}
+switch (k) { case 1: l /* x
+ */ }
+type F = ({m /* x
+ */}: {m: number}) => number
+let n = o /* x
+ */ / 2
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (identifier))
+    (comment))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block))
+  (expression_statement
+    (identifier)
+    (comment))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (identifier))
+    (comment)
+    (comment))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (identifier))
+    (comment)
+    (comment))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block))
+  (switch_statement
+    (parenthesized_expression
+      (identifier))
+    (switch_body
+      (switch_case
+        (number)
+        (expression_statement
+          (identifier)
+          (comment)))))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters
+        (required_parameter
+          (object_pattern
+            (shorthand_property_identifier_pattern)
+            (comment))
+          (type_annotation
+            (object_type
+              (property_signature
+                (property_identifier)
+                (type_annotation
+                  (predefined_type)))))))
+      (predefined_type)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (binary_expression
+        (identifier)
+        (comment)
+        (number)))))

@@ -1134,7 +1134,7 @@ module.exports = function defineGrammar(dialect) {
             choice(
               // `export` may be a member name here: the scanner ignores the
               // export statement's _no_asi_marker where _member_signature_marker
-              // is valid too.
+              // and _member_end_marker are both valid.
               $.export_statement,
               $.property_signature,
               $.call_signature,
