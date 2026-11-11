@@ -53,9 +53,16 @@ static bool scan_template_chars(TSLexer *lexer) {
     }
 }
 
+// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
+// iswspace does not report in the C locale.
+static bool is_unicode_space(int32_t c) {
+    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
+           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
+}
+
 static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) {
     for (;;) {
-        while (iswspace(lexer->lookahead)) {
+        while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
             skip(lexer);
         }
 
@@ -64,7 +71,7 @@ static bool scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment) 
 
             if (lexer->lookahead == '/') {
                 skip(lexer);
-                while (lexer->lookahead != 0 && lexer->lookahead != '\n') {
+                while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
                     skip(lexer);
                 }
                 *scanned_comment = true;
@@ -121,7 +128,7 @@ static bool scan_method_parameters(TSLexer *lexer) {
         if (c == '/') {
             skip(lexer);
             if (lexer->lookahead == '/') {
-                while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
+                while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
                     skip(lexer);
                 }
             } else if (lexer->lookahead == '*') {
@@ -159,13 +166,6 @@ static bool scan_method_parameters(TSLexer *lexer) {
         skip(lexer);
     }
     return false;
-}
-
-// JS whitespace and line terminators above ASCII (Zs, U+FEFF, U+2028/9), which
-// iswspace does not report in the C locale.
-static bool is_unicode_space(int32_t c) {
-    return c == 0xA0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200A) || c == 0x2028 || c == 0x2029 ||
-           c == 0x202F || c == 0x205F || c == 0x3000 || c == 0xFEFF;
 }
 
 static bool is_identifier_start(int32_t c) {
@@ -269,13 +269,39 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             if (!line_break) {
                 return false;
             }
-            // Nothing else on the comment's last line: let the parser take the comment
-            // as an extra, so it stays inside the statement (a trailing comment, not a
-            // doc comment for the next declaration); the next call sees the line break.
-            while (iswspace(lexer->lookahead) && !is_line_terminator(lexer->lookahead)) {
+            // Only spaces and comments left on the comment's last line, or a `}`: let the
+            // parser take the comment as an extra, so it stays inside the statement (a
+            // trailing comment, not a doc comment for the next declaration), and the
+            // next call decides from the line break or the `}` as main does.
+            for (;;) {
+                while (!is_line_terminator(lexer->lookahead) &&
+                       (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead))) {
+                    skip(lexer);
+                }
+                if (lexer->lookahead != '/') {
+                    break;
+                }
                 skip(lexer);
+                if (lexer->lookahead == '/') {
+                    return false;
+                }
+                if (lexer->lookahead != '*') {
+                    break;
+                }
+                skip(lexer);
+                while (!lexer->eof(lexer)) {
+                    if (lexer->lookahead == '*') {
+                        skip(lexer);
+                        if (lexer->lookahead == '/') {
+                            skip(lexer);
+                            break;
+                        }
+                        continue;
+                    }
+                    skip(lexer);
+                }
             }
-            if (lexer->eof(lexer) || is_line_terminator(lexer->lookahead)) {
+            if (lexer->eof(lexer) || is_line_terminator(lexer->lookahead) || lexer->lookahead == '}') {
                 return false;
             }
             break;
@@ -285,7 +311,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             skip(lexer);
             break;
         }
-        if (!iswspace(lexer->lookahead)) {
+        if (!iswspace(lexer->lookahead) && !is_unicode_space(lexer->lookahead)) {
             return false;
         }
         skip(lexer);

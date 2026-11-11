@@ -33,3 +33,29 @@ v /* x  */ w
   (comment)
   (expression_statement
     (identifier)))
+
+==================================================
+A lone CR or U+2028 ends a line comment
+==================================================
+
+x = y// c(z)
+a // c .b()
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (call_expression
+        (identifier)
+        (comment)
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (comment)
+        (property_identifier))
+      (arguments))))
