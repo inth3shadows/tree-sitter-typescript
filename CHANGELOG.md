@@ -19,8 +19,9 @@ because editor queries match on node names.
   `let⏎x = 1`, `new⏎Foo()`, `export⏎const x = 1`, `export { a }⏎from "m"` and
   `static⏎x` as one construct (#26). As in tsc, `let` continues only before a binding
   name, `[` or `{` (`let⏎if (x) {}` stays two statements), and `static`, `get` and `set`
-  (also `abstract get`/`set`) only before a property name. `static⏎private x` still reads as two members: the
-  grammar has no modifier after `static`. Node types are unchanged; the parse table
+  (also `abstract get`/`set`) only before a property name. `static⏎private x` still
+  reads as two members: the grammar has no modifier after `static`. `abstract get⏎x:
+  number` is now an ERROR, as it is in tsc. Node types are unchanged; the parse table
   grows about 9%.
 - Export specifiers may name `type` (upstream #313): `export { type }`,
   `export { type as T }`, `export { type as as }` and `export { type as "s" }` export
