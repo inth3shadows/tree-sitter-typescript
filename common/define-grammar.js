@@ -271,18 +271,18 @@ module.exports = function defineGrammar(dialect) {
 
       // `using x = …` declares only when a binding name follows `using` (tsc's
       // isUsingDeclaration); elsewhere `using` is an ordinary identifier (#57).
-      assignment_expression: $ => prec.right('assign', choice(
-        seq(
+      assignment_expression: $ => prec.right('assign', seq(
+        choice(
           field('left', choice($.parenthesized_expression, $._lhs_expression)),
-          '=',
-          field('right', $.expression),
+          seq('using', field('left', choice(
+            $._binding_identifier,
+            keywordName($, 'of'),
+            alias($._reserved_identifier, $.identifier),
+            $.object_pattern,
+          ))),
         ),
-        seq(
-          'using',
-          field('left', choice($.identifier, alias($._reserved_identifier, $.identifier))),
-          '=',
-          field('right', $.expression),
-        ),
+        '=',
+        field('right', $.expression),
       )),
 
       _augmented_assignment_lhs: ($, previous) => choice(previous, $.non_null_expression),
@@ -1359,7 +1359,6 @@ module.exports = function defineGrammar(dialect) {
         'export',
         'object',
         'new',
-        'readonly',
         'using',
         previous,
       ),

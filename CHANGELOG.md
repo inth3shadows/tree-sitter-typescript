@@ -9,9 +9,12 @@ because editor queries match on node names.
 ### Fixes
 - `using` parses as an ordinary identifier: `let y = using`, `if (using) x`,
   `using[1]`, `using++` and a parameter or method named `using` were an ERROR (#57).
-  `using` now declares only when a name follows it (`using x = f()`, as tsc's
-  isUsingDeclaration requires). `using a.b = c` and `using [a] = b`, which tsc rejects,
-  no longer parse as a using declaration. The parse table shrinks by 27 states (tsx 26).
+  `using` now declares only when a name (including `as`, `satisfies` and `of`) or an
+  object pattern follows it (`using x = f()`), as in tsc's isUsingDeclaration.
+  `using [a] = b` is now an assignment to `using[a]`, as tsc reads it, and
+  `using a.b = c`, which tsc rejects, is an ERROR. A line break after `using` ends the
+  statement: `using⏎x = 1` is two statements. The parse table shrinks by 25 states
+  (tsx 24).
 - An import type inside parentheses parses: `let x: (import("m").A)[]` and
   `type T = (import("m").A | B)[]`, which `tsc --declaration` emits, were an ERROR
   (#56). Wherever an import type and an expression can both start (after `(` in a
