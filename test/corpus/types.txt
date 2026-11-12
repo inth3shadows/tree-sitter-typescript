@@ -1447,6 +1447,45 @@ type T = typeof array[number];
       (predefined_type))))
 
 =======================================
+Index type queries of type operators
+=======================================
+
+type T = keyof readonly string[];
+type T = { [K in keyof readonly any[]]?: boolean };
+type T = U extends keyof infer V ? V : never;
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (index_type_query
+      (readonly_type
+        (array_type
+          (predefined_type)))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (readonly_type
+              (array_type
+                (predefined_type)))))
+        (opting_type_annotation
+          (predefined_type)))))
+  (type_alias_declaration
+    (type_identifier)
+    (conditional_type
+      (type_identifier)
+      (index_type_query
+        (infer_type
+          (type_identifier)))
+      (type_identifier)
+      (predefined_type))))
+
+=======================================
 Lookup types
 =======================================
 

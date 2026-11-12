@@ -7,6 +7,13 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- `keyof` takes a `readonly` or `infer` type: `keyof readonly any[]`, which TypeScript's
+  own `lib.es2015.symbol.wellknown.d.ts` uses, and `U extends keyof infer V ? V : never`
+  were an ERROR (#58). From dokimasia/tree-sitter-typescript (Roy Klopper). The parse
+  table grows by 9 states (tsx 9).
+  Known limit: `readonly` still takes everything after it, so
+  `keyof readonly T[] | U`, `& U` and `extends U ? A : B` nest inside `readonly` (as
+  `readonly string[] | null` already did) where tsc binds them outside `keyof`.
 - `using` parses as an ordinary identifier: `let y = using`, `if (using) x`,
   `using[1]`, `using++`, `x = using as T`, `class A extends using {}` and a parameter
   or method named `using` were an ERROR (#57). `using` declares only when a binding
@@ -188,6 +195,7 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- `index_type_query`'s child may also be `readonly_type` or `infer_type` (#58).
 - `non_null_expression`'s child also lists `identifier` and `undefined` (for
   `using x! = f()` and `using undefined! = 1`, #57); both were already reachable
   through `expression`.
