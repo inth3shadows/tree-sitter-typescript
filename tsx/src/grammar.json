@@ -11766,8 +11766,21 @@
           "value": "keyof"
         },
         {
-          "type": "SYMBOL",
-          "name": "primary_type"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "primary_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "readonly_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "infer_type"
+            }
+          ]
         }
       ]
     },

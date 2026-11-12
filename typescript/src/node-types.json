@@ -3010,7 +3010,15 @@
       "required": true,
       "types": [
         {
+          "type": "infer_type",
+          "named": true
+        },
+        {
           "type": "primary_type",
+          "named": true
+        },
+        {
+          "type": "readonly_type",
           "named": true
         }
       ]
