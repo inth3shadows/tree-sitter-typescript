@@ -2346,6 +2346,9 @@ await using {a} = b;
 for (using {a} = b;;);
 using x! = f();
 using undefined = 1;
+using as! = f();
+await using undefined! = 1;
+for (using of! = 1;;);
 
 ---
 
@@ -2426,13 +2429,34 @@ using undefined = 1;
   (expression_statement
     (assignment_expression
       (undefined)
-      (number))))
+      (number)))
+  (expression_statement
+    (assignment_expression
+      (non_null_expression
+        (identifier))
+      (call_expression
+        (identifier)
+        (arguments))))
+  (expression_statement
+    (await_expression
+      (assignment_expression
+        (non_null_expression
+          (undefined))
+        (number))))
+  (for_statement
+    (assignment_expression
+      (non_null_expression
+        (identifier))
+      (number))
+    (empty_statement)
+    (empty_statement)))
 
 ==================================
 using as the left side of a for head
 ==================================
 
 for (using of x) {}
+for (using of !x) {}
 for (using in o) {}
 for (using;;) {}
 
@@ -2442,6 +2466,11 @@ for (using;;) {}
   (for_in_statement
     (identifier)
     (identifier)
+    (statement_block))
+  (for_in_statement
+    (identifier)
+    (unary_expression
+      (identifier))
     (statement_block))
   (for_in_statement
     (identifier)
