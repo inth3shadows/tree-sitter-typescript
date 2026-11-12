@@ -168,6 +168,12 @@ module.exports = function defineGrammar(dialect) {
       // `(import("m").A)[]` vs `(p) => R`.
       [$.member_expression, $._type_query_member_expression_in_type_annotation],
       [$.call_expression, $._type_query_call_expression_in_type_annotation],
+
+      // `using` followed by a binding declares, but `using` is also an identifier:
+      // `using as = f()` vs `using as T`, `using {a} = b` vs `extends using {}` (#57).
+      [$.primary_expression, $._using_binding],
+      // `for (using of !x)` iterates `!x`; `for (using of! = 1;;)` declares `of`.
+      [$._for_header, $._using_binding_name],
     ]).concat(
       dialect === 'typescript' ? [
         [$.primary_type, $.type_parameter],
@@ -270,11 +276,37 @@ module.exports = function defineGrammar(dialect) {
       )),
 
       assignment_expression: $ => prec.right('assign', seq(
-        optional('using'),
-        field('left', choice($.parenthesized_expression, $._lhs_expression)),
+        choice(
+          field('left', choice($.parenthesized_expression, $._lhs_expression)),
+          $._using_binding,
+        ),
         '=',
         field('right', $.expression),
       )),
+
+      // `using x = …` declares only when a binding follows `using` on the same line
+      // (tsc's isUsingDeclaration); elsewhere `using` is an ordinary identifier (#57).
+      // The binding is a name (`as`, `satisfies`, `of`, contextual keywords
+      // included), `x!`, or an object pattern. Which reading holds is only known at
+      // a later token (`using as = f()` vs `using as T`, `using {a} = b` vs
+      // `extends using {}`), so the two are a GLR conflict (see `conflicts`).
+      // `of` is a name only here: it is not in _binding_identifier, because
+      // `for (let of of x)` needs `of` as the keyword there.
+      _using_binding: $ => seq('using', field('left', choice(
+        $._using_binding_name,
+        alias($._using_non_null_binding, $.non_null_expression),
+        $.object_pattern,
+      ))),
+
+      _using_binding_name: $ => choice(
+        $._binding_identifier,
+        keywordName($, 'of'),
+        alias($._reserved_identifier, $.identifier),
+        $.undefined,
+      ),
+
+      // `using x! = f()`, shaped as the non_null_expression main gave it.
+      _using_non_null_binding: $ => seq($._using_binding_name, '!'),
 
       _augmented_assignment_lhs: ($, previous) => choice(previous, $.non_null_expression),
 
@@ -1350,7 +1382,7 @@ module.exports = function defineGrammar(dialect) {
         'export',
         'object',
         'new',
-        'readonly',
+        'using',
         previous,
       ),
     },

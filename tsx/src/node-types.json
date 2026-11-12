@@ -4021,6 +4021,14 @@
         {
           "type": "expression",
           "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "undefined",
+          "named": true
         }
       ]
     }
@@ -6100,11 +6108,11 @@
   },
   {
     "type": "number",
-    "named": true
+    "named": false
   },
   {
     "type": "number",
-    "named": false
+    "named": true
   },
   {
     "type": "object",

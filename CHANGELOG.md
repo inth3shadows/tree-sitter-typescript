@@ -7,6 +7,18 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- `using` parses as an ordinary identifier: `let y = using`, `if (using) x`,
+  `using[1]`, `using++`, `x = using as T`, `class A extends using {}` and a parameter
+  or method named `using` were an ERROR (#57). `using` declares only when a binding
+  follows it on the same line (`using x = f()`, as in tsc's isUsingDeclaration): a
+  name (including `as`, `satisfies`, `of` and `undefined`), a name with `!` (`x!`,
+  `as!`), or an object pattern.
+  Which reading holds is decided by the tokens that follow (a GLR conflict), so
+  `using as = f()` declares and `using as T` casts. `using [a] = b` is now an
+  assignment to `using[a]`, as tsc reads it, and `using a.b = c`, which tsc rejects, is
+  an ERROR. In a statement, a line break after `using` ends it: `using⏎x = 1` is two
+  statements (in a `for` head it still declares, as before). The parse table shrinks by
+  49 states (tsx 48).
 - An import type inside parentheses parses: `let x: (import("m").A)[]` and
   `type T = (import("m").A | B)[]`, which `tsc --declaration` emits, were an ERROR
   (#56). Wherever an import type and an expression can both start (after `(` in a
@@ -176,6 +188,9 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- `non_null_expression`'s child also lists `identifier` and `undefined` (for
+  `using x! = f()` and `using undefined! = 1`, #57); both were already reachable
+  through `expression`.
 - `function_signature.name` is optional: absent in `export default function (…): T;` (#55).
 - `ambient_declaration` is now also a direct subtype of `statement` (for `global { ... }`
   without `declare`, #54).

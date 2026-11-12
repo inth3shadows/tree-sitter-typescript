@@ -3772,6 +3772,14 @@
         {
           "type": "expression",
           "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "undefined",
+          "named": true
         }
       ]
     }
