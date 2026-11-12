@@ -41,7 +41,13 @@ static bool scan_template_chars(TSLexer *lexer) {
             case '`':
                 return has_content;
             case '\0':
-                return false;
+                // A raw NUL byte is template content; only the real end of input
+                // ends the scan (#61, from vmikhailov and BrokkAi).
+                if (lexer->eof(lexer)) {
+                    return false;
+                }
+                advance(lexer);
+                break;
             case '$':
                 advance(lexer);
                 if (lexer->lookahead == '{') {

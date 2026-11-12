@@ -7,6 +7,12 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A raw NUL byte (a literal U+0000, not the `\0` escape) in a template string is
+  template content, as tsc reads it; it was an ERROR (#61). Only the real end of input
+  ends a template scan now. From vmikhailov/tree-sitter-typescript and
+  BrokkAi/tree-sitter-typescript. Scanner only: node types and the parse table are
+  unchanged. Still an ERROR: a backslash directly before the NUL in a template, and a
+  raw NUL in a quoted string, regex, comment or JSX text.
 - `keyof` takes a `readonly` or `infer` type: `keyof readonly any[]`, which TypeScript's
   own `lib.es2015.symbol.wellknown.d.ts` uses, and `U extends keyof infer V ? V : never`
   were an ERROR (#58). From dokimasia/tree-sitter-typescript (Roy Klopper). The parse
