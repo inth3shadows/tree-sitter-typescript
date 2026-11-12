@@ -13131,6 +13131,14 @@
       "_type_query_call_expression"
     ],
     [
+      "member_expression",
+      "_type_query_member_expression_in_type_annotation"
+    ],
+    [
+      "call_expression",
+      "_type_query_call_expression_in_type_annotation"
+    ],
+    [
       "primary_type",
       "type_parameter"
     ]
@@ -13561,16 +13569,6 @@
     [
       {
         "type": "SYMBOL",
-        "name": "member_expression"
-      },
-      {
-        "type": "SYMBOL",
-        "name": "_type_query_member_expression_in_type_annotation"
-      }
-    ],
-    [
-      {
-        "type": "SYMBOL",
         "name": "_type_query_call_expression"
       },
       {
@@ -13616,16 +13614,6 @@
       {
         "type": "SYMBOL",
         "name": "pattern"
-      }
-    ],
-    [
-      {
-        "type": "SYMBOL",
-        "name": "call_expression"
-      },
-      {
-        "type": "SYMBOL",
-        "name": "_type_query_call_expression_in_type_annotation"
       }
     ],
     [

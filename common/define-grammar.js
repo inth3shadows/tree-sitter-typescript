@@ -93,13 +93,11 @@ module.exports = function defineGrammar(dialect) {
       [$.type_query, $._type_query_subscript_expression],
       [$.nested_type_identifier, $.generic_type, $.primary_type, $.lookup_type, $.index_type_query, $.type],
       [$.as_expression, $.satisfies_expression, $.primary_type],
-      [$.member_expression, $._type_query_member_expression_in_type_annotation],
       [$._type_query_call_expression, $.primary_expression],
       [$.override_modifier, $.primary_expression],
       [$.decorator_call_expression, $.decorator],
       [$.literal_type, $.pattern],
       [$.predefined_type, $.pattern],
-      [$.call_expression, $._type_query_call_expression_in_type_annotation],
       [$.new_expression, $.primary_expression],
       [$.meta_property, $.primary_expression],
       [$.construct_signature, $._property_name],
@@ -163,6 +161,13 @@ module.exports = function defineGrammar(dialect) {
       // `f<typeof import('m')>()` is a call with a type argument, and `a < typeof import('m')` is a
       // comparison, so the parser keeps both until one of them fails.
       [$.call_expression, $._type_query_call_expression],
+
+      // An import type and an expression read the same tokens wherever a type and
+      // a pattern can both start, e.g. after `(` in a type, which may open a
+      // parenthesized type or a function type's parameters:
+      // `(import("m").A)[]` vs `(p) => R`.
+      [$.member_expression, $._type_query_member_expression_in_type_annotation],
+      [$.call_expression, $._type_query_call_expression_in_type_annotation],
     ]).concat(
       dialect === 'typescript' ? [
         [$.primary_type, $.type_parameter],
@@ -895,9 +900,10 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       // Oh boy
-      // The issue is these special type queries need a lower relative precedence than the normal ones,
-      // since these are used in type annotations whereas the other ones are used where `typeof` is
-      // required beforehand. This allows for parsing of annotations such as
+      // These special type queries are used in type annotations, whereas the other ones are used
+      // where `typeof` is required beforehand. They are not ordered against member_expression and
+      // call_expression by precedence: that is a GLR conflict (see `conflicts`), because a static
+      // precedence drops `(import('x').y)[]` (#56). This allows for parsing of annotations such as
       // foo: import('x').y.z;
       // but was a nightmare to get working.
       _type_query_member_expression_in_type_annotation: $ => seq(
