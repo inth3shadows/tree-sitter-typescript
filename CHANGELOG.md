@@ -9,10 +9,16 @@ because editor queries match on node names.
 ### Fixes
 - An import type inside parentheses parses: `let x: (import("m").A)[]` and
   `type T = (import("m").A | B)[]`, which `tsc --declaration` emits, were an ERROR
-  (#56). After `(` in a type, the parser now keeps both the import-type and the
-  expression reading (a function type's parameter pattern) until one fails, where
-  a static precedence used to drop the import type. The parse table shrinks by
-  225 states (tsx 95).
+  (#56). Wherever an import type and an expression can both start (after `(` in a
+  type, in type arguments, return types, `satisfies`, mapped-type `in`, asserts
+  predicates), the parser now keeps both readings until one fails, where a static
+  precedence used to drop the import type. The parse table shrinks by 225 states
+  (tsx 95).
+- Behaviour change: an import type as a type argument in an expression now reads as
+  type arguments, like every other type form: `f<import("m").A>(x)` and
+  `a < import("m").b > (c)` are a `call_expression` (was `binary_expression`), and
+  `a < import("m").b > + c` is an `instantiation_expression`, as `a < b.c > + c`
+  already was.
 - A default-exported function signature may omit its name, as `tsc --declaration`
   emits for every anonymous default export: `export default function (a: string):
   void;` and `export default async function <T>(a: T): Promise<T>;` are a

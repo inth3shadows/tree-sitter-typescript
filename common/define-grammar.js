@@ -900,9 +900,10 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       // Oh boy
-      // The issue is these special type queries need a lower relative precedence than the normal ones,
-      // since these are used in type annotations whereas the other ones are used where `typeof` is
-      // required beforehand. This allows for parsing of annotations such as
+      // These special type queries are used in type annotations, whereas the other ones are used
+      // where `typeof` is required beforehand. They are not ordered against member_expression and
+      // call_expression by precedence: that is a GLR conflict (see `conflicts`), because a static
+      // precedence drops `(import('x').y)[]` (#56). This allows for parsing of annotations such as
       // foo: import('x').y.z;
       // but was a nightmare to get working.
       _type_query_member_expression_in_type_annotation: $ => seq(

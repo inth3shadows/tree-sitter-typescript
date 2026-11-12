@@ -3265,3 +3265,232 @@ let y = (import("m").a);
               (string
                 (string_fragment))))
           (property_identifier))))))
+
+==================================
+Parenthesized import types in other type positions
+==================================
+
+let a: (import("m").A<T>)[];
+let b: (import("m").A["x"])[];
+let c: ((import("m").A))[];
+type C = T extends (import("m").A) ? 1 : 2;
+type M = { [K in (import("m").A)]: K };
+f<(import("m").A)>(x);
+new C<(import("m").A)>();
+x satisfies (import("m").A);
+function g(x): asserts x is (import("m").A) {}
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (array_type
+          (parenthesized_type
+            (generic_type
+              (member_expression
+                (call_expression
+                  (import)
+                  (arguments
+                    (string
+                      (string_fragment))))
+                (property_identifier))
+              (type_arguments
+                (type_identifier))))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (array_type
+          (parenthesized_type
+            (lookup_type
+              (member_expression
+                (call_expression
+                  (import)
+                  (arguments
+                    (string
+                      (string_fragment))))
+                (property_identifier))
+              (literal_type
+                (string
+                  (string_fragment)))))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (array_type
+          (parenthesized_type
+            (parenthesized_type
+              (member_expression
+                (call_expression
+                  (import)
+                  (arguments
+                    (string
+                      (string_fragment))))
+                (property_identifier))))))))
+  (type_alias_declaration
+    (type_identifier)
+    (conditional_type
+      (type_identifier)
+      (parenthesized_type
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier)))
+      (literal_type
+        (number))
+      (literal_type
+        (number))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (parenthesized_type
+            (member_expression
+              (call_expression
+                (import)
+                (arguments
+                  (string
+                    (string_fragment))))
+              (property_identifier))))
+        (type_annotation
+          (type_identifier)))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (parenthesized_type
+          (member_expression
+            (call_expression
+              (import)
+              (arguments
+                (string
+                  (string_fragment))))
+            (property_identifier))))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (new_expression
+      (identifier)
+      (type_arguments
+        (parenthesized_type
+          (member_expression
+            (call_expression
+              (import)
+              (arguments
+                (string
+                  (string_fragment))))
+            (property_identifier))))
+      (arguments)))
+  (expression_statement
+    (satisfies_expression
+      (identifier)
+      (parenthesized_type
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (required_parameter
+        (identifier)))
+    (asserts_annotation
+      (asserts
+        (type_predicate
+          (identifier)
+          (parenthesized_type
+            (member_expression
+              (call_expression
+                (import)
+                (arguments
+                  (string
+                    (string_fragment))))
+              (property_identifier))))))
+    (statement_block)))
+
+==================================
+Import type arguments in expressions
+==================================
+
+f<import("m").A<X>>(y);
+a < import("m").b > (c);
+f<import("m").A>;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (generic_type
+          (member_expression
+            (call_expression
+              (import)
+              (arguments
+                (string
+                  (string_fragment))))
+            (property_identifier))
+          (type_arguments
+            (type_identifier))))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (type_arguments
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier)))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (instantiation_expression
+      (identifier)
+      (type_arguments
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier))))))
+
+==================================
+Parenthesized import types (tsx)
+:language(tsx)
+==================================
+
+let x: (import("m").A)[];
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (array_type
+          (parenthesized_type
+            (member_expression
+              (call_expression
+                (import)
+                (arguments
+                  (string
+                    (string_fragment))))
+              (property_identifier))))))))
