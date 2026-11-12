@@ -269,11 +269,20 @@ module.exports = function defineGrammar(dialect) {
         field('arguments', optional($.arguments)),
       )),
 
-      assignment_expression: $ => prec.right('assign', seq(
-        optional('using'),
-        field('left', choice($.parenthesized_expression, $._lhs_expression)),
-        '=',
-        field('right', $.expression),
+      // `using x = …` declares only when a binding name follows `using` (tsc's
+      // isUsingDeclaration); elsewhere `using` is an ordinary identifier (#57).
+      assignment_expression: $ => prec.right('assign', choice(
+        seq(
+          field('left', choice($.parenthesized_expression, $._lhs_expression)),
+          '=',
+          field('right', $.expression),
+        ),
+        seq(
+          'using',
+          field('left', choice($.identifier, alias($._reserved_identifier, $.identifier))),
+          '=',
+          field('right', $.expression),
+        ),
       )),
 
       _augmented_assignment_lhs: ($, previous) => choice(previous, $.non_null_expression),
@@ -1351,6 +1360,7 @@ module.exports = function defineGrammar(dialect) {
         'object',
         'new',
         'readonly',
+        'using',
         previous,
       ),
     },
