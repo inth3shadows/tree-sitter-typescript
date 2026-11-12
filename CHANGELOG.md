@@ -7,6 +7,11 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A raw NUL byte (U+0000) in a template string is template content, as tsc reads it.
+  `` `a\0b` `` with a literal NUL was an ERROR (#61). Only the real end of input ends
+  a template scan now. From vmikhailov/tree-sitter-typescript and
+  BrokkAi/tree-sitter-typescript. Scanner only: node types and the parse table are
+  unchanged.
 - `using` parses as an ordinary identifier: `let y = using`, `if (using) x`,
   `using[1]`, `using++`, `x = using as T`, `class A extends using {}` and a parameter
   or method named `using` were an ERROR (#57). `using` declares only when a binding
