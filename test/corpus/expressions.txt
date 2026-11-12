@@ -2282,6 +2282,54 @@ let using = 1;
       (number))))
 
 ==================================
+using cast, or as a base class
+==================================
+
+x = using as any;
+const m = using satisfies Foo;
+f(using as any);
+class A extends using {}
+class B extends using { x = 1; }
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (predefined_type))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (satisfies_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (as_expression
+          (identifier)
+          (predefined_type)))))
+  (class_declaration
+    (type_identifier)
+    (class_heritage
+      (extends_clause
+        (identifier)))
+    (class_body))
+  (class_declaration
+    (type_identifier)
+    (class_heritage
+      (extends_clause
+        (identifier)))
+    (class_body
+      (public_field_definition
+        (property_identifier)
+        (number)))))
+
+==================================
 using declarations
 ==================================
 
@@ -2290,8 +2338,14 @@ await using y = g();
 using type = h();
 using as = f();
 using satisfies = f();
+await using as = 1;
+for (using as = 1;;);
 for (using of = 1;;);
 using {a} = b;
+await using {a} = b;
+for (using {a} = b;;);
+using x! = f();
+using undefined = 1;
 
 ---
 
@@ -2327,6 +2381,17 @@ using {a} = b;
       (call_expression
         (identifier)
         (arguments))))
+  (expression_statement
+    (await_expression
+      (assignment_expression
+        (identifier)
+        (number))))
+  (for_statement
+    (assignment_expression
+      (identifier)
+      (number))
+    (empty_statement)
+    (empty_statement))
   (for_statement
     (assignment_expression
       (identifier)
@@ -2337,7 +2402,55 @@ using {a} = b;
     (assignment_expression
       (object_pattern
         (shorthand_property_identifier_pattern))
-      (identifier))))
+      (identifier)))
+  (expression_statement
+    (await_expression
+      (assignment_expression
+        (object_pattern
+          (shorthand_property_identifier_pattern))
+        (identifier))))
+  (for_statement
+    (assignment_expression
+      (object_pattern
+        (shorthand_property_identifier_pattern))
+      (identifier))
+    (empty_statement)
+    (empty_statement))
+  (expression_statement
+    (assignment_expression
+      (non_null_expression
+        (identifier))
+      (call_expression
+        (identifier)
+        (arguments))))
+  (expression_statement
+    (assignment_expression
+      (undefined)
+      (number))))
+
+==================================
+using as the left side of a for head
+==================================
+
+for (using of x) {}
+for (using in o) {}
+for (using;;) {}
+
+---
+
+(program
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (statement_block))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (statement_block))
+  (for_statement
+    (identifier)
+    (empty_statement)
+    (statement_block)))
 
 ==================================
 using followed by a subscript or a line break
@@ -2348,6 +2461,8 @@ using
 x = 1;
 x = using
 y = 2;
+await using
+z = 3;
 
 ---
 
@@ -2371,7 +2486,25 @@ y = 2;
   (expression_statement
     (assignment_expression
       (identifier)
+      (number)))
+  (expression_statement
+    (await_expression
+      (identifier)))
+  (expression_statement
+    (assignment_expression
+      (identifier)
       (number))))
+
+==================================
+using declaration of a member expression
+:error
+==================================
+
+using a.b = c;
+
+---
+
+(program)
 
 ==================================
 using as an identifier (tsx)
@@ -2381,6 +2514,7 @@ using as an identifier (tsx)
 let y = using;
 using[1];
 using++;
+class A extends using {}
 
 ---
 
@@ -2395,4 +2529,10 @@ using++;
       (number)))
   (expression_statement
     (update_expression
-      (identifier))))
+      (identifier)))
+  (class_declaration
+    (type_identifier)
+    (class_heritage
+      (extends_clause
+        (identifier)))
+    (class_body)))
