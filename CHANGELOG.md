@@ -7,14 +7,22 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
-- A `using` or `await using` declaration may head a for-of loop: `for (using h of y)`,
-  `for (await using h of y)` and `for await (await using h of y)` were an ERROR (part
-  of #69). The declaration is a `for_in_statement` with `kind: "using"` and the
-  declared name as `left`, like `for (const h of y)`; the `await` of `await using` is
-  the unnamed token before `kind`. `for (using of y)` and `for (using in o)` still
-  read `using` as the left side. The parse table grows by 20 states (tsx 20).
-  Known limit: in a for head a line break after `using` does not stop the declaration
-  (`for (using⏎h of y)` parses, where tsc reports an error).
+- A `using` or `await using` declaration is a `using_declaration` node, the shape
+  tree-sitter-javascript v0.25 gives it: `kind` is `using`, or `await` and `using`, and
+  each binding is a `variable_declarator` (#69). New forms that tsc accepts parse:
+  a type annotation (`using x: Disposable = f()`), several declarators
+  (`using a = f(), b = g()`, which was a sequence expression), `using x;`,
+  `using x!: T = f()`, `export using x = f()`, and a for-of head (`for (using h of y)`,
+  `for (await using h of y)`, `for await (await using h of y)`, `for (using {a} of y)`),
+  where `kind` and `left` match `for (const h of y)`. `f(using x = 1)` and
+  `let y = using x = 1`, which tsc rejects, are now an ERROR. `using` as an identifier
+  (#57) and `using⏎x = 1` as two statements are unchanged. The parse table grows by
+  31 states (tsx 31).
+  Known limits: a reserved word after `using` is read as the declared name
+  (`using new = f()`, `for (using enum of y)`), as after `let` (`let enum = 1`).
+  In a for head a line break after `using` does not stop the declaration
+  (`for (using⏎h of y)`). `for (using x, y of z)` and `for (using x: T of z)`, which
+  tsc's parser accepts and its checker rejects, are an ERROR.
 - A re-export takes import attributes, as an import does:
   `export * from "./m.json" with { type: "json" }`, `export * as ns from … with {…}`,
   `export { a } from … with {…}`, the `export type` forms and the older `assert {…}`
@@ -226,7 +234,11 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
-- `for_in_statement.kind` may also be `using` (#69).
+- New node `using_declaration` (a `declaration`, also allowed as a `for_statement`
+  initializer): `using x = f()` was an `expression_statement` holding an
+  `assignment_expression`, and is now `(using_declaration (variable_declarator …))`
+  (#69). `for_in_statement.kind` may also be `using` or `await` `using`, so it is now
+  `multiple`. `variable_declarator.name` may also be `undefined`.
 - `export_statement` may hold an `import_attribute` child after its source, so its
   unnamed children are now `multiple` (`export * as ns from … with {…}` has both a
   `namespace_export` and an `import_attribute`) (#78).
@@ -234,9 +246,6 @@ because editor queries match on node names.
   `omitting_type_annotation` and `adding_type_annotation` now hold separate `-`/`+`,
   `?` and `:` tokens (#60). A query matching `"?:"` must match `"?" ":"` instead.
 - `index_type_query`'s child may also be `readonly_type` or `infer_type` (#58).
-- `non_null_expression`'s child also lists `identifier` and `undefined` (for
-  `using x! = f()` and `using undefined! = 1`, #57); both were already reachable
-  through `expression`.
 - `function_signature.name` is optional: absent in `export default function (…): T;` (#55).
 - `ambient_declaration` is now also a direct subtype of `statement` (for `global { ... }`
   without `declare`, #54).

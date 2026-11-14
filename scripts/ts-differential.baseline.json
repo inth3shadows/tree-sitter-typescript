@@ -1,10 +1,10 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.27.1",
- "generatedAt": "2026-11-14T19:49:32.165Z",
+ "generatedAt": "2026-11-14T20:20:36.305Z",
  "wasmSha256": {
-  "typescript": "4eb82d6ff9044e49d88f8d818b24f5cd0a30f88c039f26c4bed1244fa5846c20",
-  "tsx": "5a2d2dcc75f50bf8519c3a351e265fce4aa6000f067b382e0a60c284dad73be3"
+  "typescript": "e9461f12648fbe95dd693f64770ff827ef4e1441ad56901b73b172e26159db2d",
+  "tsx": "c45b0d1903acf06a6029c5014c147cf52f2d257ce1a075050fb6ff9b75626755"
  },
  "divergent": {
   "effect": {
