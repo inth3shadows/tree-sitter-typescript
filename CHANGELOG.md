@@ -7,6 +7,11 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A re-export takes import attributes, as an import does:
+  `export * from "./m.json" with { type: "json" }`, `export * as ns from … with {…}`,
+  `export { a } from … with {…}`, the `export type` forms and the older `assert {…}`
+  were an ERROR (#78). As in tsc, a `with` after a line break starts a new statement.
+  The parse table grows by 2 states (tsx 2).
 - A mapped type's key may be named `type`: `{ [type in keyof T]: T[type] }` was an
   ERROR (#59). Behaviour change: `[type in K]: T` in an object type, interface or
   class, which parsed as a member with a computed name, is now an `index_signature`
@@ -213,6 +218,7 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- `export_statement` may hold an `import_attribute` child after its source (#78).
 - The anonymous tokens `?:`, `-?:` and `+?:` are gone: `opting_type_annotation`,
   `omitting_type_annotation` and `adding_type_annotation` now hold separate `-`/`+`,
   `?` and `:` tokens (#60). A query matching `"?:"` must match `"?" ":"` instead.
