@@ -923,9 +923,11 @@ module.exports = function defineGrammar(dialect) {
         field('pattern', choice($.pattern, $.this)),
       ),
 
-      omitting_type_annotation: $ => seq('-?:', $.type),
-      adding_type_annotation: $ => seq('+?:', $.type),
-      opting_type_annotation: $ => seq('?:', $.type),
+      // `-?:`, `+?:` and `?:` are separate tokens, as in tsc: bundled
+      // declarations print `]? : T`.
+      omitting_type_annotation: $ => seq('-', '?', ':', $.type),
+      adding_type_annotation: $ => seq('+', '?', ':', $.type),
+      opting_type_annotation: $ => seq('?', ':', $.type),
       type_annotation: $ => seq(
         ':',
         $.type,
@@ -1187,7 +1189,8 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       mapped_type_clause: $ => seq(
-        field('name', $._type_identifier),
+        // tsc takes the keyword `type` as the key name (`[type in keyof T]`).
+        field('name', choice($._type_identifier, alias('type', $.type_identifier))),
         'in',
         field('type', $.type),
         optional(seq('as', field('alias', $.type))),

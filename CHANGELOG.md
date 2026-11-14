@@ -7,6 +7,18 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A mapped type's key may be named `type`: `{ [type in keyof T]: T[type] }` was an
+  ERROR (#59). Behaviour change: `[type in K]: T` in an object type, interface or
+  class, which parsed as a member with a computed name, is now an `index_signature`
+  with a `mapped_type_clause`, as `[K in K]: T` already was.
+  Known limit: without a `: T` after it, `[type in X]` is now an ERROR as a class
+  member name (`class C { [type in obj] = 1 }`) or a mapped type member with no value
+  type (`{ [type in X] }`), as `[K in X]` already was (#74).
+- Whitespace or a comment may separate the mapped type modifiers from the colon:
+  `]? : T`, `]- ? : T` and `]+ ?/* c */: T` were an ERROR (#60); bundled declarations
+  print `]? :`. `?:`, `-?:` and `+?:` are no longer single tokens, so the `-` or `+`
+  of a mapped type modifier now gets the `@operator` highlight.
+  Together the parse table grows by 17 states (tsx 17).
 - A raw NUL byte (a literal U+0000, not the `\0` escape) in a template string is
   template content, as tsc reads it; it was an ERROR (#61). Only the real end of input
   ends a template scan now. From vmikhailov/tree-sitter-typescript and
@@ -201,6 +213,9 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- The anonymous tokens `?:`, `-?:` and `+?:` are gone: `opting_type_annotation`,
+  `omitting_type_annotation` and `adding_type_annotation` now hold separate `-`/`+`,
+  `?` and `:` tokens (#60). A query matching `"?:"` must match `"?" ":"` instead.
 - `index_type_query`'s child may also be `readonly_type` or `infer_type` (#58).
 - `non_null_expression`'s child also lists `identifier` and `undefined` (for
   `using x! = f()` and `using undefined! = 1`, #57); both were already reachable
