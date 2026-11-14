@@ -2157,6 +2157,7 @@ Mapped type modifiers with whitespace before the colon
 type A = { [K in keyof T]? : X };
 type B = { [K in keyof T]- ? : X };
 type C = { [K in keyof T]+ ?/* c */: X };
+type D = { [K in keyof T]+?: X };
 
 ---
 
@@ -2191,6 +2192,49 @@ type C = { [K in keyof T]+ ?/* c */: X };
             (type_identifier)))
         (adding_type_annotation
           (comment)
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (adding_type_annotation
+          (type_identifier))))))
+
+==================================
+Mapped type key named type and spaced modifiers in TSX
+:language(tsx)
+==================================
+
+type A = { [type in keyof X]? : 1 };
+type B = { [K in keyof T]- ? : X };
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (opting_type_annotation
+          (literal_type
+            (number))))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (omitting_type_annotation
           (type_identifier))))))
 
 ==================================
