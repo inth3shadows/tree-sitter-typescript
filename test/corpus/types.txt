@@ -2114,6 +2114,86 @@ type StringToNumber<S extends string> = S extends `${infer N extends number}` ? 
       (predefined_type))))
 
 ==================================
+Mapped type key named type
+==================================
+
+type A<T> = { [type in keyof T]: T[type] };
+type B = { [type in keyof X]?: 1 };
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (type_parameters
+      (type_parameter
+        (type_identifier)))
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (type_annotation
+          (lookup_type
+            (type_identifier)
+            (type_identifier))))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (opting_type_annotation
+          (literal_type
+            (number)))))))
+
+==================================
+Mapped type modifiers with whitespace before the colon
+==================================
+
+type A = { [K in keyof T]? : X };
+type B = { [K in keyof T]- ? : X };
+type C = { [K in keyof T]+ ?/* c */: X };
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (opting_type_annotation
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (omitting_type_annotation
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (object_type
+      (index_signature
+        (mapped_type_clause
+          (type_identifier)
+          (index_type_query
+            (type_identifier)))
+        (adding_type_annotation
+          (comment)
+          (type_identifier))))))
+
+==================================
 Mapped type 'as' clauses
 ==================================
 
