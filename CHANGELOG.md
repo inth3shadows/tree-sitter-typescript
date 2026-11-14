@@ -11,18 +11,22 @@ because editor queries match on node names.
   tree-sitter-javascript v0.25 gives it: `kind` is `using`, or `await` and `using`, and
   each binding is a `variable_declarator` (#69). New forms that tsc accepts parse:
   a type annotation (`using x: Disposable = f()`), several declarators
-  (`using a = f(), b = g()`, which was a sequence expression), `using x;`,
-  `using x!: T = f()`, `export using x = f()`, and a for-of head (`for (using h of y)`,
-  `for (await using h of y)`, `for await (await using h of y)`, `for (using {a} of y)`),
-  where `kind` and `left` match `for (const h of y)`. `f(using x = 1)` and
+  (`using a = f(), b = g()`, which was a sequence expression, and an array pattern
+  after the first, `using a = f(), [b] = g()`), `using x;`, `using x!: T = f()`,
+  `export using x = f()`, and a for-of head (`for (using h of y)`,
+  `for (await using h of y)`, `for await (await using h of y)`, `for (using {a} of y)`,
+  `for (await using of of y)`), where `kind` and `left` match `for (const h of y)`. `f(using x = 1)` and
   `let y = using x = 1`, which tsc rejects, are now an ERROR. `using` as an identifier
   (#57) and `using⏎x = 1` as two statements are unchanged. The parse table grows by
-  31 states (tsx 31).
+  59 states (tsx 59).
   Known limits: a reserved word after `using` is read as the declared name
   (`using new = f()`, `for (using enum of y)`), as after `let` (`let enum = 1`).
   In a for head a line break after `using` does not stop the declaration
   (`for (using⏎h of y)`). `for (using x, y of z)` and `for (using x: T of z)`, which
-  tsc's parser accepts and its checker rejects, are an ERROR.
+  tsc's parser accepts and its checker rejects, are an ERROR, and so is
+  `for (await using of y)`. Some forms tsc rejects parse: `export default using x = f()`
+  (as `export default const` does), `!` in a for head (`for (using x! = 1;;)`, as
+  `for (let x!: T;;)` does), and `for (using as T;;)`, read as a cast.
 - A re-export takes import attributes, as an import does:
   `export * from "./m.json" with { type: "json" }`, `export * as ns from … with {…}`,
   `export { a } from … with {…}`, the `export type` forms and the older `assert {…}`

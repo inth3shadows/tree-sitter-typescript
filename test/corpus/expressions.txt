@@ -403,21 +403,16 @@ Type assertions
 ---
 
 (program
-  (expression_statement
-    (type_assertion
-      (type_arguments
-        (type_identifier))
-      (identifier)))
-  (expression_statement
-    (type_assertion
-      (type_arguments
-        (generic_type
-          (type_identifier)
-          (type_arguments
-            (type_identifier))))
-      (member_expression
-        (identifier)
-        (property_identifier)))))
+  (expression_statement (type_assertion
+    (type_arguments (type_identifier))
+    (identifier)))
+  (expression_statement (type_assertion
+    (type_arguments (generic_type
+      (type_identifier)
+      (type_arguments (type_identifier))))
+    (member_expression
+      (identifier)
+      (property_identifier)))))
 
 ==========================================================
 Type arguments in JSX
@@ -433,18 +428,12 @@ Type arguments in JSX
 (program
   (expression_statement
     (jsx_element
-      (jsx_opening_element
-        (identifier)
-        (type_arguments
-          (type_identifier)))
+      (jsx_opening_element (identifier) (type_arguments (type_identifier)))
       (jsx_text)
-      (jsx_closing_element
-        (identifier))))
+      (jsx_closing_element (identifier))))
   (expression_statement
     (jsx_self_closing_element
-      (identifier)
-      (type_arguments
-        (type_identifier))))
+       (identifier) (type_arguments (type_identifier))))
   (expression_statement
     (jsx_element
       (jsx_opening_element)
@@ -764,8 +753,6 @@ Strings reject bare \u and \x
 '\x';
 
 ---
-
-
 
 ==================================
 Template literal types with invalid escapes
@@ -2500,6 +2487,7 @@ using x!: T = f();
 using y;
 export using z = f();
 label: using w = f();
+using v = f(), [a] = g();
 
 ---
 
@@ -2550,7 +2538,19 @@ label: using w = f();
         (identifier)
         (call_expression
           (identifier)
-          (arguments))))))
+          (arguments)))))
+  (using_declaration
+    (variable_declarator
+      (identifier)
+      (call_expression
+        (identifier)
+        (arguments)))
+    (variable_declarator
+      (array_pattern
+        (identifier))
+      (call_expression
+        (identifier)
+        (arguments)))))
 
 ==================================
 using declaration inside an expression
@@ -2558,6 +2558,17 @@ using declaration inside an expression
 ==================================
 
 f(using x = 1);
+
+---
+
+(program)
+
+==================================
+using declaration with ! after a pattern
+:error
+==================================
+
+using {a}! = b;
 
 ---
 
@@ -2575,6 +2586,7 @@ async function f() {
   for (await using h of handles) {}
   for await (await using h of handles) {}
   for await (using h of handles) {}
+  for (await using of of y) {}
 }
 
 ---
@@ -2601,6 +2613,10 @@ async function f() {
     name: (identifier)
     parameters: (formal_parameters)
     body: (statement_block
+      (for_in_statement
+        left: (identifier)
+        right: (identifier)
+        body: (statement_block))
       (for_in_statement
         left: (identifier)
         right: (identifier)

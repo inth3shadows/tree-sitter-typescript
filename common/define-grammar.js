@@ -172,7 +172,8 @@ module.exports = function defineGrammar(dialect) {
       // `using` followed by a name declares, but `using` is also an identifier:
       // `using as = f()` vs `using as T` (#57, #69).
       [$.primary_expression, $.using_declaration],
-      // `for (using as of y)` declares `as`; `for (using as T;;)` casts `using`.
+      // `for (using as of y)` declares `as`. `for (using as T;;)` reads `using as T`
+      // as a cast, though tsc declares `as` there and errors (known limit).
       [$._for_header, $.primary_expression, $.using_declaration],
     ]).concat(
       dialect === 'typescript' ? [
@@ -281,23 +282,20 @@ module.exports = function defineGrammar(dialect) {
       // (`using⏎x = 1` is two statements). The shape is tree-sitter-javascript's
       // using_declaration (v0.25), with TypeScript's annotation and `x!` (#69).
       using_declaration: $ => seq(
-        field('kind', choice('using', seq('await', 'using'))),
-        commaSep1(alias($._using_declarator, $.variable_declarator)),
+        usingKind(),
+        alias($._using_declarator, $.variable_declarator),
+        repeat(seq(',', alias($._using_next_declarator, $.variable_declarator))),
         $._semicolon,
       ),
 
-      // variable_declarator with the names tsc allows after `using`: no array
-      // pattern (`using [a] = b` assigns to `using[a]`), and `x!` without a type.
-      _using_declarator: $ => seq(
-        field('name', choice($._using_name, keywordName($, 'of'), $.object_pattern)),
-        optional('!'),
-        field('type', optional($.type_annotation)),
-        optional($._initializer),
-      ),
+      // variable_declarator with the names tsc allows after `using`. The first has no
+      // array pattern (`using [a] = b` assigns to `using[a]`); later ones may have one.
+      // `!` follows only an identifier, with or without a type or initializer.
+      _using_declarator: $ => usingDeclarator($, $.object_pattern),
+      _using_next_declarator: $ => usingDeclarator($, $._destructuring_pattern),
 
       // A binding identifier after `using`. A keyword the parser cannot shift here
-      // (`type`, `let`, `new`) is read as an identifier, as after `let`; `as` and
-      // `satisfies` can follow `using` as operators, so they are listed. `of` is
+      // (`type`, `let`, `new`) is read as an identifier, as after `let`. `of` is
       // added where it cannot be the for-of operator.
       _using_name: $ => choice($._binding_identifier, $.undefined),
 
@@ -579,11 +577,16 @@ module.exports = function defineGrammar(dialect) {
             optional($._automatic_semicolon),
           ),
           // `for (using x of y)`, `for (await using x of y)` (#69), shaped as in
-          // tree-sitter-javascript v0.25. `of` is not a name here: `for (using of x)`
-          // iterates `x` with `using` as the left side.
+          // tree-sitter-javascript v0.25. After a bare `using`, `of` is not a name:
+          // `for (using of x)` iterates `x` with `using` as the left side. After
+          // `await using` it is, as in tsc: `for (await using of of y)`.
           seq(
-            field('kind', choice('using', seq('await', 'using'))),
+            field('kind', 'using'),
             field('left', choice($._using_name, $.object_pattern)),
+          ),
+          seq(
+            field('kind', seq('await', 'using')),
+            field('left', choice($._using_name, keywordName($, 'of'), $.object_pattern)),
           ),
         ),
         field('operator', choice('in', 'of')),
@@ -1456,6 +1459,34 @@ function specifier($, previous, aliasName) {
  */
 function keywordName($, word) {
   return alias(word, $.identifier);
+}
+
+/**
+ * The `kind` of a using declaration: `using` or `await using` (#69).
+ *
+ * @returns {RuleOrLiteral}
+ */
+function usingKind() {
+  return field('kind', choice('using', seq('await', 'using')));
+}
+
+/**
+ * A declarator after `using`: an identifier (or `of`) that may take `!`, or a
+ * destructuring pattern from `patterns`, each with an optional type and initializer.
+ *
+ * @param {GrammarSymbols<string>} $
+ * @param {RuleOrLiteral} patterns
+ * @returns {RuleOrLiteral}
+ */
+function usingDeclarator($, patterns) {
+  return seq(
+    choice(
+      seq(field('name', choice($._using_name, keywordName($, 'of'))), optional('!')),
+      field('name', patterns),
+    ),
+    field('type', optional($.type_annotation)),
+    optional($._initializer),
+  );
 }
 
 /**
