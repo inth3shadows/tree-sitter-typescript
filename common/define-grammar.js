@@ -420,6 +420,10 @@ module.exports = function defineGrammar(dialect) {
 
       import_attribute: $ => seq(choice('with', 'assert'), $.object),
 
+      // A re-export takes import attributes as an import does:
+      // `export * from "./m.json" with { type: "json" }`.
+      _from_clause_with_attributes: $ => seq($._from_clause, optional($.import_attribute)),
+
       import_clause: $ => choice(
         $.namespace_import,
         $.named_imports,
@@ -454,9 +458,9 @@ module.exports = function defineGrammar(dialect) {
           'export',
           optional($._no_asi_marker),
           choice(
-            seq('*', $._from_clause),
-            seq($.namespace_export, $._from_clause),
-            seq($.export_clause, choice($._from_clause, optional($._from_marker))),
+            seq('*', $._from_clause_with_attributes),
+            seq($.namespace_export, $._from_clause_with_attributes),
+            seq($.export_clause, choice($._from_clause_with_attributes, optional($._from_marker))),
           ),
           $._semicolon,
         ),
@@ -483,21 +487,21 @@ module.exports = function defineGrammar(dialect) {
           'export',
           'type',
           $.export_clause,
-          choice($._from_clause, optional($._from_marker)),
+          choice($._from_clause_with_attributes, optional($._from_marker)),
           $._semicolon,
         ),
         seq(
           'export',
           'type',
           '*',
-          $._from_clause,
+          $._from_clause_with_attributes,
           $._semicolon,
         ),
         seq(
           'export',
           'type',
           $.namespace_export,
-          $._from_clause,
+          $._from_clause_with_attributes,
           $._semicolon,
         ),
         seq('export', '=', $.expression, $._semicolon),

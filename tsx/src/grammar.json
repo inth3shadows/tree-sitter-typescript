@@ -66,7 +66,7 @@
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "_from_clause"
+                      "name": "_from_clause_with_attributes"
                     }
                   ]
                 },
@@ -79,7 +79,7 @@
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "_from_clause"
+                      "name": "_from_clause_with_attributes"
                     }
                   ]
                 },
@@ -95,7 +95,7 @@
                       "members": [
                         {
                           "type": "SYMBOL",
-                          "name": "_from_clause"
+                          "name": "_from_clause_with_attributes"
                         },
                         {
                           "type": "CHOICE",
@@ -238,7 +238,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "_from_clause"
+                  "name": "_from_clause_with_attributes"
                 },
                 {
                   "type": "CHOICE",
@@ -277,7 +277,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "_from_clause"
+              "name": "_from_clause_with_attributes"
             },
             {
               "type": "SYMBOL",
@@ -302,7 +302,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "_from_clause"
+              "name": "_from_clause_with_attributes"
             },
             {
               "type": "SYMBOL",
@@ -8557,6 +8557,27 @@
           },
           "named": true,
           "value": "identifier"
+        }
+      ]
+    },
+    "_from_clause_with_attributes": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_from_clause"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "import_attribute"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },

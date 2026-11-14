@@ -2004,7 +2004,7 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
@@ -2017,6 +2017,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "import_attribute",
           "named": true
         },
         {
