@@ -218,7 +218,9 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
-- `export_statement` may hold an `import_attribute` child after its source (#78).
+- `export_statement` may hold an `import_attribute` child after its source, so its
+  unnamed children are now `multiple` (`export * as ns from … with {…}` has both a
+  `namespace_export` and an `import_attribute`) (#78).
 - The anonymous tokens `?:`, `-?:` and `+?:` are gone: `opting_type_annotation`,
   `omitting_type_annotation` and `adding_type_annotation` now hold separate `-`/`+`,
   `?` and `:` tokens (#60). A query matching `"?:"` must match `"?" ":"` instead.
