@@ -1,10 +1,10 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.27.1",
- "generatedAt": "2026-11-14T15:36:59.971Z",
+ "generatedAt": "2026-11-14T20:44:39.329Z",
  "wasmSha256": {
-  "typescript": "683da1010740c7bcd74fdbc54645ca12aa9839c0462546fc647da888869c3208",
-  "tsx": "80caede2aa882af8f605766804c9d8db59507bdfa32f54fc3631c43de2d091c3"
+  "typescript": "09ba7f8145031fa4df7a10d13a4d3d1054f1750469c780bfe0948fa6fca6ea67",
+  "tsx": "63754dfaab623b42dd32678d743a59b4589a4a95c2b531b0940400285d8db2e4"
  },
  "divergent": {
   "effect": {
@@ -13,9 +13,6 @@
   "zod": {},
   "excalidraw": {},
   "vscode": {},
-  "local": {
-   "test/tsc-fixtures/gap-await-using-in-for.ts": 3,
-   "test/tsc-fixtures/gap-using-in-for.ts": 3
-  }
+  "local": {}
  }
 }

@@ -9,3 +9,6 @@ optional
 prec
 field
 blank
+# TypeScript lib globals used in test/tsc-fixtures
+Disposable
+AsyncDisposable

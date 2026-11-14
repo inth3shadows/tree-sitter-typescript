@@ -2353,101 +2353,97 @@ for (using of! = 1;;);
 ---
 
 (program
-  (expression_statement
-    (assignment_expression
+  (using_declaration
+    (variable_declarator
       (identifier)
       (call_expression
         (identifier)
         (arguments))))
-  (expression_statement
-    (await_expression
-      (assignment_expression
-        (identifier)
-        (call_expression
-          (identifier)
-          (arguments)))))
-  (expression_statement
-    (assignment_expression
+  (using_declaration
+    (variable_declarator
       (identifier)
       (call_expression
         (identifier)
         (arguments))))
-  (expression_statement
-    (assignment_expression
+  (using_declaration
+    (variable_declarator
       (identifier)
       (call_expression
         (identifier)
         (arguments))))
-  (expression_statement
-    (assignment_expression
+  (using_declaration
+    (variable_declarator
       (identifier)
       (call_expression
         (identifier)
         (arguments))))
-  (expression_statement
-    (await_expression
-      (assignment_expression
+  (using_declaration
+    (variable_declarator
+      (identifier)
+      (call_expression
         (identifier)
-        (number))))
+        (arguments))))
+  (using_declaration
+    (variable_declarator
+      (identifier)
+      (number)))
   (for_statement
-    (assignment_expression
-      (identifier)
-      (number))
+    (using_declaration
+      (variable_declarator
+        (identifier)
+        (number)))
     (empty_statement)
     (empty_statement))
   (for_statement
-    (assignment_expression
-      (identifier)
-      (number))
+    (using_declaration
+      (variable_declarator
+        (identifier)
+        (number)))
     (empty_statement)
     (empty_statement))
-  (expression_statement
-    (assignment_expression
+  (using_declaration
+    (variable_declarator
       (object_pattern
         (shorthand_property_identifier_pattern))
       (identifier)))
-  (expression_statement
-    (await_expression
-      (assignment_expression
-        (object_pattern
-          (shorthand_property_identifier_pattern))
-        (identifier))))
-  (for_statement
-    (assignment_expression
+  (using_declaration
+    (variable_declarator
       (object_pattern
         (shorthand_property_identifier_pattern))
-      (identifier))
+      (identifier)))
+  (for_statement
+    (using_declaration
+      (variable_declarator
+        (object_pattern
+          (shorthand_property_identifier_pattern))
+        (identifier)))
     (empty_statement)
     (empty_statement))
-  (expression_statement
-    (assignment_expression
-      (non_null_expression
-        (identifier))
+  (using_declaration
+    (variable_declarator
+      (identifier)
       (call_expression
         (identifier)
         (arguments))))
-  (expression_statement
-    (assignment_expression
+  (using_declaration
+    (variable_declarator
       (undefined)
       (number)))
-  (expression_statement
-    (assignment_expression
-      (non_null_expression
-        (identifier))
+  (using_declaration
+    (variable_declarator
+      (identifier)
       (call_expression
         (identifier)
         (arguments))))
-  (expression_statement
-    (await_expression
-      (assignment_expression
-        (non_null_expression
-          (undefined))
-        (number))))
+  (using_declaration
+    (variable_declarator
+      (undefined)
+      (number)))
   (for_statement
-    (assignment_expression
-      (non_null_expression
-        (identifier))
-      (number))
+    (using_declaration
+      (variable_declarator
+        (identifier)
+        (number)))
     (empty_statement)
     (empty_statement)))
 
@@ -2480,6 +2476,159 @@ for (using;;) {}
     (identifier)
     (empty_statement)
     (statement_block)))
+
+==================================
+using declarations with types and several declarators
+==================================
+
+using x: Disposable = f();
+await using a: T = f(), b = g();
+using x!: T = f();
+using y;
+export using z = f();
+label: using w = f();
+using v = f(), [a] = g();
+
+---
+
+(program
+  (using_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (type_identifier))
+      (call_expression
+        (identifier)
+        (arguments))))
+  (using_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (type_identifier))
+      (call_expression
+        (identifier)
+        (arguments)))
+    (variable_declarator
+      (identifier)
+      (call_expression
+        (identifier)
+        (arguments))))
+  (using_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (type_identifier))
+      (call_expression
+        (identifier)
+        (arguments))))
+  (using_declaration
+    (variable_declarator
+      (identifier)))
+  (export_statement
+    (using_declaration
+      (variable_declarator
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (labeled_statement
+    (statement_identifier)
+    (using_declaration
+      (variable_declarator
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (using_declaration
+    (variable_declarator
+      (identifier)
+      (call_expression
+        (identifier)
+        (arguments)))
+    (variable_declarator
+      (array_pattern
+        (identifier))
+      (call_expression
+        (identifier)
+        (arguments)))))
+
+==================================
+using declaration inside an expression
+:error
+==================================
+
+f(using x = 1);
+
+---
+
+(program)
+
+==================================
+using declaration with ! after a pattern
+:error
+==================================
+
+using {a}! = b;
+
+---
+
+(program)
+
+==================================
+using declarations in a for-of head
+==================================
+
+for (using h of handles) {}
+for (using as of y) {}
+for (using undefined of y) {}
+for (using {a} of y) {}
+async function f() {
+  for (await using h of handles) {}
+  for await (await using h of handles) {}
+  for await (using h of handles) {}
+  for (await using of of y) {}
+}
+
+---
+
+(program
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (statement_block))
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (statement_block))
+  (for_in_statement
+    left: (undefined)
+    right: (identifier)
+    body: (statement_block))
+  (for_in_statement
+    left: (object_pattern
+      (shorthand_property_identifier_pattern))
+    right: (identifier)
+    body: (statement_block))
+  (function_declaration
+    name: (identifier)
+    parameters: (formal_parameters)
+    body: (statement_block
+      (for_in_statement
+        left: (identifier)
+        right: (identifier)
+        body: (statement_block))
+      (for_in_statement
+        left: (identifier)
+        right: (identifier)
+        body: (statement_block))
+      (for_in_statement
+        left: (identifier)
+        right: (identifier)
+        body: (statement_block))
+      (for_in_statement
+        left: (identifier)
+        right: (identifier)
+        body: (statement_block)))))
 
 ==================================
 using followed by a subscript or a line break

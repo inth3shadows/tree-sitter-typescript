@@ -169,11 +169,12 @@ module.exports = function defineGrammar(dialect) {
       [$.member_expression, $._type_query_member_expression_in_type_annotation],
       [$.call_expression, $._type_query_call_expression_in_type_annotation],
 
-      // `using` followed by a binding declares, but `using` is also an identifier:
-      // `using as = f()` vs `using as T`, `using {a} = b` vs `extends using {}` (#57).
-      [$.primary_expression, $._using_binding],
-      // `for (using of !x)` iterates `!x`; `for (using of! = 1;;)` declares `of`.
-      [$._for_header, $._using_binding_name],
+      // `using` followed by a name declares, but `using` is also an identifier:
+      // `using as = f()` vs `using as T` (#57, #69).
+      [$.primary_expression, $.using_declaration],
+      // `for (using as of y)` declares `as`. `for (using as T;;)` reads `using as T`
+      // as a cast, though tsc declares `as` there and errors (known limit).
+      [$._for_header, $.primary_expression, $.using_declaration],
     ]).concat(
       dialect === 'typescript' ? [
         [$.primary_type, $.type_parameter],
@@ -275,38 +276,28 @@ module.exports = function defineGrammar(dialect) {
         field('arguments', optional($.arguments)),
       )),
 
-      assignment_expression: $ => prec.right('assign', seq(
-        choice(
-          field('left', choice($.parenthesized_expression, $._lhs_expression)),
-          $._using_binding,
-        ),
-        '=',
-        field('right', $.expression),
-      )),
-
       // `using x = …` declares only when a binding follows `using` on the same line
       // (tsc's isUsingDeclaration); elsewhere `using` is an ordinary identifier (#57).
-      // The binding is a name (`as`, `satisfies`, `of`, contextual keywords
-      // included), `x!`, or an object pattern. Which reading holds is only known at
-      // a later token (`using as = f()` vs `using as T`, `using {a} = b` vs
-      // `extends using {}`), so the two are a GLR conflict (see `conflicts`).
-      // `of` is a name only here: it is not in _binding_identifier, because
-      // `for (let of of x)` needs `of` as the keyword there.
-      _using_binding: $ => seq('using', field('left', choice(
-        $._using_binding_name,
-        alias($._using_non_null_binding, $.non_null_expression),
-        $.object_pattern,
-      ))),
-
-      _using_binding_name: $ => choice(
-        $._binding_identifier,
-        keywordName($, 'of'),
-        alias($._reserved_identifier, $.identifier),
-        $.undefined,
+      // A line break after `using` ends the statement by automatic semicolon insertion
+      // (`using⏎x = 1` is two statements). The shape is tree-sitter-javascript's
+      // using_declaration (v0.25), with TypeScript's annotation and `x!` (#69).
+      using_declaration: $ => seq(
+        usingKind(),
+        alias($._using_declarator, $.variable_declarator),
+        repeat(seq(',', alias($._using_next_declarator, $.variable_declarator))),
+        $._semicolon,
       ),
 
-      // `using x! = f()`, shaped as the non_null_expression main gave it.
-      _using_non_null_binding: $ => seq($._using_binding_name, '!'),
+      // variable_declarator with the names tsc allows after `using`. The first has no
+      // array pattern (`using [a] = b` assigns to `using[a]`); later ones may have one.
+      // `!` follows only an identifier, with or without a type or initializer.
+      _using_declarator: $ => usingDeclarator($, $.object_pattern),
+      _using_next_declarator: $ => usingDeclarator($, $._destructuring_pattern),
+
+      // A binding identifier after `using`. A keyword the parser cannot shift here
+      // (`type`, `let`, `new`) is read as an identifier, as after `let`. `of` is
+      // added where it cannot be the for-of operator.
+      _using_name: $ => choice($._binding_identifier, $.undefined),
 
       _augmented_assignment_lhs: ($, previous) => choice(previous, $.non_null_expression),
 
@@ -543,6 +534,24 @@ module.exports = function defineGrammar(dialect) {
         keywordName($, 'satisfies'),
       ),
 
+      // The JavaScript rule, with a using declaration as the initializer (#69).
+      for_statement: $ => seq(
+        'for',
+        '(',
+        choice(
+          field('initializer', choice($.lexical_declaration, $.variable_declaration, $.using_declaration)),
+          seq(field('initializer', $._expressions), ';'),
+          field('initializer', $.empty_statement),
+        ),
+        field('condition', choice(
+          seq($._expressions, ';'),
+          $.empty_statement,
+        )),
+        field('increment', optional($._expressions)),
+        ')',
+        field('body', $.statement),
+      ),
+
       // The JavaScript rule, with _binding_identifier for the declared name.
       _for_header: $ => seq(
         '(',
@@ -566,6 +575,18 @@ module.exports = function defineGrammar(dialect) {
               $._destructuring_pattern,
             )),
             optional($._automatic_semicolon),
+          ),
+          // `for (using x of y)`, `for (await using x of y)` (#69), shaped as in
+          // tree-sitter-javascript v0.25. After a bare `using`, `of` is not a name:
+          // `for (using of x)` iterates `x` with `using` as the left side. After
+          // `await using` it is, as in tsc: `for (await using of of y)`.
+          seq(
+            field('kind', 'using'),
+            field('left', choice($._using_name, $.object_pattern)),
+          ),
+          seq(
+            field('kind', seq('await', 'using')),
+            field('left', choice($._using_name, keywordName($, 'of'), $.object_pattern)),
           ),
         ),
         field('operator', choice('in', 'of')),
@@ -695,6 +716,7 @@ module.exports = function defineGrammar(dialect) {
 
       declaration: ($, previous) => choice(
         previous,
+        $.using_declaration,
         $.function_signature,
         $.abstract_class_declaration,
         $.module,
@@ -1437,6 +1459,34 @@ function specifier($, previous, aliasName) {
  */
 function keywordName($, word) {
   return alias(word, $.identifier);
+}
+
+/**
+ * The `kind` of a using declaration: `using` or `await using` (#69).
+ *
+ * @returns {RuleOrLiteral}
+ */
+function usingKind() {
+  return field('kind', choice('using', seq('await', 'using')));
+}
+
+/**
+ * A declarator after `using`: an identifier (or `of`) that may take `!`, or a
+ * destructuring pattern from `patterns`, each with an optional type and initializer.
+ *
+ * @param {GrammarSymbols<string>} $
+ * @param {RuleOrLiteral} patterns
+ * @returns {RuleOrLiteral}
+ */
+function usingDeclarator($, patterns) {
+  return seq(
+    choice(
+      seq(field('name', choice($._using_name, keywordName($, 'of'))), optional('!')),
+      field('name', patterns),
+    ),
+    field('type', optional($.type_annotation)),
+    optional($._initializer),
+  );
 }
 
 /**

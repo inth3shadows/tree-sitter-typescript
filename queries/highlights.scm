@@ -33,4 +33,5 @@
   "readonly"
   "override"
   "satisfies"
+  "using"
 ] @keyword
