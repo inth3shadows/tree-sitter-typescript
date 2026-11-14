@@ -2138,6 +2138,57 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "await"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "FIELD",
+                  "name": "kind",
+                  "content": {
+                    "type": "STRING",
+                    "value": "using"
+                  }
+                },
+                {
+                  "type": "FIELD",
+                  "name": "left",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_binding_identifier"
+                      },
+                      {
+                        "type": "ALIAS",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "_reserved_identifier"
+                        },
+                        "named": true,
+                        "value": "identifier"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "undefined"
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           ]
         },
@@ -13289,6 +13340,11 @@
     [
       "_for_header",
       "_using_binding_name"
+    ],
+    [
+      "_for_header",
+      "primary_expression",
+      "_using_binding"
     ],
     [
       "primary_type",

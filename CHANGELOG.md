@@ -7,6 +7,14 @@ because editor queries match on node names.
 ## Unreleased
 
 ### Fixes
+- A `using` or `await using` declaration may head a for-of loop: `for (using h of y)`,
+  `for (await using h of y)` and `for await (await using h of y)` were an ERROR (part
+  of #69). The declaration is a `for_in_statement` with `kind: "using"` and the
+  declared name as `left`, like `for (const h of y)`; the `await` of `await using` is
+  the unnamed token before `kind`. `for (using of y)` and `for (using in o)` still
+  read `using` as the left side. The parse table grows by 20 states (tsx 20).
+  Known limit: as in other `using` forms, a line break after `using` does not stop the
+  declaration (`for (using⏎h of y)` parses, where tsc reports an error).
 - A re-export takes import attributes, as an import does:
   `export * from "./m.json" with { type: "json" }`, `export * as ns from … with {…}`,
   `export { a } from … with {…}`, the `export type` forms and the older `assert {…}`
@@ -218,6 +226,7 @@ because editor queries match on node names.
   types, ASI before a generic call signature (upstream #335), ASI before `in` used as a name.
 
 ### Node types
+- `for_in_statement.kind` may also be `using` (#69).
 - `export_statement` may hold an `import_attribute` child after its source, so its
   unnamed children are now `multiple` (`export * as ns from … with {…}` has both a
   `namespace_export` and an `import_attribute`) (#78).

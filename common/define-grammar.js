@@ -174,6 +174,8 @@ module.exports = function defineGrammar(dialect) {
       [$.primary_expression, $._using_binding],
       // `for (using of !x)` iterates `!x`; `for (using of! = 1;;)` declares `of`.
       [$._for_header, $._using_binding_name],
+      // `for (using as of y)` declares `as`; `for (using as T;;)` casts `using` (#69).
+      [$._for_header, $.primary_expression, $._using_binding],
     ]).concat(
       dialect === 'typescript' ? [
         [$.primary_type, $.type_parameter],
@@ -566,6 +568,19 @@ module.exports = function defineGrammar(dialect) {
               $._destructuring_pattern,
             )),
             optional($._automatic_semicolon),
+          ),
+          // `for (using x of y)`, `for (await using x of y)` (#69). `of` is not a
+          // name here: `for (using of x)` iterates `x` with `using` as the left side.
+          // `kind` is the `using` token alone, so it stays a single node; the
+          // `await` of `await using` is the unnamed token before it.
+          seq(
+            optional('await'),
+            field('kind', 'using'),
+            field('left', choice(
+              $._binding_identifier,
+              alias($._reserved_identifier, $.identifier),
+              $.undefined,
+            )),
           ),
         ),
         field('operator', choice('in', 'of')),

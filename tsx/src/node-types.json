@@ -2161,6 +2161,10 @@
             "named": false
           },
           {
+            "type": "using",
+            "named": false
+          },
+          {
             "type": "var",
             "named": false
           }
