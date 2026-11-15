@@ -2003,6 +2003,56 @@ type D = new () => this is a;
         type: (type_identifier)))))
 
 ==================================
+asserts with no operand on the same line names a type
+==================================
+
+type A = new () => asserts;
+type B = () => asserts.x;
+type C = new () => asserts<x> | a;
+function g(): asserts {}
+type D = new () => asserts
+  x;
+
+---
+
+(program
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (constructor_type
+      parameters: (formal_parameters)
+      type: (type_identifier)))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (function_type
+      parameters: (formal_parameters)
+      return_type: (nested_type_identifier
+        module: (identifier)
+        name: (type_identifier))))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (constructor_type
+      parameters: (formal_parameters)
+      type: (union_type
+        (generic_type
+          name: (type_identifier)
+          type_arguments: (type_arguments
+            (type_identifier)))
+        (type_identifier))))
+  (function_declaration
+    name: (identifier)
+    parameters: (formal_parameters)
+    return_type: (type_annotation
+      (type_identifier))
+    body: (statement_block))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (constructor_type
+      parameters: (formal_parameters)
+      type: (type_identifier)))
+  (expression_statement
+    (identifier)))
+
+==================================
 Tuple types
 ==================================
 

@@ -10196,6 +10196,15 @@
                   "name": "identifier"
                 },
                 {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "asserts"
+                  },
+                  "named": true,
+                  "value": "identifier"
+                },
+                {
                   "type": "SYMBOL",
                   "name": "nested_identifier"
                 }
@@ -11385,6 +11394,15 @@
           "name": "_type_identifier"
         },
         {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "asserts"
+          },
+          "named": true,
+          "value": "type_identifier"
+        },
+        {
           "type": "SYMBOL",
           "name": "nested_type_identifier"
         },
@@ -11680,6 +11698,15 @@
                 {
                   "type": "SYMBOL",
                   "name": "_type_identifier"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "asserts"
+                  },
+                  "named": true,
+                  "value": "type_identifier"
                 },
                 {
                   "type": "SYMBOL",
