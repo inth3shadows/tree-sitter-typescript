@@ -8,7 +8,7 @@ const JavaScript = require('tree-sitter-javascript/grammar');
 // listed: that would make `[type]` (a type named type) fail.
 const TUPLE_LABEL_KEYWORDS = [
   'any', 'number', 'boolean', 'string', 'symbol', 'object', 'never', 'unknown',
-  'readonly', 'new', 'keyof',
+  'readonly', 'new', 'keyof', 'asserts',
 ];
 
 module.exports = function defineGrammar(dialect) {
@@ -121,6 +121,8 @@ module.exports = function defineGrammar(dialect) {
 
       [$.nested_identifier, $.nested_type_identifier, $.primary_expression],
       [$.nested_identifier, $.nested_type_identifier],
+      [$._asserts_nested_identifier, $.nested_type_identifier, $.primary_expression],
+      [$._asserts_nested_identifier, $.nested_type_identifier],
 
       [$._call_signature, $.function_type],
       [$._call_signature, $.constructor_type],
@@ -856,8 +858,25 @@ module.exports = function defineGrammar(dialect) {
         $._semicolon,
       ),
 
+      // A `nested_identifier` whose head is the `asserts` keyword, for a qualified type
+      // name such as `asserts.a.b` (#87). Only types use it, so the keyword stays out
+      // of states where a namespace, import alias or JSX name expects an identifier.
+      _asserts_nested_identifier: $ => prec('member', seq(
+        field('object', choice(
+          keywordName($, 'asserts'),
+          alias($._asserts_nested_identifier, $.member_expression),
+        )),
+        '.',
+        field('property', alias($.identifier, $.property_identifier)),
+      )),
+
       nested_type_identifier: $ => prec('member', seq(
-        field('module', choice($.identifier, $.nested_identifier)),
+        field('module', choice(
+          $.identifier,
+          keywordName($, 'asserts'),
+          $.nested_identifier,
+          alias($._asserts_nested_identifier, $.nested_identifier),
+        )),
         '.',
         field('name', $._type_identifier),
       )),
@@ -874,6 +893,7 @@ module.exports = function defineGrammar(dialect) {
         'extends',
         commaSep1(field('type', choice(
           $._type_identifier,
+          alias('asserts', $.type_identifier),
           $.nested_type_identifier,
           $.generic_type,
         ))),
@@ -1042,6 +1062,9 @@ module.exports = function defineGrammar(dialect) {
         $.parenthesized_type,
         $.predefined_type,
         $._type_identifier,
+        // `asserts` lexes as a keyword where an `asserts x` return may start
+        // (after `=>` or a return type's `:`). Followed by no operand, it names a type.
+        alias('asserts', $.type_identifier),
         $.nested_type_identifier,
         $.generic_type,
         $.object_type,
@@ -1120,6 +1143,7 @@ module.exports = function defineGrammar(dialect) {
       generic_type: $ => prec('call', seq(
         field('name', choice(
           $._type_identifier,
+          alias('asserts', $.type_identifier),
           $.nested_type_identifier,
           alias($._type_query_member_expression_in_type_annotation, $.member_expression),
         )),
@@ -1413,6 +1437,7 @@ module.exports = function defineGrammar(dialect) {
         'object',
         'new',
         'using',
+        'asserts',
         previous,
       ),
     },

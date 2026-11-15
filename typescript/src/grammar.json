@@ -8105,6 +8105,10 @@
           "value": "using"
         },
         {
+          "type": "STRING",
+          "value": "asserts"
+        },
+        {
           "type": "CHOICE",
           "members": [
             {
@@ -10171,6 +10175,59 @@
         }
       ]
     },
+    "_asserts_nested_identifier": {
+      "type": "PREC",
+      "value": "member",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "object",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "asserts"
+                  },
+                  "named": true,
+                  "value": "identifier"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_asserts_nested_identifier"
+                  },
+                  "named": true,
+                  "value": "member_expression"
+                }
+              ]
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "."
+          },
+          {
+            "type": "FIELD",
+            "name": "property",
+            "content": {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              "named": true,
+              "value": "property_identifier"
+            }
+          }
+        ]
+      }
+    },
     "nested_type_identifier": {
       "type": "PREC",
       "value": "member",
@@ -10188,8 +10245,26 @@
                   "name": "identifier"
                 },
                 {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "asserts"
+                  },
+                  "named": true,
+                  "value": "identifier"
+                },
+                {
                   "type": "SYMBOL",
                   "name": "nested_identifier"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_asserts_nested_identifier"
+                  },
+                  "named": true,
+                  "value": "nested_identifier"
                 }
               ]
             }
@@ -10288,6 +10363,15 @@
                     "name": "_type_identifier"
                   },
                   {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "STRING",
+                      "value": "asserts"
+                    },
+                    "named": true,
+                    "value": "type_identifier"
+                  },
+                  {
                     "type": "SYMBOL",
                     "name": "nested_type_identifier"
                   },
@@ -10316,6 +10400,15 @@
                         {
                           "type": "SYMBOL",
                           "name": "_type_identifier"
+                        },
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "STRING",
+                            "value": "asserts"
+                          },
+                          "named": true,
+                          "value": "type_identifier"
                         },
                         {
                           "type": "SYMBOL",
@@ -11081,6 +11174,15 @@
                 "value": "identifier"
               },
               {
+                "type": "ALIAS",
+                "content": {
+                  "type": "STRING",
+                  "value": "asserts"
+                },
+                "named": true,
+                "value": "identifier"
+              },
+              {
                 "type": "SYMBOL",
                 "name": "rest_pattern"
               }
@@ -11205,6 +11307,15 @@
                 "content": {
                   "type": "STRING",
                   "value": "keyof"
+                },
+                "named": true,
+                "value": "identifier"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "STRING",
+                  "value": "asserts"
                 },
                 "named": true,
                 "value": "identifier"
@@ -11375,6 +11486,15 @@
         {
           "type": "SYMBOL",
           "name": "_type_identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "asserts"
+          },
+          "named": true,
+          "value": "type_identifier"
         },
         {
           "type": "SYMBOL",
@@ -11672,6 +11792,15 @@
                 {
                   "type": "SYMBOL",
                   "name": "_type_identifier"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "asserts"
+                  },
+                  "named": true,
+                  "value": "type_identifier"
                 },
                 {
                   "type": "SYMBOL",
@@ -13403,6 +13532,15 @@
     ],
     [
       "nested_identifier",
+      "nested_type_identifier"
+    ],
+    [
+      "_asserts_nested_identifier",
+      "nested_type_identifier",
+      "primary_expression"
+    ],
+    [
+      "_asserts_nested_identifier",
       "nested_type_identifier"
     ],
     [
