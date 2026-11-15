@@ -13772,6 +13772,10 @@
     [
       {
         "type": "SYMBOL",
+        "name": "readonly_type"
+      },
+      {
+        "type": "SYMBOL",
         "name": "intersection_type"
       },
       {
@@ -13787,16 +13791,16 @@
         "name": "function_type"
       },
       {
+        "type": "SYMBOL",
+        "name": "constructor_type"
+      },
+      {
         "type": "STRING",
         "value": "binary"
       },
       {
         "type": "SYMBOL",
         "name": "type_predicate"
-      },
-      {
-        "type": "SYMBOL",
-        "name": "readonly_type"
       }
     ],
     [

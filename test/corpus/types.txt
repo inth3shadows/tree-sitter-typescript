@@ -1744,6 +1744,224 @@ type t = readonly (readonly a[]) []
               (type_identifier))))))))
 
 ==================================
+Read-only types in unions, intersections and conditional types
+==================================
+
+type t = readonly string[] | null
+type t = keyof readonly a[] | b
+type t = readonly a[] & b
+type t = readonly a[] extends b ? 1 : 2
+type t = b | readonly a[]
+type t = readonly [a] | b
+type t = () => readonly a[] | b
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (union_type
+      (readonly_type
+        (array_type
+          (predefined_type)))
+      (literal_type
+        (null))))
+  (type_alias_declaration
+    (type_identifier)
+    (union_type
+      (index_type_query
+        (readonly_type
+          (array_type
+            (type_identifier))))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (intersection_type
+      (readonly_type
+        (array_type
+          (type_identifier)))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (conditional_type
+      (readonly_type
+        (array_type
+          (type_identifier)))
+      (type_identifier)
+      (literal_type
+        (number))
+      (literal_type
+        (number))))
+  (type_alias_declaration
+    (type_identifier)
+    (union_type
+      (type_identifier)
+      (readonly_type
+        (array_type
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (union_type
+      (readonly_type
+        (tuple_type
+          (type_identifier)))
+      (type_identifier)))
+  (type_alias_declaration
+    (type_identifier)
+    (function_type
+      (formal_parameters)
+      (union_type
+        (readonly_type
+          (array_type
+            (type_identifier)))
+        (type_identifier)))))
+
+==================================
+Constructor types with a union, intersection or conditional return type
+==================================
+
+type t = new () => a | b
+type t = abstract new () => a & b
+type t = new () => readonly a[] | b
+type t = new () => a extends b ? 1 : 2
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (union_type
+        (type_identifier)
+        (type_identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (intersection_type
+        (type_identifier)
+        (type_identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (union_type
+        (readonly_type
+          (array_type
+            (type_identifier)))
+        (type_identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (conditional_type
+        (type_identifier)
+        (type_identifier)
+        (literal_type
+          (number))
+        (literal_type
+          (number))))))
+
+==================================
+Readonly and constructor types before |, ?? and in type predicates
+==================================
+
+function f(x): x is readonly a[] | b {}
+function g(x): asserts x is readonly a[] | b {}
+type I<T> = T extends abstract new (...a: any) => infer R | null ? R : never;
+x as readonly a[] | b;
+x as new () => a | b;
+x as readonly a[] ?? y;
+x satisfies new () => a ?? y;
+
+---
+
+(program
+  (function_declaration
+    name: (identifier)
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)))
+    return_type: (type_predicate_annotation
+      (type_predicate
+        name: (identifier)
+        type: (union_type
+          (readonly_type
+            (array_type
+              (type_identifier)))
+          (type_identifier))))
+    body: (statement_block))
+  (function_declaration
+    name: (identifier)
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)))
+    return_type: (asserts_annotation
+      (asserts
+        (type_predicate
+          name: (identifier)
+          type: (union_type
+            (readonly_type
+              (array_type
+                (type_identifier)))
+            (type_identifier)))))
+    body: (statement_block))
+  (type_alias_declaration
+    name: (type_identifier)
+    type_parameters: (type_parameters
+      (type_parameter
+        name: (type_identifier)))
+    value: (conditional_type
+      left: (type_identifier)
+      right: (constructor_type
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (rest_pattern
+              (identifier))
+            type: (type_annotation
+              (predefined_type))))
+        type: (union_type
+          (infer_type
+            (type_identifier))
+          (literal_type
+            (null))))
+      consequence: (type_identifier)
+      alternative: (predefined_type)))
+  (expression_statement
+    (as_expression
+      (identifier)
+      (union_type
+        (readonly_type
+          (array_type
+            (type_identifier)))
+        (type_identifier))))
+  (expression_statement
+    (as_expression
+      (identifier)
+      (constructor_type
+        parameters: (formal_parameters)
+        type: (union_type
+          (type_identifier)
+          (type_identifier)))))
+  (expression_statement
+    (binary_expression
+      left: (as_expression
+        (identifier)
+        (readonly_type
+          (array_type
+            (type_identifier))))
+      right: (identifier)))
+  (expression_statement
+    (binary_expression
+      left: (satisfies_expression
+        (identifier)
+        (constructor_type
+          parameters: (formal_parameters)
+          type: (type_identifier)))
+      right: (identifier))))
+
+==================================
 Tuple types
 ==================================
 
