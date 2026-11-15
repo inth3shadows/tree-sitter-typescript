@@ -1817,6 +1817,53 @@ type t = () => readonly a[] | b
         (type_identifier)))))
 
 ==================================
+Constructor types with a union, intersection or conditional return type
+==================================
+
+type t = new () => a | b
+type t = abstract new () => a & b
+type t = new () => readonly a[] | b
+type t = new () => a extends b ? 1 : 2
+
+---
+
+(program
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (union_type
+        (type_identifier)
+        (type_identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (intersection_type
+        (type_identifier)
+        (type_identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (union_type
+        (readonly_type
+          (array_type
+            (type_identifier)))
+        (type_identifier))))
+  (type_alias_declaration
+    (type_identifier)
+    (constructor_type
+      (formal_parameters)
+      (conditional_type
+        (type_identifier)
+        (type_identifier)
+        (literal_type
+          (number))
+        (literal_type
+          (number))))))
+
+==================================
 Tuple types
 ==================================
 

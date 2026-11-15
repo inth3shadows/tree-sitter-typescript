@@ -30,11 +30,18 @@ because editor queries match on node names.
 - `readonly` binds only to the type directly after it, as `keyof` does, so a following
   union, intersection or conditional type now sits outside it, as in tsc (#75):
   `readonly string[] | null` is a `union_type` of a `readonly_type` and `null`, and
-  `keyof readonly T[] | U`, `readonly T[] & U` and `readonly T[] extends U ? A : B`
-  nest the same way. Each of these used to be a `readonly_type` around the whole type.
-  This changes tree shape only: node types are unchanged, and 257 of 34,956 real files
-  parse differently, all of them in this way. From dokimasia/tree-sitter-typescript
-  (Roy Klopper). The parse table shrinks by 1 state (tsx 1).
+  `readonly T[] & U` and `readonly T[] extends U ? A : B` nest the same way; each was a
+  `readonly_type` around the whole type. `keyof readonly T[] | U` is a `union_type` of
+  the `index_type_query` and `U`; it was an `index_type_query` of a `readonly_type` of
+  the union. From dokimasia/tree-sitter-typescript (Roy Klopper).
+  A constructor type's return type takes a following union, intersection or conditional
+  type, as a function type's does: `new () => A | B` is a `constructor_type` returning
+  the union; it was a `union_type` of the `constructor_type` and `B`. The same holds for
+  `abstract new`, `&` and `extends`.
+  Tree shape only: node types are unchanged. Of 34,956 real files, 263 parse
+  differently: 257 for `readonly` and 6 for a constructor's return type
+  (`new () => HTMLElement | undefined`). None errors before or after. The parse table
+  grows by 3 states (tsx 3).
 - A re-export takes import attributes, as an import does:
   `export * from "./m.json" with { type: "json" }`, `export * as ns from … with {…}`,
   `export { a } from … with {…}`, the `export type` forms and the older `assert {…}`
@@ -62,7 +69,7 @@ because editor queries match on node names.
   own `lib.es2015.symbol.wellknown.d.ts` uses, and `U extends keyof infer V ? V : never`
   were an ERROR (#58). From dokimasia/tree-sitter-typescript (Roy Klopper). The parse
   table grows by 9 states (tsx 9).
-  `keyof readonly T[] | U` nested inside `readonly` until #75.
+  `keyof readonly T[] | U`, `& U` and `extends U ? A : B` nested inside `readonly` until #75.
 - `using` parses as an ordinary identifier: `let y = using`, `if (using) x`,
   `using[1]`, `using++`, `x = using as T`, `class A extends using {}` and a parameter
   or method named `using` were an ERROR (#57). `using` declares only when a binding

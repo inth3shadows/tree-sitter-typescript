@@ -75,6 +75,7 @@ module.exports = function defineGrammar(dialect) {
         $.union_type,
         $.conditional_type,
         $.function_type,
+        $.constructor_type,
         'binary',
         $.type_predicate,
       ],
