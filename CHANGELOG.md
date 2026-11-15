@@ -14,10 +14,10 @@ because editor queries match on node names.
   `readonly_type` around the whole type. `keyof readonly T[] | U` is a `union_type` of
   the `index_type_query` and `U`; it was an `index_type_query` of a `readonly_type` of
   the union. From dokimasia/tree-sitter-typescript (Roy Klopper).
-  A constructor type's return type takes a following union, intersection or conditional
-  type, as a function type's does: `new () => A | B` is a `constructor_type` returning
-  the union; it was a `union_type` of the `constructor_type` and `B`. The same holds for
-  `abstract new`, `&` and `extends`.
+  A constructor type's return type takes a following union, intersection or
+  conditional type, as a function type's return type does: `new () => A | B` is a
+  `constructor_type` returning the union; it was a `union_type` of the
+  `constructor_type` and `B`. The same holds for `abstract new`, `&` and `extends`.
   Tree shape only: node types are unchanged. Of 34,956 real files, 263 parse
   differently: 257 for `readonly` and 6 for a constructor's return type
   (`new () => HTMLElement | undefined`). None errors before or after. The parse table
@@ -78,7 +78,9 @@ because editor queries match on node names.
   own `lib.es2015.symbol.wellknown.d.ts` uses, and `U extends keyof infer V ? V : never`
   were an ERROR (#58). From dokimasia/tree-sitter-typescript (Roy Klopper). The parse
   table grows by 9 states (tsx 9).
-  `keyof readonly T[] | U`, `& U` and `extends U ? A : B` nested inside `readonly` until #75.
+  Known limit: `readonly` still takes everything after it, so
+  `keyof readonly T[] | U`, `& U` and `extends U ? A : B` nest inside `readonly` (as
+  `readonly string[] | null` already did) where tsc binds them outside `keyof`.
 - `using` parses as an ordinary identifier: `let y = using`, `if (using) x`,
   `using[1]`, `using++`, `x = using as T`, `class A extends using {}` and a parameter
   or method named `using` were an ERROR (#57). `using` declares only when a binding
