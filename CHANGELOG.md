@@ -4,7 +4,12 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
-## Unreleased
+## 0.24.0
+
+### Packaging
+- The Rust crate is published to crates.io as `tree-sitter-typescript-next`; its library
+  is still `tree_sitter_typescript` (#72). Version 0.24.0, since node types changed
+  since upstream v0.23.2.
 
 ### Fixes
 - A `using` or `await using` declaration is a `using_declaration` node, the shape
