@@ -202,7 +202,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8ddffe35a0e5eeeadf13ff7350af564c6e73993a24db62caee1822b185c2600"
 
 [[package]]
-name = "tree-sitter-typescript"
+name = "tree-sitter-typescript-next"
 version = "0.23.2"
 dependencies = [
  "cc",

@@ -1,5 +1,5 @@
 [package]
-name = "tree-sitter-typescript"
+name = "tree-sitter-typescript-next"
 description = "TypeScript and TSX grammars for tree-sitter"
 version = "0.23.2"
 authors = [
@@ -10,7 +10,7 @@ license = "MIT"
 readme = "README.md"
 keywords = ["incremental", "parsing", "tree-sitter", "typescript", "tsx"]
 categories = ["parsing", "text-editors"]
-repository = "https://github.com/tree-sitter/tree-sitter-typescript"
+repository = "https://github.com/inth3shadows/tree-sitter-typescript"
 edition = "2021"
 autoexamples = false
 
@@ -28,6 +28,7 @@ include = [
 ]
 
 [lib]
+name = "tree_sitter_typescript"
 path = "bindings/rust/lib.rs"
 
 [dependencies]
