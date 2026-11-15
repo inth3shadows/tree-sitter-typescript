@@ -1676,7 +1676,15 @@
         "required": true,
         "types": [
           {
+            "type": "asserts",
+            "named": true
+          },
+          {
             "type": "type",
+            "named": true
+          },
+          {
+            "type": "type_predicate",
             "named": true
           }
         ]

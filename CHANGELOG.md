@@ -22,6 +22,16 @@ because editor queries match on node names.
   differently: 257 for `readonly` and 6 for a constructor's return type
   (`new () => HTMLElement | undefined`). None errors before or after. The parse table
   grows by 3 states (tsx 3).
+- A constructor type may return a type predicate or an assertion, as a function type
+  may: `new () => x is T`, `abstract new () => asserts x` and
+  `new () => asserts x is T` were an ERROR (#85). The parse table grows by 36 states
+  (tsx 36). Known limit: as after a function type's `=>`, `asserts` with no operand
+  is read as the keyword, so a type named `asserts` there (`new () => asserts`,
+  `new () => asserts.x`) is an ERROR; it parsed before this change.
+
+### Node types
+- `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
+  `function_type.return_type` already may.
 
 ## 0.24.0
 

@@ -1962,6 +1962,47 @@ x satisfies new () => a ?? y;
       right: (identifier))))
 
 ==================================
+Constructor types returning a type predicate or asserts
+==================================
+
+type A = new () => x is a;
+type B = abstract new () => asserts x;
+type C = new () => asserts x is a;
+type D = new () => this is a;
+
+---
+
+(program
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (constructor_type
+      parameters: (formal_parameters)
+      type: (type_predicate
+        name: (identifier)
+        type: (type_identifier))))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (constructor_type
+      parameters: (formal_parameters)
+      type: (asserts
+        (identifier))))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (constructor_type
+      parameters: (formal_parameters)
+      type: (asserts
+        (type_predicate
+          name: (identifier)
+          type: (type_identifier)))))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (constructor_type
+      parameters: (formal_parameters)
+      type: (type_predicate
+        name: (this)
+        type: (type_identifier)))))
+
+==================================
 Tuple types
 ==================================
 

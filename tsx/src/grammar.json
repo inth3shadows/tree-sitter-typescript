@@ -11349,8 +11349,21 @@
             "type": "FIELD",
             "name": "type",
             "content": {
-              "type": "SYMBOL",
-              "name": "type"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "type"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "asserts"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "type_predicate"
+                }
+              ]
             }
           }
         ]
