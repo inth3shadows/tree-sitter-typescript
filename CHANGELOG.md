@@ -6,6 +6,11 @@ because editor queries match on node names.
 
 ## Unreleased
 
+### Packaging
+- The Rust crate is published to crates.io as `tree-sitter-typescript-next`; its library
+  is still `tree_sitter_typescript` (#72). Version 0.24.0, since node types changed
+  since upstream v0.23.2.
+
 ### Fixes
 - A `using` or `await using` declaration is a `using_declaration` node, the shape
   tree-sitter-javascript v0.25 gives it: `kind` is `using`, or `await` and `using`, and
