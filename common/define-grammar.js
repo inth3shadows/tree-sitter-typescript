@@ -857,7 +857,7 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       nested_type_identifier: $ => prec('member', seq(
-        field('module', choice($.identifier, alias('asserts', $.identifier), $.nested_identifier)),
+        field('module', choice($.identifier, $.nested_identifier)),
         '.',
         field('name', $._type_identifier),
       )),
@@ -1042,9 +1042,6 @@ module.exports = function defineGrammar(dialect) {
         $.parenthesized_type,
         $.predefined_type,
         $._type_identifier,
-        // `asserts` lexes as a keyword where an `asserts x` return may start
-        // (after `=>` or a return type's `:`). Followed by no operand, it names a type.
-        alias('asserts', $.type_identifier),
         $.nested_type_identifier,
         $.generic_type,
         $.object_type,
@@ -1123,7 +1120,6 @@ module.exports = function defineGrammar(dialect) {
       generic_type: $ => prec('call', seq(
         field('name', choice(
           $._type_identifier,
-          alias('asserts', $.type_identifier),
           $.nested_type_identifier,
           alias($._type_query_member_expression_in_type_annotation, $.member_expression),
         )),
