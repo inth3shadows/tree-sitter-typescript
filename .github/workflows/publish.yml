@@ -13,16 +13,21 @@ permissions:
 
 # No `generate`: these jobs would regenerate the parsers with the latest tree-sitter CLI
 # instead of 0.25.10, and `cargo publish` refuses the changed files.
-# The shared workflows are pinned to a commit: they receive the crates.io token, and
-# their inputs have changed under callers before.
+# The shared workflows are pinned to a commit, because their inputs have changed under
+# callers before. The actions they call are not pinned by this.
 jobs:
   check:
     name: Check the tag
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Tag matches the crate version
         run: |
+          set -o pipefail
           if [[ "$GITHUB_REF" != refs/tags/v* ]]; then
             echo "::error::Run this workflow from a v<version> tag, not $GITHUB_REF"
             exit 1

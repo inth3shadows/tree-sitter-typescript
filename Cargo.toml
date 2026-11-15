@@ -17,7 +17,7 @@ autoexamples = false
 build = "bindings/rust/build.rs"
 include = [
   "/LICENSE",
-  "common",
+  "/common",
   "bindings/rust",
   "typescript/grammar.js",
   "typescript/src",
