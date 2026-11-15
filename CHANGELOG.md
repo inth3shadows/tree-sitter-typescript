@@ -4,6 +4,25 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
+## Unreleased
+
+### Fixes
+- `readonly` binds only to the type directly after it, as `keyof` does, so a following
+  union, intersection or conditional type now sits outside it, as in tsc (#75):
+  `readonly string[] | null` is a `union_type` of a `readonly_type` and `null`, and
+  `readonly T[] & U` and `readonly T[] extends U ? A : B` nest the same way; each was a
+  `readonly_type` around the whole type. `keyof readonly T[] | U` is a `union_type` of
+  the `index_type_query` and `U`; it was an `index_type_query` of a `readonly_type` of
+  the union. From dokimasia/tree-sitter-typescript (Roy Klopper).
+  A constructor type's return type takes a following union, intersection or conditional
+  type, as a function type's does: `new () => A | B` is a `constructor_type` returning
+  the union; it was a `union_type` of the `constructor_type` and `B`. The same holds for
+  `abstract new`, `&` and `extends`.
+  Tree shape only: node types are unchanged. Of 34,956 real files, 263 parse
+  differently: 257 for `readonly` and 6 for a constructor's return type
+  (`new () => HTMLElement | undefined`). None errors before or after. The parse table
+  grows by 3 states (tsx 3).
+
 ## 0.24.0
 
 ### Packaging
@@ -32,21 +51,6 @@ because editor queries match on node names.
   `for (await using of y)`. Some forms tsc rejects parse: `export default using x = f()`
   (as `export default const` does), `!` in a for head (`for (using x! = 1;;)`, as
   `for (let x!: T;;)` does), and `for (using as T;;)`, read as a cast.
-- `readonly` binds only to the type directly after it, as `keyof` does, so a following
-  union, intersection or conditional type now sits outside it, as in tsc (#75):
-  `readonly string[] | null` is a `union_type` of a `readonly_type` and `null`, and
-  `readonly T[] & U` and `readonly T[] extends U ? A : B` nest the same way; each was a
-  `readonly_type` around the whole type. `keyof readonly T[] | U` is a `union_type` of
-  the `index_type_query` and `U`; it was an `index_type_query` of a `readonly_type` of
-  the union. From dokimasia/tree-sitter-typescript (Roy Klopper).
-  A constructor type's return type takes a following union, intersection or conditional
-  type, as a function type's does: `new () => A | B` is a `constructor_type` returning
-  the union; it was a `union_type` of the `constructor_type` and `B`. The same holds for
-  `abstract new`, `&` and `extends`.
-  Tree shape only: node types are unchanged. Of 34,956 real files, 263 parse
-  differently: 257 for `readonly` and 6 for a constructor's return type
-  (`new () => HTMLElement | undefined`). None errors before or after. The parse table
-  grows by 3 states (tsx 3).
 - A re-export takes import attributes, as an import does:
   `export * from "./m.json" with { type: "json" }`, `export * as ns from … with {…}`,
   `export { a } from … with {…}`, the `export type` forms and the older `assert {…}`
