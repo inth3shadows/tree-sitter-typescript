@@ -49,6 +49,9 @@ module.exports = function defineGrammar(dialect) {
       $._type_member_end_marker,
       // `global` at a statement start when `{` follows: a global augmentation.
       $._global_keyword,
+      // `asserts` in a return type only when an identifier or keyword follows on
+      // the same line, as in tsc; otherwise `asserts` is an identifier (#87).
+      $._asserts_keyword,
     ], dialect === 'tsx' ? [$._jsx_string_marker] : []),
 
     supertypes: ($, previous) => previous.concat([
@@ -989,7 +992,7 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       asserts: $ => seq(
-        'asserts',
+        alias($._asserts_keyword, 'asserts'),
         choice($.type_predicate, $.identifier, $.this),
       ),
 

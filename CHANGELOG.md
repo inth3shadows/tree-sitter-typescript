@@ -25,9 +25,14 @@ because editor queries match on node names.
 - A constructor type may return a type predicate or an assertion, as a function type
   may: `new () => x is T`, `abstract new () => asserts x` and
   `new () => asserts x is T` were an ERROR (#85). The parse table grows by 36 states
-  (tsx 36). Known limit: as after a function type's `=>`, `asserts` with no operand
-  is read as the keyword, so a type named `asserts` there (`new () => asserts`,
-  `new () => asserts.x`) is an ERROR; it parsed before this change.
+  (tsx 36).
+- `asserts` starts an assertion return type only when an identifier or keyword
+  follows on the same line, as in tsc; otherwise it names a type (#87). The scanner
+  decides, as for `global`, so `asserts` is never a keyword anywhere else.
+  `() => asserts`, `new () => asserts.a.b`, `() => asserts<T> | U` and
+  `function f(): asserts {}` were an ERROR or a MISSING identifier, and
+  `() => asserts⏎x` took `x` as the asserted name; it now ends the type at the line
+  break, as does a block comment containing one. The parse table is unchanged.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
