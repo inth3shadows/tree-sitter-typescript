@@ -23,6 +23,7 @@ enum TokenType {
     ACCESSOR_MARKER,
     TYPE_MEMBER_END_MARKER,
     GLOBAL_KEYWORD,
+    ASSERTS_KEYWORD,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -822,6 +823,58 @@ static bool scan_global_keyword(TSLexer *lexer) {
     return true;
 }
 
+// `asserts` starting an assertion return type, only when an identifier or keyword
+// follows on the same line (tsc's nextTokenIsIdentifierOrKeywordOnSameLine). A line
+// break, including one inside a block comment, ends the type: `asserts` is then a
+// type name. The caller has skipped leading whitespace and seen `a`. The token
+// ends after `asserts`; everything after it is lookahead only.
+static bool scan_asserts_keyword(TSLexer *lexer) {
+    for (const char *c = "asserts"; *c; c++) {
+        if (lexer->lookahead != *c) {
+            return false;
+        }
+        advance(lexer);
+    }
+    if (is_identifier_part(lexer->lookahead)) {
+        return false;
+    }
+    lexer->mark_end(lexer);
+    for (;;) {
+        while (!is_line_terminator(lexer->lookahead) &&
+               (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead))) {
+            advance(lexer);
+        }
+        if (lexer->lookahead != '/') {
+            break;
+        }
+        advance(lexer);
+        if (lexer->lookahead != '*') {
+            // `//` runs to a line break; a lone `/` is no identifier.
+            return false;
+        }
+        advance(lexer);
+        for (;;) {
+            if (lexer->eof(lexer) || is_line_terminator(lexer->lookahead)) {
+                return false;
+            }
+            if (lexer->lookahead == '*') {
+                advance(lexer);
+                if (lexer->lookahead == '/') {
+                    advance(lexer);
+                    break;
+                }
+            } else {
+                advance(lexer);
+            }
+        }
+    }
+    if (!is_identifier_start(lexer->lookahead)) {
+        return false;
+    }
+    lexer->result_symbol = ASSERTS_KEYWORD;
+    return true;
+}
+
 static inline bool external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     if (valid_symbols[TEMPLATE_CHARS]) {
         if (valid_symbols[AUTOMATIC_SEMICOLON]) {
@@ -838,6 +891,16 @@ static inline bool external_scanner_scan(void *payload, TSLexer *lexer, const bo
         // would start mid-identifier (`g-->0` read as an HTML comment).
         if (lexer->lookahead == 'g') {
             return scan_global_keyword(lexer);
+        }
+    }
+
+    if (valid_symbols[ASSERTS_KEYWORD] && !valid_symbols[AUTOMATIC_SEMICOLON]) {
+        while (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
+            skip(lexer);
+        }
+        // As for `global`: once past an `a`, a failed scan must not fall through.
+        if (lexer->lookahead == 'a') {
+            return scan_asserts_keyword(lexer);
         }
     }
 

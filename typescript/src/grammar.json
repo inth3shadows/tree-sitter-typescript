@@ -10903,7 +10903,12 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_asserts_keyword"
+          },
+          "named": false,
           "value": "asserts"
         },
         {
@@ -14139,6 +14144,10 @@
     {
       "type": "SYMBOL",
       "name": "_global_keyword"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_asserts_keyword"
     }
   ],
   "inline": [
