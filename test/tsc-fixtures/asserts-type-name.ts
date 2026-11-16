@@ -15,3 +15,8 @@ declare let q: asserts.a.b;
 interface Child extends asserts {}
 declare const n: number;
 n < asserts.a.b && n > 0;
+type Keys = { [asserts in "a" | "b"]: asserts };
+declare function g<T>(x: unknown): T;
+g<typeof asserts>(0);
+declare let r: Child.asserts.x;
+const generic = <asserts>(x: asserts) => x;

@@ -878,7 +878,9 @@ module.exports = function defineGrammar(dialect) {
           alias($._asserts_nested_identifier, $.nested_identifier),
         )),
         '.',
-        field('name', $._type_identifier),
+        // A plain identifier, not _type_identifier: after `.` the `asserts` keyword
+        // would otherwise win over a property named `asserts` (`a.asserts.b`).
+        field('name', alias($.identifier, $.type_identifier)),
       )),
 
       interface_declaration: $ => seq(
@@ -893,7 +895,6 @@ module.exports = function defineGrammar(dialect) {
         'extends',
         commaSep1(field('type', choice(
           $._type_identifier,
-          alias('asserts', $.type_identifier),
           $.nested_type_identifier,
           $.generic_type,
         ))),
@@ -1062,9 +1063,6 @@ module.exports = function defineGrammar(dialect) {
         $.parenthesized_type,
         $.predefined_type,
         $._type_identifier,
-        // `asserts` lexes as a keyword where an `asserts x` return may start
-        // (after `=>` or a return type's `:`). Followed by no operand, it names a type.
-        alias('asserts', $.type_identifier),
         $.nested_type_identifier,
         $.generic_type,
         $.object_type,
@@ -1143,7 +1141,6 @@ module.exports = function defineGrammar(dialect) {
       generic_type: $ => prec('call', seq(
         field('name', choice(
           $._type_identifier,
-          alias('asserts', $.type_identifier),
           $.nested_type_identifier,
           alias($._type_query_member_expression_in_type_annotation, $.member_expression),
         )),
@@ -1175,6 +1172,7 @@ module.exports = function defineGrammar(dialect) {
       _type_query_identifier: $ => choice(
         $.identifier,
         keywordName($, 'abstract'),
+        keywordName($, 'asserts'),
       ),
 
       _type_query_member_expression: $ => seq(
@@ -1194,6 +1192,7 @@ module.exports = function defineGrammar(dialect) {
       _type_query_subscript_expression: $ => seq(
         field('object', choice(
           $.identifier,
+          keywordName($, 'asserts'),
           $.this,
           alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
@@ -1348,7 +1347,13 @@ module.exports = function defineGrammar(dialect) {
         // as tsc accepts it (brajevicm@9fcaa13). tsc also takes `const` on
         // either side of the variance (`<in const T>`).
         optional('const'),
-        field('name', choice($._type_identifier, alias('out', $.type_identifier))),
+        // In tsx a plain identifier: the `asserts` keyword would otherwise win over
+        // a JSX element named `asserts` (`<asserts />`). tsx has no `<T>x` type
+        // assertion, so `<asserts,>() => …` still reads as a type parameter.
+        field('name', choice(
+          dialect === 'tsx' ? alias($.identifier, $.type_identifier) : $._type_identifier,
+          alias('out', $.type_identifier),
+        )),
         field('constraint', optional($.constraint)),
         field('value', optional($.default_type)),
       ),
@@ -1415,7 +1420,13 @@ module.exports = function defineGrammar(dialect) {
         field('return_type', choice($.type, $.asserts, $.type_predicate)),
       )),
 
-      _type_identifier: $ => alias($.identifier, $.type_identifier),
+      // `asserts` lexes as a keyword wherever a type may start (an `asserts x` return
+      // may start after `=>` or a return type's `:`), so every type name also takes the
+      // keyword: with no operand on the same line, `asserts` names a type (#87).
+      _type_identifier: $ => choice(
+        alias($.identifier, $.type_identifier),
+        alias('asserts', $.type_identifier),
+      ),
 
       _reserved_identifier: (_, previous) => choice(
         'abstract',

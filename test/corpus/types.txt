@@ -2139,6 +2139,158 @@ a < asserts && b > c;
         right: (identifier)))))
 
 ==================================
+asserts as a mapped key, type query or property name
+==================================
+
+type M = { [asserts in K]: V };
+type N = { -readonly [asserts in keyof T]-?: T[asserts] };
+f<typeof asserts>(x);
+class D extends B<typeof asserts> {}
+let v: a.asserts.b;
+let w: asserts.asserts.asserts;
+
+---
+
+(program
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (object_type
+      (index_signature
+        (mapped_type_clause
+          name: (type_identifier)
+          type: (type_identifier))
+        type: (type_annotation
+          (type_identifier)))))
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (object_type
+      (index_signature
+        (mapped_type_clause
+          name: (type_identifier)
+          type: (index_type_query
+            (type_identifier)))
+        type: (omitting_type_annotation
+          (lookup_type
+            (type_identifier)
+            (type_identifier))))))
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      type_arguments: (type_arguments
+        (type_query
+          (identifier)))
+      arguments: (arguments
+        (identifier))))
+  (class_declaration
+    name: (type_identifier)
+    (class_heritage
+      (extends_clause
+        value: (identifier)
+        type_arguments: (type_arguments
+          (type_query
+            (identifier)))))
+    body: (class_body))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (nested_type_identifier
+          module: (nested_identifier
+            object: (identifier)
+            property: (property_identifier))
+          name: (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (nested_type_identifier
+          module: (nested_identifier
+            object: (identifier)
+            property: (property_identifier))
+          name: (type_identifier))))))
+
+==================================
+asserts as a generic arrow type parameter
+:language(typescript)
+==================================
+
+const g = <asserts>(x: asserts) => x;
+const h = <asserts extends object>(x) => x;
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (arrow_function
+        type_parameters: (type_parameters
+          (type_parameter
+            name: (type_identifier)))
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)
+            type: (type_annotation
+              (type_identifier))))
+        body: (identifier))))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (arrow_function
+        type_parameters: (type_parameters
+          (type_parameter
+            name: (type_identifier)
+            constraint: (constraint
+              (predefined_type))))
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)))
+        body: (identifier)))))
+
+==================================
+asserts as a JSX element name and tsx type parameter
+:language(tsx)
+==================================
+
+let e = <asserts.a b={asserts}>{asserts}</asserts.a>;
+let f = <asserts,>(x: asserts) => x;
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (jsx_element
+        open_tag: (jsx_opening_element
+          name: (member_expression
+            object: (identifier)
+            property: (property_identifier))
+          attribute: (jsx_attribute
+            (property_identifier)
+            (jsx_expression
+              (identifier))))
+        (jsx_expression
+          (identifier))
+        close_tag: (jsx_closing_element
+          name: (member_expression
+            object: (identifier)
+            property: (property_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (arrow_function
+        type_parameters: (type_parameters
+          (type_parameter
+            name: (type_identifier)))
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)
+            type: (type_annotation
+              (type_identifier))))
+        body: (identifier)))))
+
+==================================
 Tuple types
 ==================================
 

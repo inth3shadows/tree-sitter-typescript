@@ -30,9 +30,11 @@ because editor queries match on node names.
   after a return type's `:` (#87): `() => asserts`, `new () => asserts.a.b`,
   `() => asserts<T> | U` and `function f(): asserts {}` were an ERROR or a MISSING
   identifier, and `() => asserts⏎x` took `x` as the asserted name; it now ends the type
-  at the line break. A parameter, tuple label, qualified name, `extends` entry or `<`
-  operand named `asserts` parses as before. The parse table grows by 80 states
-  (tsx 79).
+  at the line break. Every other name `asserts` parses as before: a parameter, tuple
+  label, mapped-type key, type parameter (`<asserts>(x) => x`), `typeof asserts`,
+  property in a qualified name, `extends` entry, JSX element and `<` operand.
+  `() => asserts extends X ? A : B`, which tsc rejects, now parses as a conditional
+  type. The parse table grows by 235 states (tsx 232).
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
