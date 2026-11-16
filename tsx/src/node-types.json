@@ -90,6 +90,10 @@
         "named": true
       },
       {
+        "type": "call_expression",
+        "named": true
+      },
+      {
         "type": "instantiation_expression",
         "named": true
       },
@@ -4420,10 +4424,6 @@
       "multiple": false,
       "required": true,
       "types": [
-        {
-          "type": "call_expression",
-          "named": true
-        },
         {
           "type": "expression",
           "named": true

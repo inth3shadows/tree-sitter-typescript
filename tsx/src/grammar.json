@@ -2825,6 +2825,15 @@
           "name": "internal_module"
         },
         {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_generic_call_of_primary"
+          },
+          "named": true,
+          "value": "call_expression"
+        },
+        {
           "type": "SYMBOL",
           "name": "primary_expression"
         },
@@ -8435,6 +8444,52 @@
         }
       ]
     },
+    "_generic_call_of_primary": {
+      "type": "PREC_DYNAMIC",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "function",
+            "content": {
+              "type": "SYMBOL",
+              "name": "primary_expression"
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "type_arguments",
+            "content": {
+              "type": "SYMBOL",
+              "name": "type_arguments"
+            }
+          },
+          {
+            "type": "PREC",
+            "value": "generic_call_end",
+            "content": {
+              "type": "FIELD",
+              "name": "arguments",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "arguments"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "template_string"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
     "using_declaration": {
       "type": "SEQ",
       "members": [
@@ -13407,6 +13462,10 @@
       "await_expression"
     ],
     [
+      "expression",
+      "_generic_call_of_primary"
+    ],
+    [
       "class"
     ],
     [
@@ -13789,6 +13848,16 @@
     ],
     [
       {
+        "type": "STRING",
+        "value": "new"
+      },
+      {
+        "type": "STRING",
+        "value": "generic_call_end"
+      }
+    ],
+    [
+      {
         "type": "SYMBOL",
         "name": "readonly_type"
       },
@@ -13869,6 +13938,16 @@
       {
         "type": "STRING",
         "value": "assign"
+      }
+    ],
+    [
+      {
+        "type": "STRING",
+        "value": "member"
+      },
+      {
+        "type": "STRING",
+        "value": "unary"
       }
     ],
     [

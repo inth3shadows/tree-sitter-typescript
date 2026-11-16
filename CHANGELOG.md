@@ -35,10 +35,25 @@ because editor queries match on node names.
   break, as does a block comment containing one. The parse table is unchanged.
   Known limit: a type predicate on a parameter named `asserts` (`(asserts) => asserts is T`)
   is still an ERROR; tsc reads `asserts is` as that predicate.
+- A prefix operator before a generic call or a tagged template with type arguments
+  applies to the whole call, as in tsc (#77): `await f<T>(x)` is an
+  `await_expression` around the `call_expression`; it was a `call_expression` whose
+  callee was `await f`. The same holds for `!`, `void`, `typeof`, `-`, `delete` and
+  binary operators (`a + f<T>(x)`), for tagged templates (``await f<T>`t` ``), and for
+  member chains after the call (`!x.get<T>().y`). Also fixed: `x as A.B<T>` is an
+  `as_expression` of a `generic_type`; it was an `instantiation_expression` of a
+  member of the `as_expression`. A `new` expression keeps its own type arguments:
+  `new A<T>();` as a statement was a `call_expression` of `new A`. Of 14,623 files in
+  the differential corpora, 378 parse differently (1,223 sites, 1,027 of them
+  `await`); none errors before or after. The parse table grows by 9 states (tsx 9).
+  Known limit: a prefix operator before a generic instantiation with no call,
+  `await f<T>`, still applies to `f` alone.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
   `function_type.return_type` already may.
+- `call_expression` is also a direct subtype of `expression` (#77). It was one already
+  through `primary_expression`, so every position that accepts it still does.
 
 ## 0.24.0
 

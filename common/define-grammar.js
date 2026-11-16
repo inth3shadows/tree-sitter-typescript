@@ -72,6 +72,9 @@ module.exports = function defineGrammar(dialect) {
         'extends',
         'instantiation',
       ],
+      // `new A<T>(x)` takes its own type arguments and arguments; the argument list
+      // never closes a generic call inside the constructor (#77).
+      ['new', 'generic_call_end'],
       [
         $.readonly_type,
         $.intersection_type,
@@ -87,6 +90,8 @@ module.exports = function defineGrammar(dialect) {
       ['unary_void', $.expression],
       [$.extends_clause, $.primary_expression],
       ['unary', 'assign'],
+      // `<T>a<U>(b).c` asserts the whole member chain, as `<T>a(b).c` does (#77).
+      ['member', 'unary'],
       ['declaration', $.expression],
       [$.predefined_type, $.unary_expression],
       [$.type, $.flow_maybe_type],
@@ -118,6 +123,8 @@ module.exports = function defineGrammar(dialect) {
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.unary_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.update_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.await_expression],
+      // `f<T>(x)` vs `f < T > (x)`; also `await f<T>(x)` vs `(await f)<T>(x)` (#77).
+      [$.expression, $._generic_call_of_primary],
 
       // This appears to be necessary to parse a parenthesized class expression
       [$.class],
@@ -272,6 +279,19 @@ module.exports = function defineGrammar(dialect) {
         )),
       ),
 
+      // A generic call or tagged template whose callee is a primary expression (#77).
+      // call_expression's own generic branches take any expression as the callee, so
+      // `await f<T>(x)` is ambiguous between `await (f<T>(x))` and `(await f)<T>(x)`.
+      // Both readings hold the same nodes, so only this branch's dynamic precedence
+      // makes tsc's reading, the operator around the call, win. It lives under
+      // `expression`, not `primary_expression`, so `new` cannot take such a call as
+      // its constructor.
+      _generic_call_of_primary: $ => prec.dynamic(1, seq(
+        field('function', $.primary_expression),
+        field('type_arguments', $.type_arguments),
+        prec('generic_call_end', field('arguments', choice($.arguments, $.template_string))),
+      )),
+
       new_expression: $ => prec.right('new', seq(
         'new',
         optional($._no_asi_marker),
@@ -320,6 +340,7 @@ module.exports = function defineGrammar(dialect) {
           $.satisfies_expression,
           $.instantiation_expression,
           $.internal_module,
+          alias($._generic_call_of_primary, $.call_expression),
         ];
 
         if (dialect === 'typescript') {
