@@ -64,8 +64,10 @@ module.exports = function defineGrammar(dialect) {
         'call',
         'instantiation',
         'unary',
-        'binary',
+        // `await x as T` casts the awaited value, as in tsc (#92): `as` and
+        // `satisfies` (precedence 'binary') bind looser than `await`.
         $.await_expression,
+        'binary',
         $.arrow_function,
       ],
       [

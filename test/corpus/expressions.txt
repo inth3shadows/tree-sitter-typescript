@@ -3134,3 +3134,81 @@ Type assertions before generic call chains
             (identifier)))
         (template_string
           (string_fragment))))))
+
+==================================
+Await before as and satisfies
+==================================
+
+await x as T;
+await x satisfies T;
+await f<T>(x) as U;
+await x as unknown as T;
+await (x as T);
+
+---
+
+(program
+  (expression_statement
+    (as_expression
+      (await_expression
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (satisfies_expression
+      (await_expression
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (await_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier))))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (as_expression
+        (await_expression
+          (identifier))
+        (predefined_type))
+      (type_identifier)))
+  (expression_statement
+    (await_expression
+      (parenthesized_expression
+        (as_expression
+          (identifier)
+          (type_identifier))))))
+
+==================================
+Await before as and satisfies (typescript)
+:language(typescript)
+==================================
+
+await <T>x as U;
+await x as T;
+await x satisfies T;
+
+---
+
+(program
+  (expression_statement
+    (as_expression
+      (await_expression
+        (type_assertion
+          (type_arguments
+            (type_identifier))
+          (identifier)))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (await_expression
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (satisfies_expression
+      (await_expression
+        (identifier))
+      (type_identifier))))
