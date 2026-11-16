@@ -3181,3 +3181,34 @@ await (x as T);
         (as_expression
           (identifier)
           (type_identifier))))))
+
+==================================
+Await before as and satisfies (typescript)
+:language(typescript)
+==================================
+
+await <T>x as U;
+await x as T;
+await x satisfies T;
+
+---
+
+(program
+  (expression_statement
+    (as_expression
+      (await_expression
+        (type_assertion
+          (type_arguments
+            (type_identifier))
+          (identifier)))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (await_expression
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (satisfies_expression
+      (await_expression
+        (identifier))
+      (type_identifier))))
