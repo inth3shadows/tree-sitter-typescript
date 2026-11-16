@@ -61,8 +61,10 @@ module.exports = function defineGrammar(dialect) {
 
     precedences: ($, previous) => previous.concat([
       [
-        // A postfix `!` (precedence 'member') binds before a type assertion:
-        // `<T>x!` is `<T>(x!)` (#98).
+        // 'member' ranks above this row, as in JavaScript's ladder. It makes a
+        // postfix `!` bind before a type assertion, `<T>x!` is `<T>(x!)` (#98), and
+        // also ranks member_expression, the `?.` call and nested_type_identifier
+        // above instantiation, type assertions and await.
         'member',
         'call',
         'instantiation',

@@ -3558,3 +3558,81 @@ Non-null assertions inside a type assertion
         (non_null_expression
           (identifier))
         (property_identifier)))))
+
+==================================
+Non-null assertions with update, void and delete
+==================================
+
+++x!;
+x!++;
+void x!;
+delete x!.y;
+
+---
+
+(program
+  (expression_statement
+    (update_expression
+      (non_null_expression
+        (identifier))))
+  (expression_statement
+    (update_expression
+      (non_null_expression
+        (identifier))))
+  (expression_statement
+    (unary_expression
+      (non_null_expression
+        (identifier))))
+  (expression_statement
+    (unary_expression
+      (member_expression
+        (non_null_expression
+          (identifier))
+        (property_identifier)))))
+
+==================================
+Type assertions before member, call and subscript chains
+:language(typescript)
+==================================
+
+<T>x!();
+<T>x![0];
+<T>new A().b;
+<T>a?.b;
+
+---
+
+(program
+  (expression_statement
+    (type_assertion
+      (type_arguments
+        (type_identifier))
+      (call_expression
+        (non_null_expression
+          (identifier))
+        (arguments))))
+  (expression_statement
+    (type_assertion
+      (type_arguments
+        (type_identifier))
+      (subscript_expression
+        (non_null_expression
+          (identifier))
+        (number))))
+  (expression_statement
+    (type_assertion
+      (type_arguments
+        (type_identifier))
+      (member_expression
+        (new_expression
+          (identifier)
+          (arguments))
+        (property_identifier))))
+  (expression_statement
+    (type_assertion
+      (type_arguments
+        (type_identifier))
+      (member_expression
+        (identifier)
+        (optional_chain)
+        (property_identifier)))))
