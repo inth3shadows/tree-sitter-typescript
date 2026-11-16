@@ -1,4 +1,5 @@
-// A prefix operator before a generic call applies to the whole call (#77).
+// Prefix operators before generic calls parse without errors (#77). The differential
+// compares errors only; the tree shapes are pinned in test/corpus/expressions.txt.
 declare function f<T>(x: T): Promise<T>;
 declare const a: { get<T>(): { b?: T }; c<T>(x: T): { d(y: number): void } };
 declare class K<T> { constructor(x: T); c(x: number): K<T>; d(y: number): void }

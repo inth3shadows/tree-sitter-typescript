@@ -48,8 +48,12 @@ because editor queries match on node names.
   corpora, 380 parse differently (1,234 sites, 1,054 of them `await`); none errors
   before or after. The parse table grows by 3 states (tsx 3).
   Known limits: a prefix operator before a generic instantiation with no call,
-  `await f<T>`, still applies to `f` alone; `await x as T` is still
-  `await (x as T)`, with or without type arguments.
+  `await f<T>`, still applies to `f` alone. `await x as T` is still
+  `await (x as T)`, with or without type arguments (#92). After an instantiation
+  with no call, `as`, `satisfies`, `instanceof` and `in` can now be read as
+  identifiers in a comparison, where tsc and the previous release read the operator:
+  `a<T> as | A`, `a<A.B> as [B]`, `a<A.B> instanceof (b)`. ``new new B<T>`t` `` now
+  has a missing `!`; it was a clean tree of the wrong shape.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
