@@ -57,11 +57,21 @@ because editor queries match on node names.
   around the `await_expression`; it was an `await_expression` around `x as T`. The
   same holds for `satisfies`. Of 14,625 files in the differential corpora, 71 parse
   differently (191 sites, all this case); none errors before or after. The parse
-  table is unchanged. Tree shape only: node types are unchanged, but a query for
+  table size is unchanged. Tree shape only: node types are unchanged, but a query for
   `(await_expression (as_expression))` now needs `(as_expression (await_expression))`.
-  Known limits: `as` / `satisfies` still nest wrongly against `||`, `??`, `&&`, `==`,
-  bitwise operators and `**` (#95), so `a || await x as T` is
-  `(a || await x) as T`; `await f<T> as U` keeps the `await f<T>` limit above.
+  Known limit: `await f<T> as U` keeps the `await f<T>` limit above.
+- `as` and `satisfies` take tsc's relational precedence, the level of `<` and
+  `instanceof` (#95). They bind tighter than `==`, `&`, `^`, `|`, `&&`, `||` and
+  `??`: `a ?? b as T` is a `binary_expression` whose right side is `b as T`; it was
+  an `as_expression` of `a ?? b`. They bind looser than `**`: `a ** b as T` is now an
+  `as_expression` of `a ** b`. `a || await x as T` is `a || ((await x) as T)`. Of
+  14,625 files in the differential corpora, 36 parse differently (47 sites, all
+  this case: 28 `??`, 8 `===`, 7 `&&`, 4 `||`); none errors before or after. The
+  parse table size is unchanged. Tree shape only: node types are unchanged, but a
+  query for `(as_expression (binary_expression))` on `a ?? b as T` now needs
+  `(binary_expression (as_expression))`. Known limits: `<T>a < b` is still
+  `<T>(a < b)` (#97), and `a + b!` is still `(a + b)!`, so `a ?? b!.c as T` casts
+  `(a ?? b)!.c` (#98).
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as

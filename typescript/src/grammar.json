@@ -9814,7 +9814,7 @@
     },
     "as_expression": {
       "type": "PREC_LEFT",
-      "value": "binary",
+      "value": "binary_relation",
       "content": {
         "type": "SEQ",
         "members": [
@@ -9844,7 +9844,7 @@
     },
     "satisfies_expression": {
       "type": "PREC_LEFT",
-      "value": "binary",
+      "value": "binary_relation",
       "content": {
         "type": "SEQ",
         "members": [
@@ -13905,10 +13905,6 @@
         "name": "await_expression"
       },
       {
-        "type": "STRING",
-        "value": "binary"
-      },
-      {
         "type": "SYMBOL",
         "name": "arrow_function"
       }
@@ -13950,7 +13946,7 @@
       },
       {
         "type": "STRING",
-        "value": "binary"
+        "value": "binary_relation"
       },
       {
         "type": "SYMBOL",
