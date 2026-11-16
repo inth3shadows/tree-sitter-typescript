@@ -33,6 +33,8 @@ because editor queries match on node names.
   `function f(): asserts {}` were an ERROR or a MISSING identifier, and
   `() => asserts⏎x` took `x` as the asserted name; it now ends the type at the line
   break, as does a block comment containing one. The parse table is unchanged.
+  Known limit: a type predicate on a parameter named `asserts` (`(asserts) => asserts is T`)
+  is still an ERROR; tsc reads `asserts is` as that predicate.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as

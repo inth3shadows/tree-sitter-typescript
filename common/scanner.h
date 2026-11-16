@@ -835,9 +835,7 @@ static bool scan_asserts_keyword(TSLexer *lexer) {
         }
         advance(lexer);
     }
-    int32_t next = lexer->lookahead;
-    if (iswalnum(next) || next == '_' || next == '$' || next == '\\' ||
-        (next > 0x7f && !is_unicode_space(next))) {
+    if (is_identifier_part(lexer->lookahead)) {
         return false;
     }
     lexer->mark_end(lexer);
