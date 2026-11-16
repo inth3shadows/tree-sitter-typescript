@@ -325,6 +325,250 @@ f<T>(x)
         (identifier)))))
 
 ==================================
+Prefix operators before generic calls
+==================================
+
+async function g() {
+  await f<T>(x);
+  await a.b<T>(x).c;
+  await f<T>`t`;
+}
+!f<T>(x);
+void a.b<T>(x);
+typeof f<T>(x);
+-f<T>(x);
+!!x.get<T>()?.y;
+a + f<T>(x);
+
+---
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (await_expression
+          (call_expression
+            (identifier)
+            (type_arguments
+              (type_identifier))
+            (arguments
+              (identifier)))))
+      (expression_statement
+        (await_expression
+          (member_expression
+            (call_expression
+              (member_expression
+                (identifier)
+                (property_identifier))
+              (type_arguments
+                (type_identifier))
+              (arguments
+                (identifier)))
+            (property_identifier))))
+      (expression_statement
+        (await_expression
+          (call_expression
+            (identifier)
+            (type_arguments
+              (type_identifier))
+            (template_string
+              (string_fragment)))))))
+  (expression_statement
+    (unary_expression
+      (call_expression
+        (identifier)
+        (type_arguments
+          (type_identifier))
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (unary_expression
+      (call_expression
+        (member_expression
+          (identifier)
+          (property_identifier))
+        (type_arguments
+          (type_identifier))
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (unary_expression
+      (call_expression
+        (identifier)
+        (type_arguments
+          (type_identifier))
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (unary_expression
+      (call_expression
+        (identifier)
+        (type_arguments
+          (type_identifier))
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (unary_expression
+      (unary_expression
+        (member_expression
+          (call_expression
+            (member_expression
+              (identifier)
+              (property_identifier))
+            (type_arguments
+              (type_identifier))
+            (arguments))
+          (optional_chain)
+          (property_identifier)))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (call_expression
+        (identifier)
+        (type_arguments
+          (type_identifier))
+        (arguments
+          (identifier))))))
+
+==================================
+New expressions with type arguments and arguments
+==================================
+
+new A<T>();
+new Array<T>(n).fill(0);
+new K<b>(a).c(x).d(y);
+new K<b>(a).c<d>(x).e(y);
+
+---
+
+(program
+  (expression_statement
+    (new_expression
+      (identifier)
+      (type_arguments
+        (type_identifier))
+      (arguments)))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (new_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (property_identifier))
+      (arguments
+        (number))))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (call_expression
+          (member_expression
+            (new_expression
+              (identifier)
+              (type_arguments
+                (type_identifier))
+              (arguments
+                (identifier)))
+            (property_identifier))
+          (arguments
+            (identifier)))
+        (property_identifier))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (call_expression
+          (member_expression
+            (new_expression
+              (identifier)
+              (type_arguments
+                (type_identifier))
+              (arguments
+                (identifier)))
+            (property_identifier))
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (property_identifier))
+      (arguments
+        (identifier)))))
+
+==================================
+Type assertions and as before generic calls
+:language(typescript)
+==================================
+
+<T>a<V>(b).g;
+x = input as A.B.C<T>;
+y = !!a.get<T>()?.b;
+
+---
+
+(program
+  (expression_statement
+    (type_assertion
+      (type_arguments
+        (type_identifier))
+      (member_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (property_identifier))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (generic_type
+          (nested_type_identifier
+            (nested_identifier
+              (identifier)
+              (property_identifier))
+            (type_identifier))
+          (type_arguments
+            (type_identifier))))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (unary_expression
+        (unary_expression
+          (member_expression
+            (call_expression
+              (member_expression
+                (identifier)
+                (property_identifier))
+              (type_arguments
+                (type_identifier))
+              (arguments))
+            (optional_chain)
+            (property_identifier)))))))
+
+==================================
+Prefix operator before a generic instantiation (known limit)
+==================================
+
+await f<T>;
+
+---
+
+(program
+  (expression_statement
+    (instantiation_expression
+      (await_expression
+        (identifier))
+      (type_arguments
+        (type_identifier)))))
+
+==================================
 Generic calls with type queries of imports
 ==================================
 
@@ -2714,3 +2958,179 @@ class A extends using {}
       (extends_clause
         (identifier)))
     (class_body)))
+
+==================================
+Comparisons that only look like generic calls
+==================================
+
+a < b && c > (d);
+a < b || c.d > (e);
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (binary_expression
+        (identifier)
+        (parenthesized_expression
+          (identifier)))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (binary_expression
+        (member_expression
+          (identifier)
+          (property_identifier))
+        (parenthesized_expression
+          (identifier))))))
+
+==================================
+Generic calls inside other expressions
+==================================
+
+f(b<T, U>(x)`t`);
+f(b<T, U>(x)?.(y));
+a + b.c<T>(x);
+new f<T>`t`;
+await f<T>(x)<U>(y);
+await f<T>(x)?.();
+await f<T>(x)`t`;
+await f<T>(x)!;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (call_expression
+          (call_expression
+            (identifier)
+            (type_arguments
+              (type_identifier)
+              (type_identifier))
+            (arguments
+              (identifier)))
+          (template_string
+            (string_fragment))))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (call_expression
+          (call_expression
+            (identifier)
+            (type_arguments
+              (type_identifier)
+              (type_identifier))
+            (arguments
+              (identifier)))
+          (arguments
+            (identifier))))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (call_expression
+        (member_expression
+          (identifier)
+          (property_identifier))
+        (type_arguments
+          (type_identifier))
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (new_expression
+      (call_expression
+        (identifier)
+        (type_arguments
+          (type_identifier))
+        (template_string
+          (string_fragment)))))
+  (expression_statement
+    (await_expression
+      (call_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (type_arguments
+          (type_identifier))
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (await_expression
+      (call_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (arguments))))
+  (expression_statement
+    (await_expression
+      (call_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (template_string
+          (string_fragment)))))
+  (expression_statement
+    (await_expression
+      (non_null_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))))))
+
+==================================
+Type assertions before generic call chains
+:language(typescript)
+==================================
+
+<T>f<U>(x)?.(y);
+<T>f<U>(x)`t`;
+
+---
+
+(program
+  (expression_statement
+    (type_assertion
+      (type_arguments
+        (type_identifier))
+      (call_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (arguments
+          (identifier)))))
+  (expression_statement
+    (type_assertion
+      (type_arguments
+        (type_identifier))
+      (call_expression
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_identifier))
+          (arguments
+            (identifier)))
+        (template_string
+          (string_fragment))))))
