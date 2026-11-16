@@ -3321,3 +3321,129 @@ a || await x as T;
         (await_expression
           (identifier))
         (type_identifier)))))
+
+==================================
+As and satisfies beside other binary operators
+==================================
+
+a && b as T;
+a & b as T;
+a | b as T;
+a ^ b as T;
+a != b as T;
+a !== b satisfies T;
+a < b as T;
+a instanceof B as T;
+a in b as T;
+a as T ?? b;
+x = c ? a as T : b;
+f = () => a ?? b as T;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (satisfies_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (as_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (binary_expression
+      (as_expression
+        (identifier)
+        (type_identifier))
+      (identifier)))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (ternary_expression
+        (identifier)
+        (as_expression
+          (identifier)
+          (type_identifier))
+        (identifier))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (arrow_function
+        (formal_parameters)
+        (binary_expression
+          (identifier)
+          (as_expression
+            (identifier)
+            (type_identifier)))))))
+
+==================================
+As and satisfies after a type assertion
+:language(typescript)
+==================================
+
+<T>x as U;
+<T>x satisfies U;
+
+---
+
+(program
+  (expression_statement
+    (as_expression
+      (type_assertion
+        (type_arguments
+          (type_identifier))
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (satisfies_expression
+      (type_assertion
+        (type_arguments
+          (type_identifier))
+        (identifier))
+      (type_identifier))))
