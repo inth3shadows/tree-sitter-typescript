@@ -64,10 +64,7 @@ module.exports = function defineGrammar(dialect) {
         'call',
         'instantiation',
         'unary',
-        // `await x as T` casts the awaited value, as in tsc (#92): `as` and
-        // `satisfies` (precedence 'binary') bind looser than `await`.
         $.await_expression,
-        'binary',
         $.arrow_function,
       ],
       [
@@ -81,7 +78,7 @@ module.exports = function defineGrammar(dialect) {
         $.conditional_type,
         $.function_type,
         $.constructor_type,
-        'binary',
+        'binary_relation',
         $.type_predicate,
       ],
       [$.mapped_type_clause, $.primary_expression],
@@ -755,13 +752,17 @@ module.exports = function defineGrammar(dialect) {
         $.expression,
       )),
 
-      as_expression: $ => prec.left('binary', seq(
+      // `as` and `satisfies` take tsc's relational precedence, JavaScript's
+      // 'binary_relation' (#95): tighter than `==`, `&&`, `||` and `??`, looser
+      // than `+` and `**`, and below `await` ('unary_void'), so `await x as T`
+      // casts the awaited value (#92).
+      as_expression: $ => prec.left('binary_relation', seq(
         $.expression,
         'as',
         choice('const', $.type),
       )),
 
-      satisfies_expression: $ => prec.left('binary', seq(
+      satisfies_expression: $ => prec.left('binary_relation', seq(
         $.expression,
         'satisfies',
         $.type,

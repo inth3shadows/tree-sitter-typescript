@@ -3212,3 +3212,112 @@ await x satisfies T;
       (await_expression
         (identifier))
       (type_identifier))))
+
+==================================
+As and satisfies at relational precedence
+==================================
+
+a == b as T;
+a || b satisfies T;
+a ?? b as unknown as T;
+a ** b as T;
+a + b as T;
+a || await x as T;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (satisfies_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (as_expression
+          (identifier)
+          (predefined_type))
+        (type_identifier))))
+  (expression_statement
+    (as_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (await_expression
+          (identifier))
+        (type_identifier)))))
+
+==================================
+As and satisfies at relational precedence (typescript)
+:language(typescript)
+==================================
+
+a == b as T;
+a || b satisfies T;
+a ?? b as unknown as T;
+a ** b as T;
+a + b as T;
+a || await x as T;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (satisfies_expression
+        (identifier)
+        (type_identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (as_expression
+          (identifier)
+          (predefined_type))
+        (type_identifier))))
+  (expression_statement
+    (as_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (as_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (type_identifier)))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (as_expression
+        (await_expression
+          (identifier))
+        (type_identifier)))))
