@@ -38,22 +38,22 @@ because editor queries match on node names.
 - A prefix operator before a generic call or a tagged template with type arguments
   applies to the whole call, as in tsc (#77): `await f<T>(x)` is an
   `await_expression` around the `call_expression`; it was a `call_expression` whose
-  callee was `await f`. The same holds for `!`, `void`, `typeof`, `-`, `delete` and
-  binary operators (`a + f<T>(x)`), for tagged templates (``await f<T>`t` ``), and for
-  member chains after the call (`!x.get<T>().y`). Also fixed: `x as A.B<T>` is an
-  `as_expression` of a `generic_type`; it was an `instantiation_expression` of a
-  member of the `as_expression`. A `new` expression keeps its own type arguments:
-  `new A<T>();` as a statement was a `call_expression` of `new A`. Of 14,623 files in
-  the differential corpora, 378 parse differently (1,223 sites, 1,027 of them
-  `await`); none errors before or after. The parse table grows by 9 states (tsx 9).
-  Known limit: a prefix operator before a generic instantiation with no call,
-  `await f<T>`, still applies to `f` alone.
+  callee was `await f`. The same holds for `!`, `void`, `typeof`, `-` and `delete`,
+  for binary operators (`a + b.c<T>(x)`), for tagged templates (``await f<T>`t` ``)
+  and for chains after the call (`await f<T>(x)<U>(y)`, `!x.get<T>().y`). A generic
+  call now wins whenever its type arguments parse, as in tsc, so `x as A.B.C<T>` is an
+  `as_expression` of a `generic_type`, not an `instantiation_expression`. Comparisons
+  that tsc cannot read as type arguments stay comparisons: `a < b && c > (d)` (a
+  leading `&` or `|` inside a type is penalized). Of 14,625 files in the differential
+  corpora, 380 parse differently (1,234 sites, 1,054 of them `await`); none errors
+  before or after. The parse table grows by 3 states (tsx 3).
+  Known limits: a prefix operator before a generic instantiation with no call,
+  `await f<T>`, still applies to `f` alone; `await x as T` is still
+  `await (x as T)`, with or without type arguments.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
   `function_type.return_type` already may.
-- `call_expression` is also a direct subtype of `expression` (#77). It was one already
-  through `primary_expression`, so every position that accepts it still does.
 
 ## 0.24.0
 

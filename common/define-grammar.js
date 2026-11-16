@@ -72,9 +72,6 @@ module.exports = function defineGrammar(dialect) {
         'extends',
         'instantiation',
       ],
-      // `new A<T>(x)` takes its own type arguments and arguments; the argument list
-      // never closes a generic call inside the constructor (#77).
-      ['new', 'generic_call_end'],
       [
         $.readonly_type,
         $.intersection_type,
@@ -90,8 +87,6 @@ module.exports = function defineGrammar(dialect) {
       ['unary_void', $.expression],
       [$.extends_clause, $.primary_expression],
       ['unary', 'assign'],
-      // `<T>a<U>(b).c` asserts the whole member chain, as `<T>a(b).c` does (#77).
-      ['member', 'unary'],
       ['declaration', $.expression],
       [$.predefined_type, $.unary_expression],
       [$.type, $.flow_maybe_type],
@@ -123,8 +118,9 @@ module.exports = function defineGrammar(dialect) {
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.unary_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.update_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.await_expression],
-      // `f<T>(x)` vs `f < T > (x)`; also `await f<T>(x)` vs `(await f)<T>(x)` (#77).
-      [$.expression, $._generic_call_of_primary],
+      // A generic call on a primary callee forks against every reading that first
+      // reduces the callee to an expression; dynamic precedence picks (#77).
+      [$.expression, $.call_expression],
 
       // This appears to be necessary to parse a parenthesized class expression
       [$.class],
@@ -256,17 +252,30 @@ module.exports = function defineGrammar(dialect) {
       call_expression: $ => choice(
         prec('call', seq(
           field('function', choice($.expression, $.import)),
-          field('type_arguments', optional($.type_arguments)),
           field('arguments', $.arguments),
         )),
-        // A tagged template with type arguments, sql<{ id: number }>`SELECT ...`, is
-        // ambiguous with `<` / `>` comparisons exactly like f<T>(x), so it takes the
-        // generic call's precedence and conflicts rather than template_call's.
-        prec('call', seq(
-          field('function', choice($.expression, $.import)),
-          field('type_arguments', $.type_arguments),
-          field('arguments', $.template_string),
-        )),
+        // A generic call, f<T>(x), or a tagged template with type arguments,
+        // sql<{ id: number }>`SELECT ...`. Each is ambiguous with `<` / `>`
+        // comparisons, and with an operator taking the callee, `(await f)<T>(x)` for
+        // `await f<T>(x)`; the GLR parse keeps every reading. tsc takes the call
+        // whenever the type arguments parse, so a primary (or `new`) callee carries
+        // dynamic precedence 1 and wins over both (#77). It has no static precedence
+        // before its arguments, or the call would statically shift past the
+        // `primary_expression -> expression` reduce that the other readings need.
+        // Any other callee keeps the static precedence that decides `new`,
+        // `extends` and type positions.
+        ...[$.arguments, $.template_string].flatMap((args) => [
+          prec.dynamic(1, seq(
+            field('function', choice($.primary_expression, $.new_expression, $.import)),
+            field('type_arguments', $.type_arguments),
+            prec('call', field('arguments', args)),
+          )),
+          prec('call', seq(
+            field('function', $.expression),
+            field('type_arguments', $.type_arguments),
+            field('arguments', args),
+          )),
+        ]),
         prec('template_call', seq(
           field('function', choice($.primary_expression, $.new_expression)),
           field('arguments', $.template_string),
@@ -278,19 +287,6 @@ module.exports = function defineGrammar(dialect) {
           field('arguments', $.arguments),
         )),
       ),
-
-      // A generic call or tagged template whose callee is a primary expression (#77).
-      // call_expression's own generic branches take any expression as the callee, so
-      // `await f<T>(x)` is ambiguous between `await (f<T>(x))` and `(await f)<T>(x)`.
-      // Both readings hold the same nodes, so only this branch's dynamic precedence
-      // makes tsc's reading, the operator around the call, win. It lives under
-      // `expression`, not `primary_expression`, so `new` cannot take such a call as
-      // its constructor.
-      _generic_call_of_primary: $ => prec.dynamic(1, seq(
-        field('function', $.primary_expression),
-        field('type_arguments', $.type_arguments),
-        prec('generic_call_end', field('arguments', choice($.arguments, $.template_string))),
-      )),
 
       new_expression: $ => prec.right('new', seq(
         'new',
@@ -340,7 +336,6 @@ module.exports = function defineGrammar(dialect) {
           $.satisfies_expression,
           $.instantiation_expression,
           $.internal_module,
-          alias($._generic_call_of_primary, $.call_expression),
         ];
 
         if (dialect === 'typescript') {
@@ -1405,8 +1400,17 @@ module.exports = function defineGrammar(dialect) {
       ),
       readonly_type: $ => seq('readonly', $.type),
 
-      union_type: $ => prec.left(seq(optional($.type), '|', $.type)),
-      intersection_type: $ => prec.left(seq(optional($.type), '&', $.type)),
+      // tsc allows a leading `|` / `&` only at the start of a type, so a nested
+      // `b & &c` must not make `a < b && c > (d)` a generic call: the penalty
+      // outweighs the generic call's dynamic precedence (#77).
+      union_type: $ => choice(
+        prec.left(seq($.type, '|', $.type)),
+        prec.dynamic(-2, prec.left(seq('|', $.type))),
+      ),
+      intersection_type: $ => choice(
+        prec.left(seq($.type, '&', $.type)),
+        prec.dynamic(-2, prec.left(seq('&', $.type))),
+      ),
 
       function_type: $ => prec.left(seq(
         field('type_parameters', optional($.type_parameters)),
