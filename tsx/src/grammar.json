@@ -8937,7 +8937,7 @@
     },
     "non_null_expression": {
       "type": "PREC_LEFT",
-      "value": "unary",
+      "value": "member",
       "content": {
         "type": "SEQ",
         "members": [
@@ -13900,6 +13900,10 @@
       }
     ],
     [
+      {
+        "type": "STRING",
+        "value": "member"
+      },
       {
         "type": "STRING",
         "value": "call"

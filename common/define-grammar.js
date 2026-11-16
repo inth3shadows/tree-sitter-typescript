@@ -61,6 +61,9 @@ module.exports = function defineGrammar(dialect) {
 
     precedences: ($, previous) => previous.concat([
       [
+        // A postfix `!` (precedence 'member') binds before a type assertion:
+        // `<T>x!` is `<T>(x!)` (#98).
+        'member',
         'call',
         'instantiation',
         'unary',
@@ -518,7 +521,9 @@ module.exports = function defineGrammar(dialect) {
         seq('export', 'as', 'namespace', $.identifier, $._semicolon),
       ),
 
-      non_null_expression: $ => prec.left('unary', seq(
+      // tsc parses a postfix `!` with member access, so it binds to the operand
+      // before it: `a + b!` is `a + (b!)` and `!x!` is `!(x!)` (#98).
+      non_null_expression: $ => prec.left('member', seq(
         $.expression, '!',
       )),
 

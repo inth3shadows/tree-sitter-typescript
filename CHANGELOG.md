@@ -72,6 +72,16 @@ because editor queries match on node names.
   `(binary_expression (as_expression))`. Known limits: `<T>a < b` is still
   `<T>(a < b)` (#97), and `a + b!` is still `(a + b)!`, so `a ?? b!.c as T` casts
   `(a ?? b)!.c` (#98).
+- A non-null assertion binds to the operand right before it, as in tsc (#98): `a + b!`
+  is a `binary_expression` whose right side is `b!`; it was a `non_null_expression`
+  around `a + b`, so `a ?? b!.c` read `.c` off `a ?? b`. The same holds after any
+  binary operator, `?:`, a prefix operator (`!x!` is `!(x!)`, `typeof x!`, `await x!`)
+  and a type assertion (`<T>x!` is `<T>(x!)`). Of 14,625 files in the differential
+  corpora, 282 parse differently (494 sites); compared with tsc's tree, 224 of them
+  come closer and none moves away, and none errors before or after. In 52,867 unique
+  real files on one machine, 2,242 `non_null_expression`s wrapped a binary
+  expression. The parse table size is unchanged. Tree shape only: node types are
+  unchanged.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
