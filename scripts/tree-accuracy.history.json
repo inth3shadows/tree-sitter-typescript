@@ -1313,6 +1313,151 @@
     }
    },
    "commit": "713d1ba"
+  },
+  {
+   "name": "fork-102",
+   "files": 14533,
+   "filesWithErrors": 1,
+   "total": {
+    "tp": 6218830,
+    "fp": 351,
+    "fn": 89
+   },
+   "precision": 0.9999435617004876,
+   "recall": 0.9999856888311297,
+   "categories": {
+    "call": {
+     "tp": 1891525,
+     "fp": 155,
+     "fn": 69
+    },
+    "member": {
+     "tp": 2634505,
+     "fp": 148,
+     "fn": 2
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 0,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136429,
+     "fp": 2,
+     "fn": 2
+    },
+    "arrow": {
+     "tp": 301079,
+     "fp": 1,
+     "fn": 5
+    },
+    "binary": {
+     "tp": 488494,
+     "fp": 1,
+     "fn": 0
+    },
+    "unary": {
+     "tp": 116447,
+     "fp": 0,
+     "fn": 0
+    },
+    "cast": {
+     "tp": 37279,
+     "fp": 0,
+     "fn": 0
+    },
+    "union_type": {
+     "tp": 94533,
+     "fp": 0,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42361,
+     "fp": 0,
+     "fn": 0
+    },
+    "function_type": {
+     "tp": 21144,
+     "fp": 0,
+     "fn": 0
+    },
+    "ternary": {
+     "tp": 61309,
+     "fp": 0,
+     "fn": 0
+    },
+    "non_null": {
+     "tp": 20368,
+     "fp": 2,
+     "fn": 2
+    },
+    "parenthesized": {
+     "tp": 50372,
+     "fp": 0,
+     "fn": 0
+    },
+    "await": {
+     "tp": 126334,
+     "fp": 0,
+     "fn": 0
+    },
+    "intersection_type": {
+     "tp": 3372,
+     "fp": 0,
+     "fn": 0
+    },
+    "subscript": {
+     "tp": 68881,
+     "fp": 2,
+     "fn": 0
+    },
+    "type_predicate": {
+     "tp": 2764,
+     "fp": 40,
+     "fn": 0
+    },
+    "tuple_type": {
+     "tp": 5402,
+     "fp": 0,
+     "fn": 4
+    },
+    "parenthesized_type": {
+     "tp": 4082,
+     "fp": 0,
+     "fn": 1
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 0,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2803,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_operator": {
+     "tp": 16585,
+     "fp": 0,
+     "fn": 4
+    },
+    "constructor_type": {
+     "tp": 125,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_assertion": {
+     "tp": 1820,
+     "fp": 0,
+     "fn": 0
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 0,
+     "fn": 0
+    }
+   },
+   "commit": "57c8417"
   }
  ]
 }
