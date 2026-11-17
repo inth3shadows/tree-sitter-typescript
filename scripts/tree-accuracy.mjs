@@ -19,7 +19,12 @@
  *
  * Usage:
  *   node scripts/tree-accuracy.mjs [--build NAME=TS_WASM,TSX_WASM]... [--corpus NAME]...
- *                                  [--json FILE] [--show N]
+ *                                  [--files LIST] [--spans] [--json FILE] [--show N]
+ *   --files LIST  measure the files named in LIST (one path per line, deduplicated by
+ *                 content) instead of the corpora
+ *   --spans       also compare every node's span, whatever its kind (tsc nodes vs this
+ *                 grammar's named nodes), and list the node kinds whose spans most often
+ *                 have no match: a triage aid for wrong trees the categories do not see
  *   Default build: this checkout's tree-sitter-typescript.wasm / tree-sitter-tsx.wasm
  *   (run `npm run build:wasm` first). Corpora come from the differential's cache
  *   (TS_DIFF_CACHE or ~/.cache/tree-sitter-typescript-differential); run
@@ -105,6 +110,7 @@ function tscNodes(text, isTsx) {
   const sf = ts.createSourceFile('x' + (isTsx ? '.tsx' : '.ts'), text, ts.ScriptTarget.Latest, true, isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   if (sf.parseDiagnostics.length) return null;
   const out = new Set();
+  out.sf = sf;
   const visit = (n) => {
     if (TSC_SKIP.has(n.kind)) return;
     // `typeof import('m')` is an ImportType in tsc and a type_query (left out) here
@@ -151,6 +157,79 @@ function tsNodes(tree) {
   return {out, errors};
 }
 
+// Span-only comparison: every tsc node and every named tree-sitter node, kind ignored.
+// Leaves (tokens, names, literals) are left out on both sides, and so are list wrappers that
+// only one side has: tree-sitter's argument, parameter and body containers, tsc's
+// declaration lists and template spans.
+const TSC_SPAN_SKIP = new Set([K.SourceFile, K.EndOfFileToken, K.VariableDeclarationList, K.TemplateSpan, K.HeritageClause, K.ThisType,
+  K.JsxAttributes, K.TemplateLiteralTypeSpan, K.MetaProperty]);
+const TSN_SPAN_SKIP = new Set(['program', 'comment', 'html_comment', 'ERROR',
+  'arguments', 'formal_parameters', 'type_arguments', 'type_parameters', 'type_annotation',
+  'template_substitution', 'class_body', 'interface_body', 'enum_body', 'else_clause',
+  'extends_clause', 'implements_clause', 'class_heritage', 'extends_type_clause',
+  'constraint', 'default_type', 'string', 'regex', 'literal_type', 'finally_clause',
+  'type_predicate_annotation', 'template_type']);
+// a trailing `;` or `,` belongs to a member in tsc and not here; drop it on both sides
+const spanKey = (text, st, en) => {
+  while (en > st && (text[en - 1] === ';' || text[en - 1] === ',')) en--;
+  return `${st}:${en}`;
+};
+function tscSpans(sf) {
+  const out = new Map();
+  const text = sf.text;
+  const visit = (n) => {
+    // a bare type name is a TypeReference (or ExpressionWithTypeArguments) around a name in tsc
+    // a bare type name is a TypeReference around a name in tsc, and a class's `extends A<T>`
+    // has no node for `A<T>` here
+    const bareRef = n.kind === K.TypeReference && !n.typeArguments || n.kind === K.ExpressionWithTypeArguments;
+    // a node that is only a wrapper around one name (`{a}`, `for (const a of b)`), or has no
+    // child node (`{}`, `break`), is a leaf here; flat unions count once, as above
+    const kids = [];
+    ts.forEachChild(n, (c) => {
+      kids.push(c);
+    });
+    const leafish = kids.length === 0 || (kids.length === 1 && kids[0].getStart(sf) === n.getStart(sf) && kids[0].end === n.end && kids[0].kind <= K.LastToken);
+    const innerFlat = (n.kind === K.UnionType || n.kind === K.IntersectionType) && n.parent && n.parent.kind === n.kind ||
+      // `unique symbol` is one token here; `import type {a}` starts its clause after `type` here
+      n.kind === K.TypeOperator && n.operator === K.UniqueKeyword || n.kind === K.ImportClause && n.isTypeOnly;
+    if (!TSC_SPAN_SKIP.has(n.kind) && !ts.isJSDoc(n) && n.kind > K.LastToken && !bareRef && !leafish && !innerFlat) {
+      // an exported declaration starts at `export` in tsc, as export_statement does here
+      const k = spanKey(text, n.getStart(sf), n.end);
+      if (!out.has(k)) out.set(k, K[n.kind]);
+    }
+    ts.forEachChild(n, visit);
+  };
+  visit(sf);
+  return out;
+}
+function tsSpans(tree, text) {
+  const out = new Map();
+  const visit = (n) => {
+    const p = n.parent;
+    const kids = n.namedChildren.filter((c) => c.type !== 'comment' && c.type !== 'html_comment');
+    const skip = TSN_SPAN_SKIP.has(n.type) || kids.length === 0 ||
+      // a rest parameter is one Parameter in tsc, with its annotation
+      (n.type === 'rest_pattern' && p && (p.type === 'required_parameter' || p.type === 'optional_parameter')) ||
+      (p && p.type === 'ambient_declaration' && n.type !== 'statement_block' && p.namedChild(0)?.id === n.id) ||
+      // the declaration inside export_statement: tsc's declaration spans the export
+      (p && p.type === 'export_statement' && p.childForFieldName('declaration')?.id === n.id) ||
+      (n.type === 'parenthesized_expression' && p && COND_PARENTS.has(p.type)) ||
+      (n.type === 'template_string' && !n.namedChildren.some((c) => c.type === 'template_substitution')) ||
+      ((n.type === 'union_type' || n.type === 'intersection_type') && p && p.type === n.type) ||
+      (n.type === 'literal_type' && n.namedChild(0)?.type === 'undefined') ||
+      // a mapped type is an index_signature in an object_type here and one MappedType in tsc
+      (n.type === 'index_signature' && n.namedChildren.some((c) => c.type === 'mapped_type_clause')) ||
+      (n.namedChildCount === 1 && n.namedChild(0).namedChildCount === 0 && n.namedChild(0).startIndex === n.startIndex && n.namedChild(0).endIndex === n.endIndex);
+    if (!skip) {
+      const k = spanKey(text, n.startIndex, n.endIndex);
+      if (!out.has(k)) out.set(k, n.type);
+    }
+    for (let i = 0; i < n.namedChildCount; i++) visit(n.namedChild(i));
+  };
+  visit(tree.rootNode);
+  return out;
+}
+
 function listFiles(base, rel) {
   const out = [];
   const stack = [rel];
@@ -176,7 +255,7 @@ function corpusDir(c, cacheRoot) {
 }
 
 function parseArgs(argv) {
-  const a = {builds: [], corpora: [], json: null, show: 0, showCat: null};
+  const a = {builds: [], corpora: [], json: null, show: 0, showCat: null, files: null, spans: false};
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     const v = () => {
@@ -191,6 +270,11 @@ function parseArgs(argv) {
     else if (k === '--json') a.json = v();
     else if (k === '--show') a.show = Number(v());
     else if (k === '--show-category') a.showCat = v();
+    else if (k === '--files') a.files = v();
+    else if (k === '--spans') a.spans = true;
+    else if (k === '--show-span') {
+      a.showSpan = v(); a.spans = true;
+    }
     else throw new Error(`unknown argument ${k}`);
   }
   if (!a.builds.length) a.builds.push({name: 'this', ts: path.join(ROOT, 'tree-sitter-typescript.wasm'), tsx: path.join(ROOT, 'tree-sitter-tsx.wasm')});
@@ -210,17 +294,42 @@ async function main() {
     const mk = async (w) => {
       const p = new Parser(); p.setLanguage(await Language.load(fs.readFileSync(w))); return p;
     };
-    builds.push({...b, p: {ts: await mk(b.ts), tsx: await mk(b.tsx)}, cats: {}, files: 0, errFiles: 0, samples: []});
+    builds.push({...b, p: {ts: await mk(b.ts), tsx: await mk(b.tsx)}, cats: {}, files: 0, errFiles: 0, samples: [], span: {tp: 0, fp: 0, fn: 0, fpKinds: {}, fnKinds: {}}});
   }
   const cacheRoot = process.env.TS_DIFF_CACHE || path.join(os.homedir(), '.cache', 'tree-sitter-typescript-differential');
   let corpora = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'ts-differential.corpora.json'), 'utf8')).filter((c) => !c.local);
   if (args.corpora.length) corpora = corpora.filter((c) => args.corpora.includes(c.name));
   let files = 0;
   let skipped = 0;
-  for (const c of corpora) {
-    const base = corpusDir(c, cacheRoot);
-    for (const f of listFiles(base, '')) {
-      const text = fs.readFileSync(path.join(base, f), 'utf8');
+  const sources = [];
+  if (args.files) {
+    const seen = new Set();
+    const list = fs.readFileSync(args.files, 'utf8').split('\n').filter((l) => l && EXTS.has(path.extname(l)));
+    const group = {name: 'files', files: []};
+    for (const f of list) {
+      let text;
+      try {
+        text = fs.readFileSync(f, 'utf8');
+      } catch {
+        continue;
+      }
+      if (text.length > 2_000_000) continue;
+      const h = crypto.createHash('sha1').update(text).digest('hex');
+      if (seen.has(h)) continue;
+      seen.add(h); group.files.push(f);
+    }
+    sources.push({name: 'files', base: '', files: group.files});
+    corpora = [{name: `files:${path.basename(args.files)}`, sha: `${group.files.length}-unique`}];
+  } else {
+    for (const c of corpora) {
+      const base = corpusDir(c, cacheRoot);
+      sources.push({name: c.name, base, files: listFiles(base, '')});
+    }
+  }
+  for (const c of sources) {
+    const base = c.base;
+    for (const f of c.files) {
+      const text = fs.readFileSync(base ? path.join(base, f) : f, 'utf8');
       const isTsx = f.endsWith('.tsx');
       const want = tscNodes(text, isTsx);
       if (!want) {
@@ -236,6 +345,24 @@ async function main() {
       for (const b of builds) {
         const tree = b.p[isTsx ? 'tsx' : 'ts'].parse(text);
         const {out: got, errors} = tsNodes(tree);
+        if (args.spans) {
+          const ws = (want.spans ??= tscSpans(want.sf));
+          const gs = tsSpans(tree, text);
+          const sp = b.span;
+          for (const [k, kind] of gs) {
+            if (ws.has(k)) sp.tp++;
+            else {
+              sp.fp++; sp.fpKinds[kind] = (sp.fpKinds[kind] ?? 0) + 1;
+              if (args.showSpan === kind && b.samples.length < args.show) b.samples.push(`+ ${c.name}/${f} ${kind} ${JSON.stringify(text.slice(+k.split(':')[0], Math.min(+k.split(':')[1], +k.split(':')[0] + 90)))}`);
+            }
+          }
+          for (const [k, kind] of ws) {
+            if (!gs.has(k)) {
+              sp.fn++; sp.fnKinds[kind] = (sp.fnKinds[kind] ?? 0) + 1;
+              if (args.showSpan === kind && b.samples.length < args.show) b.samples.push(`- ${c.name}/${f} ${kind} ${JSON.stringify(text.slice(+k.split(':')[0], Math.min(+k.split(':')[1], +k.split(':')[0] + 90)))}`);
+            }
+          }
+        }
         tree.delete();
         b.files++;
         if (errors) b.errFiles++;
@@ -263,12 +390,23 @@ async function main() {
     for (const s of Object.values(b.cats)) {
       t.tp += s.tp; t.fp += s.fp; t.fn += s.fn;
     }
-    report.builds.push({name: b.name, files: b.files, filesWithErrors: b.errFiles, total: t, precision: t.tp / (t.tp + t.fp), recall: t.tp / (t.tp + t.fn), categories: b.cats});
+    const r = {name: b.name, files: b.files, filesWithErrors: b.errFiles, total: t, precision: t.tp / (t.tp + t.fp), recall: t.tp / (t.tp + t.fn), categories: b.cats};
+    if (args.spans) r.spans = b.span;
+    report.builds.push(r);
   }
   console.log(`tree accuracy vs tsc ${ts.version}: ${files} files tsc parses cleanly (${skipped} skipped) in ${report.corpora.join(', ')}`);
   console.log(['build'.padEnd(28), 'precision%'.padStart(11), 'recall%'.padStart(9), 'wrong'.padStart(8), 'missed'.padStart(8), 'err files'.padStart(10)].join(' '));
   for (const r of report.builds) {
     console.log([r.name.padEnd(28), pct(r.total.tp, r.total.tp + r.total.fp).padStart(11), pct(r.total.tp, r.total.tp + r.total.fn).padStart(9), String(r.total.fp).padStart(8), String(r.total.fn).padStart(8), String(r.filesWithErrors).padStart(10)].join(' '));
+  }
+  if (args.spans) {
+    const top = (o) => Object.entries(o).sort((x, y) => y[1] - x[1]).slice(0, 12).map(([k, n]) => `${k} ${n}`).join(', ');
+    for (const b of builds) {
+      const sp = b.span;
+      console.log(`${b.name} spans: precision ${pct(sp.tp, sp.tp + sp.fp)}% recall ${pct(sp.tp, sp.tp + sp.fn)}% (${sp.fp} unmatched here, ${sp.fn} unmatched in tsc)`);
+      console.log(`  unmatched here, by kind: ${top(sp.fpKinds)}`);
+      console.log(`  unmatched in tsc, by kind: ${top(sp.fnKinds)}`);
+    }
   }
   for (const b of builds) for (const s of b.samples) console.log(`${b.name} ${s}`);
   if (args.json) fs.writeFileSync(args.json, JSON.stringify(report, null, 1) + '\n');
