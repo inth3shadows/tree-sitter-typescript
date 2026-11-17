@@ -1,0 +1,2531 @@
+{
+ "measuredAt": "2026-11-17T11:27Z/2026-11-17T11:55Z",
+ "tsc": "5.9.3",
+ "corpora": [
+  "effect@7a87ff9b88b1",
+  "zod@2554b70c3d4a",
+  "excalidraw@dd2f8fc32b92",
+  "vscode@ca43fc94a6cc"
+ ],
+ "files": 14533,
+ "treeSitterCli": "0.25.10",
+ "note": "Each build is that branch tip with its committed typescript/src and tsx/src compiled to wasm.",
+ "builds": [
+  {
+   "repo": "inth3shadows/tree-sitter-typescript",
+   "branch": "main",
+   "sha": "713d1ba774ef8b7fdfebdcb131669c9bade96b89",
+   "date": "2026-11-16",
+   "name": "inth3shadows/tree-sitter-typescript@main",
+   "files": 14533,
+   "filesWithErrors": 1,
+   "total": {
+    "tp": 6218672,
+    "fp": 697,
+    "fn": 247
+   },
+   "precision": 0.9998879307531038,
+   "recall": 0.9999602824863936,
+   "categories": {
+    "call": {
+     "tp": 1891525,
+     "fp": 155,
+     "fn": 69
+    },
+    "member": {
+     "tp": 2634505,
+     "fp": 300,
+     "fn": 2
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 0,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136429,
+     "fp": 2,
+     "fn": 2
+    },
+    "arrow": {
+     "tp": 301079,
+     "fp": 1,
+     "fn": 5
+    },
+    "binary": {
+     "tp": 488494,
+     "fp": 2,
+     "fn": 0
+    },
+    "unary": {
+     "tp": 116447,
+     "fp": 0,
+     "fn": 0
+    },
+    "cast": {
+     "tp": 37127,
+     "fp": 152,
+     "fn": 152
+    },
+    "union_type": {
+     "tp": 94529,
+     "fp": 3,
+     "fn": 4
+    },
+    "spread": {
+     "tp": 42361,
+     "fp": 0,
+     "fn": 0
+    },
+    "function_type": {
+     "tp": 21144,
+     "fp": 0,
+     "fn": 0
+    },
+    "ternary": {
+     "tp": 61309,
+     "fp": 0,
+     "fn": 0
+    },
+    "non_null": {
+     "tp": 20368,
+     "fp": 2,
+     "fn": 2
+    },
+    "parenthesized": {
+     "tp": 50372,
+     "fp": 0,
+     "fn": 0
+    },
+    "await": {
+     "tp": 126334,
+     "fp": 0,
+     "fn": 0
+    },
+    "intersection_type": {
+     "tp": 3372,
+     "fp": 0,
+     "fn": 0
+    },
+    "subscript": {
+     "tp": 68881,
+     "fp": 2,
+     "fn": 0
+    },
+    "type_predicate": {
+     "tp": 2764,
+     "fp": 40,
+     "fn": 0
+    },
+    "tuple_type": {
+     "tp": 5402,
+     "fp": 0,
+     "fn": 4
+    },
+    "parenthesized_type": {
+     "tp": 4082,
+     "fp": 0,
+     "fn": 1
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 36,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2803,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_operator": {
+     "tp": 16583,
+     "fp": 2,
+     "fn": 6
+    },
+    "constructor_type": {
+     "tp": 125,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_assertion": {
+     "tp": 1820,
+     "fp": 0,
+     "fn": 0
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 0,
+     "fn": 0
+    }
+   }
+  },
+  {
+   "repo": "dokimasia/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "839d520b3f2a221734d7144bbf384e7b0a47d504",
+   "date": "2026-10-21",
+   "name": "dokimasia/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 127,
+   "total": {
+    "tp": 6213186,
+    "fp": 6452,
+    "fn": 5733
+   },
+   "precision": 0.9989626405909797,
+   "recall": 0.9990781356052394,
+   "categories": {
+    "call": {
+     "tp": 1889917,
+     "fp": 1899,
+     "fn": 1677
+    },
+    "member": {
+     "tp": 2633947,
+     "fp": 987,
+     "fn": 560
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 57,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136422,
+     "fp": 7,
+     "fn": 9
+    },
+    "arrow": {
+     "tp": 300987,
+     "fp": 53,
+     "fn": 97
+    },
+    "binary": {
+     "tp": 488013,
+     "fp": 613,
+     "fn": 481
+    },
+    "unary": {
+     "tp": 116182,
+     "fp": 264,
+     "fn": 265
+    },
+    "cast": {
+     "tp": 36850,
+     "fp": 419,
+     "fn": 429
+    },
+    "union_type": {
+     "tp": 94426,
+     "fp": 4,
+     "fn": 107
+    },
+    "non_null": {
+     "tp": 19886,
+     "fp": 568,
+     "fn": 484
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 174,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42351,
+     "fp": 1,
+     "fn": 10
+    },
+    "function_type": {
+     "tp": 21110,
+     "fp": 0,
+     "fn": 34
+    },
+    "ternary": {
+     "tp": 61299,
+     "fp": 1,
+     "fn": 10
+    },
+    "parenthesized": {
+     "tp": 50363,
+     "fp": 2,
+     "fn": 9
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3342,
+     "fp": 10,
+     "fn": 30
+    },
+    "subscript": {
+     "tp": 68823,
+     "fp": 63,
+     "fn": 58
+    },
+    "type_predicate": {
+     "tp": 2763,
+     "fp": 40,
+     "fn": 1
+    },
+    "tuple_type": {
+     "tp": 5348,
+     "fp": 0,
+     "fn": 58
+    },
+    "parenthesized_type": {
+     "tp": 4069,
+     "fp": 0,
+     "fn": 14
+    },
+    "conditional_type": {
+     "tp": 2778,
+     "fp": 0,
+     "fn": 25
+    },
+    "type_operator": {
+     "tp": 16537,
+     "fp": 2,
+     "fn": 52
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 34,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 0,
+     "fn": 0
+    }
+   }
+  },
+  {
+   "repo": "marionebl/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "53071c97beb59f6ddc197a3473d22882ad756918",
+   "date": "2026-03-27",
+   "name": "marionebl/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 17,
+   "total": {
+    "tp": 6211637,
+    "fp": 8274,
+    "fn": 7282
+   },
+   "precision": 0.9986697558855746,
+   "recall": 0.9988290569470353,
+   "categories": {
+    "call": {
+     "tp": 1890039,
+     "fp": 1627,
+     "fn": 1555
+    },
+    "member": {
+     "tp": 2634057,
+     "fp": 768,
+     "fn": 450
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 55,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136429,
+     "fp": 2,
+     "fn": 2
+    },
+    "arrow": {
+     "tp": 301047,
+     "fp": 33,
+     "fn": 37
+    },
+    "binary": {
+     "tp": 488026,
+     "fp": 639,
+     "fn": 468
+    },
+    "unary": {
+     "tp": 116183,
+     "fp": 327,
+     "fn": 264
+    },
+    "cast": {
+     "tp": 36861,
+     "fp": 419,
+     "fn": 418
+    },
+    "union_type": {
+     "tp": 93448,
+     "fp": 1113,
+     "fn": 1085
+    },
+    "non_null": {
+     "tp": 19886,
+     "fp": 568,
+     "fn": 484
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 174,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42361,
+     "fp": 0,
+     "fn": 0
+    },
+    "function_type": {
+     "tp": 21144,
+     "fp": 0,
+     "fn": 0
+    },
+    "ternary": {
+     "tp": 61308,
+     "fp": 1,
+     "fn": 1
+    },
+    "parenthesized": {
+     "tp": 50372,
+     "fp": 59,
+     "fn": 0
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1243,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3361,
+     "fp": 11,
+     "fn": 11
+    },
+    "subscript": {
+     "tp": 68824,
+     "fp": 59,
+     "fn": 57
+    },
+    "type_predicate": {
+     "tp": 2764,
+     "fp": 40,
+     "fn": 0
+    },
+    "tuple_type": {
+     "tp": 5402,
+     "fp": 0,
+     "fn": 4
+    },
+    "parenthesized_type": {
+     "tp": 4082,
+     "fp": 0,
+     "fn": 1
+    },
+    "conditional_type": {
+     "tp": 2803,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_operator": {
+     "tp": 15471,
+     "fp": 1114,
+     "fn": 1118
+    },
+    "constructor_type": {
+     "tp": 116,
+     "fp": 9,
+     "fn": 9
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 13,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "lzehrung/tree-sitter-typescript",
+   "branch": "codegraph-main",
+   "sha": "f0a42fe031d137374bafada517cf11165e9c5c87",
+   "date": "2026-11-11",
+   "name": "lzehrung/tree-sitter-typescript@codegraph-main",
+   "files": 14533,
+   "filesWithErrors": 141,
+   "total": {
+    "tp": 6210989,
+    "fp": 8925,
+    "fn": 7930
+   },
+   "precision": 0.9985650927006386,
+   "recall": 0.9987248587736872,
+   "categories": {
+    "call": {
+     "tp": 1889913,
+     "fp": 1903,
+     "fn": 1681
+    },
+    "member": {
+     "tp": 2633944,
+     "fp": 989,
+     "fn": 563
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 57,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136422,
+     "fp": 7,
+     "fn": 9
+    },
+    "arrow": {
+     "tp": 300987,
+     "fp": 53,
+     "fn": 97
+    },
+    "binary": {
+     "tp": 488013,
+     "fp": 738,
+     "fn": 481
+    },
+    "unary": {
+     "tp": 116182,
+     "fp": 327,
+     "fn": 265
+    },
+    "cast": {
+     "tp": 36850,
+     "fp": 419,
+     "fn": 429
+    },
+    "union_type": {
+     "tp": 93357,
+     "fp": 1113,
+     "fn": 1176
+    },
+    "non_null": {
+     "tp": 19886,
+     "fp": 568,
+     "fn": 484
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 174,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42351,
+     "fp": 1,
+     "fn": 10
+    },
+    "function_type": {
+     "tp": 21110,
+     "fp": 0,
+     "fn": 34
+    },
+    "ternary": {
+     "tp": 61299,
+     "fp": 1,
+     "fn": 10
+    },
+    "parenthesized": {
+     "tp": 50363,
+     "fp": 59,
+     "fn": 9
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3341,
+     "fp": 11,
+     "fn": 31
+    },
+    "subscript": {
+     "tp": 68823,
+     "fp": 63,
+     "fn": 58
+    },
+    "type_predicate": {
+     "tp": 2763,
+     "fp": 40,
+     "fn": 1
+    },
+    "tuple_type": {
+     "tp": 5348,
+     "fp": 0,
+     "fn": 58
+    },
+    "parenthesized_type": {
+     "tp": 4069,
+     "fp": 0,
+     "fn": 14
+    },
+    "conditional_type": {
+     "tp": 2778,
+     "fp": 0,
+     "fn": 25
+    },
+    "type_operator": {
+     "tp": 15425,
+     "fp": 1114,
+     "fn": 1164
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 34,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "dive2Pro/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "a867410aafe39d27702d6aa9d077062bdbe6e16e",
+   "date": "2026-01-13",
+   "name": "dive2Pro/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 162,
+   "total": {
+    "tp": 6210234,
+    "fp": 9606,
+    "fn": 8685
+   },
+   "precision": 0.9984555872819879,
+   "recall": 0.9986034550377646,
+   "categories": {
+    "call": {
+     "tp": 1889809,
+     "fp": 2026,
+     "fn": 1785
+    },
+    "member": {
+     "tp": 2633822,
+     "fp": 1119,
+     "fn": 685
+    },
+    "yield": {
+     "tp": 35992,
+     "fp": 58,
+     "fn": 56
+    },
+    "new": {
+     "tp": 136412,
+     "fp": 7,
+     "fn": 19
+    },
+    "arrow": {
+     "tp": 300922,
+     "fp": 72,
+     "fn": 162
+    },
+    "binary": {
+     "tp": 487994,
+     "fp": 847,
+     "fn": 500
+    },
+    "unary": {
+     "tp": 116182,
+     "fp": 332,
+     "fn": 265
+    },
+    "cast": {
+     "tp": 36850,
+     "fp": 420,
+     "fn": 429
+    },
+    "union_type": {
+     "tp": 93276,
+     "fp": 1141,
+     "fn": 1257
+    },
+    "non_null": {
+     "tp": 19878,
+     "fp": 596,
+     "fn": 492
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 191,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42350,
+     "fp": 3,
+     "fn": 11
+    },
+    "function_type": {
+     "tp": 20791,
+     "fp": 196,
+     "fn": 353
+    },
+    "ternary": {
+     "tp": 61295,
+     "fp": 3,
+     "fn": 14
+    },
+    "parenthesized": {
+     "tp": 50362,
+     "fp": 61,
+     "fn": 10
+    },
+    "await": {
+     "tp": 125091,
+     "fp": 1245,
+     "fn": 1243
+    },
+    "intersection_type": {
+     "tp": 3331,
+     "fp": 11,
+     "fn": 41
+    },
+    "subscript": {
+     "tp": 68822,
+     "fp": 64,
+     "fn": 59
+    },
+    "type_predicate": {
+     "tp": 2763,
+     "fp": 40,
+     "fn": 1
+    },
+    "tuple_type": {
+     "tp": 5348,
+     "fp": 0,
+     "fn": 58
+    },
+    "parenthesized_type": {
+     "tp": 4069,
+     "fp": 14,
+     "fn": 14
+    },
+    "conditional_type": {
+     "tp": 2778,
+     "fp": 3,
+     "fn": 25
+    },
+    "type_operator": {
+     "tp": 15417,
+     "fp": 1114,
+     "fn": 1172
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 34,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "TobiasBak/tree-sitter-typescript",
+   "branch": "parse-fixes",
+   "sha": "795c3152b8dc3a0a3d8732589eae4cf4196b77f5",
+   "date": "2026-11-10",
+   "name": "TobiasBak/tree-sitter-typescript@parse-fixes",
+   "files": 14533,
+   "filesWithErrors": 168,
+   "total": {
+    "tp": 6208634,
+    "fp": 13817,
+    "fn": 10285
+   },
+   "precision": 0.9977794923575934,
+   "recall": 0.9983461755973988,
+   "categories": {
+    "call": {
+     "tp": 1890777,
+     "fp": 2252,
+     "fn": 817
+    },
+    "member": {
+     "tp": 2633697,
+     "fp": 1505,
+     "fn": 810
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 2,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136403,
+     "fp": 7,
+     "fn": 28
+    },
+    "arrow": {
+     "tp": 300602,
+     "fp": 265,
+     "fn": 482
+    },
+    "binary": {
+     "tp": 487890,
+     "fp": 2388,
+     "fn": 604
+    },
+    "unary": {
+     "tp": 116338,
+     "fp": 107,
+     "fn": 109
+    },
+    "cast": {
+     "tp": 36841,
+     "fp": 419,
+     "fn": 438
+    },
+    "union_type": {
+     "tp": 92600,
+     "fp": 1449,
+     "fn": 1933
+    },
+    "spread": {
+     "tp": 42347,
+     "fp": 916,
+     "fn": 14
+    },
+    "function_type": {
+     "tp": 18413,
+     "fp": 1379,
+     "fn": 2731
+    },
+    "ternary": {
+     "tp": 61263,
+     "fp": 22,
+     "fn": 46
+    },
+    "non_null": {
+     "tp": 19884,
+     "fp": 714,
+     "fn": 486
+    },
+    "parenthesized": {
+     "tp": 50353,
+     "fp": 34,
+     "fn": 19
+    },
+    "await": {
+     "tp": 126143,
+     "fp": 194,
+     "fn": 191
+    },
+    "intersection_type": {
+     "tp": 3297,
+     "fp": 19,
+     "fn": 75
+    },
+    "subscript": {
+     "tp": 68803,
+     "fp": 79,
+     "fn": 78
+    },
+    "type_predicate": {
+     "tp": 2738,
+     "fp": 53,
+     "fn": 26
+    },
+    "tuple_type": {
+     "tp": 5330,
+     "fp": 9,
+     "fn": 76
+    },
+    "parenthesized_type": {
+     "tp": 4030,
+     "fp": 37,
+     "fn": 53
+    },
+    "instantiation": {
+     "tp": 140,
+     "fp": 729,
+     "fn": 1
+    },
+    "conditional_type": {
+     "tp": 2747,
+     "fp": 38,
+     "fn": 56
+    },
+    "type_operator": {
+     "tp": 15411,
+     "fp": 1160,
+     "fn": 1178
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 30,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 10,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "vincentkoc/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "2ec69f5037f56a99a0d0c0e1a191d0eef50afe49",
+   "date": "2026-11-03",
+   "name": "vincentkoc/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 247,
+   "total": {
+    "tp": 6207026,
+    "fp": 17167,
+    "fn": 11893
+   },
+   "precision": 0.9972418914387777,
+   "recall": 0.9980876097598312,
+   "categories": {
+    "call": {
+     "tp": 1889820,
+     "fp": 2520,
+     "fn": 1774
+    },
+    "member": {
+     "tp": 2633658,
+     "fp": 1688,
+     "fn": 849
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 2,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300595,
+     "fp": 280,
+     "fn": 489
+    },
+    "binary": {
+     "tp": 487901,
+     "fp": 3880,
+     "fn": 593
+    },
+    "unary": {
+     "tp": 116170,
+     "fp": 281,
+     "fn": 277
+    },
+    "cast": {
+     "tp": 36986,
+     "fp": 278,
+     "fn": 293
+    },
+    "union_type": {
+     "tp": 92556,
+     "fp": 1450,
+     "fn": 1977
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 914,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18379,
+     "fp": 1371,
+     "fn": 2765
+    },
+    "ternary": {
+     "tp": 61261,
+     "fp": 19,
+     "fn": 48
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 720,
+     "fn": 493
+    },
+    "parenthesized": {
+     "tp": 50355,
+     "fp": 712,
+     "fn": 17
+    },
+    "await": {
+     "tp": 125632,
+     "fp": 705,
+     "fn": 702
+    },
+    "intersection_type": {
+     "tp": 3295,
+     "fp": 18,
+     "fn": 77
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 96,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5322,
+     "fp": 1,
+     "fn": 84
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 29,
+     "fn": 56
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 901,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2746,
+     "fp": 38,
+     "fn": 57
+    },
+    "type_operator": {
+     "tp": 15413,
+     "fp": 1158,
+     "fn": 1176
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54627,
+     "fp": 0,
+     "fn": 1
+    }
+   }
+  },
+  {
+   "repo": "vmikhailov/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "4f96ecded78cb426fd13f3a7fce9d48ba01d96f5",
+   "date": "2026-11-10",
+   "name": "vmikhailov/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 224,
+   "total": {
+    "tp": 6206211,
+    "fp": 16685,
+    "fn": 12708
+   },
+   "precision": 0.9973187724814941,
+   "recall": 0.9979565580448949,
+   "categories": {
+    "call": {
+     "tp": 1889616,
+     "fp": 3490,
+     "fn": 1978
+    },
+    "member": {
+     "tp": 2633683,
+     "fp": 1622,
+     "fn": 824
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 2,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300613,
+     "fp": 281,
+     "fn": 471
+    },
+    "binary": {
+     "tp": 487895,
+     "fp": 2500,
+     "fn": 599
+    },
+    "unary": {
+     "tp": 116172,
+     "fp": 275,
+     "fn": 275
+    },
+    "cast": {
+     "tp": 36822,
+     "fp": 441,
+     "fn": 457
+    },
+    "union_type": {
+     "tp": 92592,
+     "fp": 1448,
+     "fn": 1941
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18390,
+     "fp": 1372,
+     "fn": 2754
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 747,
+     "fn": 493
+    },
+    "parenthesized": {
+     "tp": 50355,
+     "fp": 41,
+     "fn": 17
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3297,
+     "fp": 19,
+     "fn": 75
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 80,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 1,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 28,
+     "fn": 56
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 859,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2750,
+     "fp": 37,
+     "fn": 53
+    },
+    "type_operator": {
+     "tp": 15411,
+     "fp": 1158,
+     "fn": 1178
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "bavovna/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "e0a41f4f1c65bf0dfdb3c5f587d1d86acecc9a7b",
+   "date": "2026-10-24",
+   "name": "bavovna/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 231,
+   "total": {
+    "tp": 6206201,
+    "fp": 16922,
+    "fn": 12718
+   },
+   "precision": 0.9972807865118527,
+   "recall": 0.9979549500483926,
+   "categories": {
+    "call": {
+     "tp": 1889609,
+     "fp": 3497,
+     "fn": 1985
+    },
+    "member": {
+     "tp": 2633680,
+     "fp": 1623,
+     "fn": 827
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 2,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300613,
+     "fp": 278,
+     "fn": 471
+    },
+    "binary": {
+     "tp": 487895,
+     "fp": 2612,
+     "fn": 599
+    },
+    "unary": {
+     "tp": 116172,
+     "fp": 338,
+     "fn": 275
+    },
+    "cast": {
+     "tp": 36822,
+     "fp": 441,
+     "fn": 457
+    },
+    "union_type": {
+     "tp": 92592,
+     "fp": 1448,
+     "fn": 1941
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18390,
+     "fp": 1372,
+     "fn": 2754
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 747,
+     "fn": 493
+    },
+    "parenthesized": {
+     "tp": 50355,
+     "fp": 98,
+     "fn": 17
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3297,
+     "fp": 19,
+     "fn": 75
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 80,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 1,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 28,
+     "fn": 56
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 859,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2750,
+     "fp": 37,
+     "fn": 53
+    },
+    "type_operator": {
+     "tp": 15411,
+     "fp": 1158,
+     "fn": 1178
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "tree-sitter/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+   "date": "2025-01-30",
+   "name": "tree-sitter/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 231,
+   "total": {
+    "tp": 6205941,
+    "fp": 17404,
+    "fn": 12978
+   },
+   "precision": 0.9972034332019195,
+   "recall": 0.9979131421393332,
+   "categories": {
+    "call": {
+     "tp": 1889482,
+     "fp": 3608,
+     "fn": 2112
+    },
+    "member": {
+     "tp": 2633641,
+     "fp": 1666,
+     "fn": 866
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 57,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300582,
+     "fp": 309,
+     "fn": 502
+    },
+    "binary": {
+     "tp": 487895,
+     "fp": 2653,
+     "fn": 599
+    },
+    "unary": {
+     "tp": 116172,
+     "fp": 338,
+     "fn": 275
+    },
+    "cast": {
+     "tp": 36822,
+     "fp": 441,
+     "fn": 457
+    },
+    "union_type": {
+     "tp": 92585,
+     "fp": 1448,
+     "fn": 1948
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 831,
+     "fn": 493
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 976,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18390,
+     "fp": 1372,
+     "fn": 2754
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "parenthesized": {
+     "tp": 50355,
+     "fp": 98,
+     "fn": 17
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3296,
+     "fp": 19,
+     "fn": 76
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 80,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 1,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 28,
+     "fn": 56
+    },
+    "conditional_type": {
+     "tp": 2750,
+     "fp": 37,
+     "fn": 53
+    },
+    "type_operator": {
+     "tp": 15411,
+     "fp": 1158,
+     "fn": 1178
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "QuiltLang/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "25f4db1700b970293b83c5964581ff8ef718106f",
+   "date": "2026-06-12",
+   "name": "QuiltLang/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 231,
+   "total": {
+    "tp": 6205941,
+    "fp": 17404,
+    "fn": 12978
+   },
+   "precision": 0.9972034332019195,
+   "recall": 0.9979131421393332,
+   "categories": {
+    "call": {
+     "tp": 1889482,
+     "fp": 3608,
+     "fn": 2112
+    },
+    "member": {
+     "tp": 2633641,
+     "fp": 1666,
+     "fn": 866
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 57,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300582,
+     "fp": 309,
+     "fn": 502
+    },
+    "binary": {
+     "tp": 487895,
+     "fp": 2653,
+     "fn": 599
+    },
+    "unary": {
+     "tp": 116172,
+     "fp": 338,
+     "fn": 275
+    },
+    "cast": {
+     "tp": 36822,
+     "fp": 441,
+     "fn": 457
+    },
+    "union_type": {
+     "tp": 92585,
+     "fp": 1448,
+     "fn": 1948
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 831,
+     "fn": 493
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 976,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18390,
+     "fp": 1372,
+     "fn": 2754
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "parenthesized": {
+     "tp": 50355,
+     "fp": 98,
+     "fn": 17
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3296,
+     "fp": 19,
+     "fn": 76
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 80,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 1,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 28,
+     "fn": 56
+    },
+    "conditional_type": {
+     "tp": 2750,
+     "fp": 37,
+     "fn": 53
+    },
+    "type_operator": {
+     "tp": 15411,
+     "fp": 1158,
+     "fn": 1178
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "HerringtonDarkholme/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "c6a1b87d0b5251be8cddbd8a77c3ec477293bb59",
+   "date": "2025-04-29",
+   "name": "HerringtonDarkholme/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 229,
+   "total": {
+    "tp": 6205941,
+    "fp": 17404,
+    "fn": 12978
+   },
+   "precision": 0.9972034332019195,
+   "recall": 0.9979131421393332,
+   "categories": {
+    "call": {
+     "tp": 1889482,
+     "fp": 3608,
+     "fn": 2112
+    },
+    "member": {
+     "tp": 2633641,
+     "fp": 1666,
+     "fn": 866
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 57,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300582,
+     "fp": 309,
+     "fn": 502
+    },
+    "binary": {
+     "tp": 487895,
+     "fp": 2653,
+     "fn": 599
+    },
+    "unary": {
+     "tp": 116172,
+     "fp": 338,
+     "fn": 275
+    },
+    "cast": {
+     "tp": 36822,
+     "fp": 441,
+     "fn": 457
+    },
+    "union_type": {
+     "tp": 92585,
+     "fp": 1448,
+     "fn": 1948
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 831,
+     "fn": 493
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 976,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18390,
+     "fp": 1372,
+     "fn": 2754
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "parenthesized": {
+     "tp": 50355,
+     "fp": 98,
+     "fn": 17
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3296,
+     "fp": 19,
+     "fn": 76
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 80,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 1,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 28,
+     "fn": 56
+    },
+    "conditional_type": {
+     "tp": 2750,
+     "fp": 37,
+     "fn": 53
+    },
+    "type_operator": {
+     "tp": 15411,
+     "fp": 1158,
+     "fn": 1178
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "NzSN/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "ad3165c3686331d6db0188c420281650ce32a430",
+   "date": "2025-02-14",
+   "name": "NzSN/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 231,
+   "total": {
+    "tp": 6205941,
+    "fp": 17404,
+    "fn": 12978
+   },
+   "precision": 0.9972034332019195,
+   "recall": 0.9979131421393332,
+   "categories": {
+    "call": {
+     "tp": 1889482,
+     "fp": 3608,
+     "fn": 2112
+    },
+    "member": {
+     "tp": 2633641,
+     "fp": 1666,
+     "fn": 866
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 57,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300582,
+     "fp": 309,
+     "fn": 502
+    },
+    "binary": {
+     "tp": 487895,
+     "fp": 2653,
+     "fn": 599
+    },
+    "unary": {
+     "tp": 116172,
+     "fp": 338,
+     "fn": 275
+    },
+    "cast": {
+     "tp": 36822,
+     "fp": 441,
+     "fn": 457
+    },
+    "union_type": {
+     "tp": 92585,
+     "fp": 1448,
+     "fn": 1948
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 831,
+     "fn": 493
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 976,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18390,
+     "fp": 1372,
+     "fn": 2754
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "parenthesized": {
+     "tp": 50355,
+     "fp": 98,
+     "fn": 17
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3296,
+     "fp": 19,
+     "fn": 76
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 80,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 1,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 28,
+     "fn": 56
+    },
+    "conditional_type": {
+     "tp": 2750,
+     "fp": 37,
+     "fn": 53
+    },
+    "type_operator": {
+     "tp": 15411,
+     "fp": 1158,
+     "fn": 1178
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "etchpad/tree-sitter-typescript",
+   "branch": "development",
+   "sha": "bf45087ef5d4987e7ef8f76d59104486d9a8f064",
+   "date": "2026-03-06",
+   "name": "etchpad/tree-sitter-typescript@development",
+   "files": 14533,
+   "filesWithErrors": 239,
+   "total": {
+    "tp": 6203108,
+    "fp": 14628,
+    "fn": 15811
+   },
+   "precision": 0.9976473751860806,
+   "recall": 0.9974575967302356,
+   "categories": {
+    "call": {
+     "tp": 1889325,
+     "fp": 2820,
+     "fn": 2269
+    },
+    "member": {
+     "tp": 2633354,
+     "fp": 2095,
+     "fn": 1153
+    },
+    "yield": {
+     "tp": 35992,
+     "fp": 97,
+     "fn": 56
+    },
+    "new": {
+     "tp": 136371,
+     "fp": 13,
+     "fn": 60
+    },
+    "arrow": {
+     "tp": 300732,
+     "fp": 129,
+     "fn": 352
+    },
+    "binary": {
+     "tp": 487862,
+     "fp": 1730,
+     "fn": 632
+    },
+    "unary": {
+     "tp": 116164,
+     "fp": 501,
+     "fn": 283
+    },
+    "cast": {
+     "tp": 36803,
+     "fp": 445,
+     "fn": 476
+    },
+    "union_type": {
+     "tp": 92401,
+     "fp": 1570,
+     "fn": 2132
+    },
+    "non_null": {
+     "tp": 19884,
+     "fp": 750,
+     "fn": 486
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 331,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42346,
+     "fp": 1,
+     "fn": 15
+    },
+    "function_type": {
+     "tp": 17767,
+     "fp": 1353,
+     "fn": 3377
+    },
+    "ternary": {
+     "tp": 61263,
+     "fp": 25,
+     "fn": 46
+    },
+    "parenthesized": {
+     "tp": 50348,
+     "fp": 103,
+     "fn": 24
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1252,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3270,
+     "fp": 21,
+     "fn": 102
+    },
+    "subscript": {
+     "tp": 68796,
+     "fp": 88,
+     "fn": 85
+    },
+    "type_predicate": {
+     "tp": 2738,
+     "fp": 58,
+     "fn": 26
+    },
+    "tuple_type": {
+     "tp": 4316,
+     "fp": 5,
+     "fn": 1090
+    },
+    "parenthesized_type": {
+     "tp": 3963,
+     "fp": 51,
+     "fn": 120
+    },
+    "conditional_type": {
+     "tp": 2215,
+     "fp": 26,
+     "fn": 588
+    },
+    "type_operator": {
+     "tp": 15425,
+     "fp": 1139,
+     "fn": 1164
+    },
+    "constructor_type": {
+     "tp": 113,
+     "fp": 9,
+     "fn": 12
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 15,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54620,
+     "fp": 1,
+     "fn": 8
+    }
+   }
+  },
+  {
+   "repo": "BrokkAi/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "bb76a11fd0dcee4381e1b283ed8359432e5071b1",
+   "date": "2026-10-16",
+   "name": "BrokkAi/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 224,
+   "total": {
+    "tp": 6205888,
+    "fp": 17450,
+    "fn": 13031
+   },
+   "precision": 0.9971960385246631,
+   "recall": 0.9979046197578711,
+   "categories": {
+    "call": {
+     "tp": 1889434,
+     "fp": 3592,
+     "fn": 2160
+    },
+    "member": {
+     "tp": 2633615,
+     "fp": 1683,
+     "fn": 892
+    },
+    "yield": {
+     "tp": 36025,
+     "fp": 25,
+     "fn": 23
+    },
+    "new": {
+     "tp": 136406,
+     "fp": 7,
+     "fn": 25
+    },
+    "arrow": {
+     "tp": 300578,
+     "fp": 314,
+     "fn": 506
+    },
+    "binary": {
+     "tp": 487898,
+     "fp": 2795,
+     "fn": 596
+    },
+    "unary": {
+     "tp": 116171,
+     "fp": 339,
+     "fn": 276
+    },
+    "cast": {
+     "tp": 36820,
+     "fp": 442,
+     "fn": 459
+    },
+    "union_type": {
+     "tp": 92575,
+     "fp": 1450,
+     "fn": 1958
+    },
+    "non_null": {
+     "tp": 19877,
+     "fp": 784,
+     "fn": 493
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 931,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18382,
+     "fp": 1374,
+     "fn": 2762
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "parenthesized": {
+     "tp": 50356,
+     "fp": 109,
+     "fn": 16
+    },
+    "await": {
+     "tp": 125092,
+     "fp": 1245,
+     "fn": 1242
+    },
+    "intersection_type": {
+     "tp": 3296,
+     "fp": 19,
+     "fn": 76
+    },
+    "subscript": {
+     "tp": 68805,
+     "fp": 80,
+     "fn": 76
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 2,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 30,
+     "fn": 56
+    },
+    "conditional_type": {
+     "tp": 2749,
+     "fp": 37,
+     "fn": 54
+    },
+    "type_operator": {
+     "tp": 15413,
+     "fp": 1156,
+     "fn": 1176
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 37,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 4,
+     "fn": 0
+    }
+   }
+  },
+  {
+   "repo": "SegaraRai/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "82b3609d6fb079bd728f88979d2ca27dd27a19bd",
+   "date": "2026-09-02",
+   "name": "SegaraRai/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 180,
+   "total": {
+    "tp": 6204452,
+    "fp": 18499,
+    "fn": 14467
+   },
+   "precision": 0.9970272946066906,
+   "recall": 0.9976737114601428,
+   "categories": {
+    "call": {
+     "tp": 1889128,
+     "fp": 4331,
+     "fn": 2466
+    },
+    "member": {
+     "tp": 2633243,
+     "fp": 2071,
+     "fn": 1264
+    },
+    "yield": {
+     "tp": 35993,
+     "fp": 57,
+     "fn": 55
+    },
+    "new": {
+     "tp": 136405,
+     "fp": 7,
+     "fn": 26
+    },
+    "arrow": {
+     "tp": 300589,
+     "fp": 303,
+     "fn": 495
+    },
+    "binary": {
+     "tp": 487895,
+     "fp": 2623,
+     "fn": 599
+    },
+    "unary": {
+     "tp": 116172,
+     "fp": 340,
+     "fn": 275
+    },
+    "cast": {
+     "tp": 36822,
+     "fp": 440,
+     "fn": 457
+    },
+    "union_type": {
+     "tp": 92587,
+     "fp": 1448,
+     "fn": 1946
+    },
+    "non_null": {
+     "tp": 19875,
+     "fp": 833,
+     "fn": 495
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 976,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42349,
+     "fp": 915,
+     "fn": 12
+    },
+    "function_type": {
+     "tp": 18390,
+     "fp": 1372,
+     "fn": 2754
+    },
+    "ternary": {
+     "tp": 61265,
+     "fp": 18,
+     "fn": 44
+    },
+    "parenthesized": {
+     "tp": 49981,
+     "fp": 102,
+     "fn": 391
+    },
+    "await": {
+     "tp": 124718,
+     "fp": 1244,
+     "fn": 1616
+    },
+    "intersection_type": {
+     "tp": 3296,
+     "fp": 19,
+     "fn": 76
+    },
+    "subscript": {
+     "tp": 68799,
+     "fp": 86,
+     "fn": 82
+    },
+    "type_predicate": {
+     "tp": 2739,
+     "fp": 53,
+     "fn": 25
+    },
+    "tuple_type": {
+     "tp": 5328,
+     "fp": 1,
+     "fn": 78
+    },
+    "parenthesized_type": {
+     "tp": 4027,
+     "fp": 28,
+     "fn": 56
+    },
+    "conditional_type": {
+     "tp": 2750,
+     "fp": 37,
+     "fn": 53
+    },
+    "type_operator": {
+     "tp": 15413,
+     "fp": 1156,
+     "fn": 1176
+    },
+    "type_assertion": {
+     "tp": 1807,
+     "fp": 30,
+     "fn": 13
+    },
+    "constructor_type": {
+     "tp": 112,
+     "fp": 9,
+     "fn": 13
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 0,
+     "fn": 0
+    }
+   }
+  },
+  {
+   "repo": "plewg/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "051c106b8eee3c008e9f44ae03e3d34d3b43d70b",
+   "date": "2026-08-20",
+   "name": "plewg/tree-sitter-typescript@master",
+   "files": 14533,
+   "filesWithErrors": 6698,
+   "total": {
+    "tp": 6077216,
+    "fp": 76697,
+    "fn": 141703
+   },
+   "precision": 0.9875368728807183,
+   "recall": 0.9772142071636566,
+   "categories": {
+    "call": {
+     "tp": 1860704,
+     "fp": 27266,
+     "fn": 30890
+    },
+    "member": {
+     "tp": 2587906,
+     "fp": 18342,
+     "fn": 46601
+    },
+    "yield": {
+     "tp": 35934,
+     "fp": 21,
+     "fn": 114
+    },
+    "new": {
+     "tp": 134678,
+     "fp": 7,
+     "fn": 1753
+    },
+    "arrow": {
+     "tp": 296228,
+     "fp": 742,
+     "fn": 4856
+    },
+    "binary": {
+     "tp": 458403,
+     "fp": 14753,
+     "fn": 30091
+    },
+    "unary": {
+     "tp": 113139,
+     "fp": 1298,
+     "fn": 3308
+    },
+    "cast": {
+     "tp": 36498,
+     "fp": 559,
+     "fn": 781
+    },
+    "union_type": {
+     "tp": 90111,
+     "fp": 1991,
+     "fn": 4422
+    },
+    "spread": {
+     "tp": 41706,
+     "fp": 21,
+     "fn": 655
+    },
+    "function_type": {
+     "tp": 17044,
+     "fp": 1492,
+     "fn": 4100
+    },
+    "ternary": {
+     "tp": 58681,
+     "fp": 648,
+     "fn": 2628
+    },
+    "non_null": {
+     "tp": 19528,
+     "fp": 2962,
+     "fn": 842
+    },
+    "parenthesized": {
+     "tp": 49241,
+     "fp": 572,
+     "fn": 1131
+    },
+    "await": {
+     "tp": 124544,
+     "fp": 421,
+     "fn": 1790
+    },
+    "intersection_type": {
+     "tp": 3222,
+     "fp": 458,
+     "fn": 150
+    },
+    "subscript": {
+     "tp": 66580,
+     "fp": 2017,
+     "fn": 2301
+    },
+    "parenthesized_type": {
+     "tp": 3889,
+     "fp": 1097,
+     "fn": 194
+    },
+    "type_predicate": {
+     "tp": 2660,
+     "fp": 53,
+     "fn": 104
+    },
+    "tuple_type": {
+     "tp": 4258,
+     "fp": 183,
+     "fn": 1148
+    },
+    "instantiation": {
+     "tp": 0,
+     "fp": 450,
+     "fn": 141
+    },
+    "conditional_type": {
+     "tp": 2241,
+     "fp": 54,
+     "fn": 562
+    },
+    "type_operator": {
+     "tp": 14961,
+     "fp": 1184,
+     "fn": 1628
+    },
+    "type_assertion": {
+     "tp": 1800,
+     "fp": 68,
+     "fn": 20
+    },
+    "constructor_type": {
+     "tp": 108,
+     "fp": 11,
+     "fn": 17
+    },
+    "array_type": {
+     "tp": 53152,
+     "fp": 27,
+     "fn": 1476
+    }
+   }
+  }
+ ]
+}
