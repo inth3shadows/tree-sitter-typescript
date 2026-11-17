@@ -23,6 +23,10 @@ fixes ended up here.
   `test/tsc-fixtures/` is parsed with both grammars. A file that tsc accepts and the grammar
   rejects fails CI unless it is already in the baseline. On those corpora, upstream v0.23.2
   fails 259 files; this fork fails 2.
+- **Tree accuracy** ([docs/accuracy.md](docs/accuracy.md)): the same corpora, but node by node.
+  Each expression and type node is compared with the node tsc builds (kind and exact span). From
+  upstream v0.23.2 to this fork's main, wrong nodes fell from 17,404 to 697 and missed nodes from
+  12,978 to 247, out of 6.2 million.
 - **Corpus tests** (`test/corpus/`) pin node shapes, and node tests in `bindings/node/` pin
   field readings for the trickier cases.
 
