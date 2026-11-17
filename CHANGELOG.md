@@ -105,7 +105,8 @@ because editor queries match on node names.
   ternary `?` is never followed by `]`. This was the cause of the last file in the
   differential corpora that tsc accepts and this grammar rejected (effect's
   `typetest/schema/Schema.tst.ts`); no file there changes otherwise. The parse table is
-  unchanged.
+  unchanged. Known limit: a comment between `?` and `]` (`([B? /* c */])`) is still an
+  ERROR, as a comment between `?` and `)` in `(a? /* c */) => 1` already was.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as

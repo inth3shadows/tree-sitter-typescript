@@ -56,9 +56,11 @@ What remains at #107, by category (wrong / missed):
 
 - **member** (112 / 2) and **call** (91 / 0): no single pattern yet. Samples include
   `import('m')` in a type, which this grammar builds as a `call_expression` and tsc as an
-  `ImportType`; the inner part of a qualified name in a type (`z.core` in `z.core.$ZodType`),
-  a `member_expression` here and a `QualifiedName` in tsc; and `new a.b!.C()` (#100).
+  `ImportType`, and the inner part of a qualified name in a type (`z.core` in
+  `z.core.$ZodType`), a `member_expression` here and a `QualifiedName` in tsc.
 - **type_predicate** (40 / 0): not yet examined.
+- **new** (2 / 2) and **non_null** (2 / 2): `!` after `new` wraps the `new_expression`
+  (`new a.b!.C()`, #100). **arrow** (1 / 1): not yet examined.
 
 ## Other forks
 

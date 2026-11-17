@@ -4353,7 +4353,12 @@ type A = ([B?]);
 type C = ({ a: [number?] });
 type D = M<readonly [(readonly [E?])?]>;
 f<([G?])>();
+type H = ([I? ]);
+type J = ([K?
+]);
 x = [a ? b : c];
+x = y[a ? b : c];
+x = a?.[b];
 
 ---
 
@@ -4396,6 +4401,18 @@ x = [a ? b : c];
             (optional_type
               (type_identifier)))))
       (arguments)))
+  (type_alias_declaration
+    (type_identifier)
+    (parenthesized_type
+      (tuple_type
+        (optional_type
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (parenthesized_type
+      (tuple_type
+        (optional_type
+          (type_identifier)))))
   (expression_statement
     (assignment_expression
       (identifier)
@@ -4403,7 +4420,23 @@ x = [a ? b : c];
         (ternary_expression
           (identifier)
           (identifier)
-          (identifier))))))
+          (identifier)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (subscript_expression
+        (identifier)
+        (ternary_expression
+          (identifier)
+          (identifier)
+          (identifier)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (subscript_expression
+        (identifier)
+        (optional_chain)
+        (identifier)))))
 
 ==================================================
 Optional tuple elements inside a parenthesized type (typescript)
@@ -4414,7 +4447,12 @@ type A = ([B?]);
 type C = ({ a: [number?] });
 type D = M<readonly [(readonly [E?])?]>;
 f<([G?])>();
+type H = ([I? ]);
+type J = ([K?
+]);
 x = [a ? b : c];
+x = y[a ? b : c];
+x = a?.[b];
 
 ---
 
@@ -4457,6 +4495,18 @@ x = [a ? b : c];
             (optional_type
               (type_identifier)))))
       (arguments)))
+  (type_alias_declaration
+    (type_identifier)
+    (parenthesized_type
+      (tuple_type
+        (optional_type
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (parenthesized_type
+      (tuple_type
+        (optional_type
+          (type_identifier)))))
   (expression_statement
     (assignment_expression
       (identifier)
@@ -4464,4 +4514,20 @@ x = [a ? b : c];
         (ternary_expression
           (identifier)
           (identifier)
-          (identifier))))))
+          (identifier)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (subscript_expression
+        (identifier)
+        (ternary_expression
+          (identifier)
+          (identifier)
+          (identifier)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (subscript_expression
+        (identifier)
+        (optional_chain)
+        (identifier)))))
