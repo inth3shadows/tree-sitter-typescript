@@ -63,9 +63,11 @@ module.exports = function defineGrammar(dialect) {
       [
         // 'member' ranks above this row, as in JavaScript's ladder. It makes a
         // postfix `!` bind before a type assertion, `<T>x!` is `<T>(x!)` (#98), and
-        // also ranks member_expression, the `?.` call and nested_type_identifier
-        // above instantiation, type assertions and await.
+        // also ranks member_expression and the `?.` call above instantiation,
+        // type assertions and await; 'nested_type' (nested_type_identifier)
+        // ranks just below 'member' and above the rest (#102).
         'member',
+        'nested_type',
         'call',
         'instantiation',
         'unary',
@@ -130,7 +132,6 @@ module.exports = function defineGrammar(dialect) {
       [$.class],
 
       [$.nested_identifier, $.nested_type_identifier, $.primary_expression],
-      [$.nested_identifier, $.nested_type_identifier],
 
       [$._call_signature, $.function_type],
       [$._call_signature, $.constructor_type],
@@ -885,14 +886,12 @@ module.exports = function defineGrammar(dialect) {
         $._semicolon,
       ),
 
-      // After `x as a.b`, a `.` can continue the type name or start a member
-      // access on the finished cast; the two readings are a declared conflict
-      // with equal static precedence. Each nested_identifier counts +1, so the
-      // longest qualified name wins: `x as a.b.C` is a cast to `a.b.C`, as in
-      // tsc, not `(x as a.b).C` (#102).
-      nested_identifier: ($, previous) => prec.dynamic(1, previous),
-
-      nested_type_identifier: $ => prec('member', seq(
+      // 'nested_type' sits just below 'member', which nested_identifier has:
+      // after `x as a.b`, a `.` continues the qualified name instead of ending
+      // the type, so `x as a.b.C` casts to `a.b.C`, as in tsc, not
+      // `(x as a.b).C` (#102). This replaces a declared conflict between the
+      // two, which forked here and let the wrong reading win.
+      nested_type_identifier: $ => prec('nested_type', seq(
         field('module', choice($.identifier, $.nested_identifier)),
         '.',
         field('name', $._type_identifier),

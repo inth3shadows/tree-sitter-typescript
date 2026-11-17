@@ -3791,3 +3791,208 @@ x as a.b.C as d.e.F;
             (identifier)
             (type_identifier))))
       (property_identifier))))
+
+==================================================
+Comparisons with dotted operands that only look like type arguments
+==================================================
+
+a < x.y.z.w && c > (d);
+a < x.y.z.w || c > (d);
+i < a.b.c > -1;
+i < a.b.c >> 1;
+a < b.c.d > [e];
+x < a.b.c | d > -1;
+a < b.c.d > +e;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (member_expression
+              (identifier)
+              (property_identifier))
+            (property_identifier))
+          (property_identifier)))
+      (binary_expression
+        (identifier)
+        (parenthesized_expression
+          (identifier)))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (member_expression
+              (identifier)
+              (property_identifier))
+            (property_identifier))
+          (property_identifier)))
+      (binary_expression
+        (identifier)
+        (parenthesized_expression
+          (identifier)))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (unary_expression
+        (number))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (binary_expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier))
+        (number))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (array
+        (identifier))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (binary_expression
+        (identifier)
+        (unary_expression
+          (number)))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (unary_expression
+        (identifier)))))
+
+==================================================
+Comparisons with dotted operands that only look like type arguments (typescript)
+:language(typescript)
+==================================================
+
+a < x.y.z.w && c > (d);
+a < x.y.z.w || c > (d);
+i < a.b.c > -1;
+i < a.b.c >> 1;
+a < b.c.d > [e];
+x < a.b.c | d > -1;
+a < b.c.d > +e;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (member_expression
+              (identifier)
+              (property_identifier))
+            (property_identifier))
+          (property_identifier)))
+      (binary_expression
+        (identifier)
+        (parenthesized_expression
+          (identifier)))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (member_expression
+              (identifier)
+              (property_identifier))
+            (property_identifier))
+          (property_identifier)))
+      (binary_expression
+        (identifier)
+        (parenthesized_expression
+          (identifier)))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (unary_expression
+        (number))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (binary_expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier))
+        (number))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (array
+        (identifier))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (binary_expression
+        (identifier)
+        (unary_expression
+          (number)))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (unary_expression
+        (identifier)))))

@@ -91,8 +91,11 @@ because editor queries match on node names.
   and when type arguments or a union follow (`x as a.b.C<T>`, `x as a.b.C | D`). Two
   segments (`x as a.B`) and `(x as a.b).C` are unchanged. Of 14,625 files in the
   differential corpora, 46 parse differently (152 sites, all this case); compared with
-  tsc's tree, every one comes closer, and none errors before or after. The parse table
-  size is unchanged. Tree shape only: node types are unchanged.
+  tsc's tree, every one comes closer, and none errors before or after. Comparisons with
+  dotted operands (`i < a.b.c > -1`, `a < x.y.z.w && c > (d)`) stay comparisons. The
+  parse table size is unchanged. Tree shape only: node types are unchanged. Known limit:
+  on input tsc rejects, such as `x as a.b.C.d()`, the qualified name now runs to the
+  last segment and the call wraps the cast.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as

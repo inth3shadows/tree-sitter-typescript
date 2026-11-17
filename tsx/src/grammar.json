@@ -3667,55 +3667,51 @@
       ]
     },
     "nested_identifier": {
-      "type": "PREC_DYNAMIC",
-      "value": 1,
+      "type": "PREC",
+      "value": "member",
       "content": {
-        "type": "PREC",
-        "value": "member",
-        "content": {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "FIELD",
-              "name": "object",
-              "content": {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "identifier"
-                  },
-                  {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "nested_identifier"
-                    },
-                    "named": true,
-                    "value": "member_expression"
-                  }
-                ]
-              }
-            },
-            {
-              "type": "STRING",
-              "value": "."
-            },
-            {
-              "type": "FIELD",
-              "name": "property",
-              "content": {
-                "type": "ALIAS",
-                "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "object",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
                   "type": "SYMBOL",
                   "name": "identifier"
                 },
-                "named": true,
-                "value": "property_identifier"
-              }
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "nested_identifier"
+                  },
+                  "named": true,
+                  "value": "member_expression"
+                }
+              ]
             }
-          ]
-        }
+          },
+          {
+            "type": "STRING",
+            "value": "."
+          },
+          {
+            "type": "FIELD",
+            "name": "property",
+            "content": {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              "named": true,
+              "value": "property_identifier"
+            }
+          }
+        ]
       }
     },
     "jsx_namespace_name": {
@@ -10293,7 +10289,7 @@
     },
     "nested_type_identifier": {
       "type": "PREC",
-      "value": "member",
+      "value": "nested_type",
       "content": {
         "type": "SEQ",
         "members": [
@@ -13567,10 +13563,6 @@
       "primary_expression"
     ],
     [
-      "nested_identifier",
-      "nested_type_identifier"
-    ],
-    [
       "_call_signature",
       "function_type"
     ],
@@ -13907,6 +13899,10 @@
       {
         "type": "STRING",
         "value": "member"
+      },
+      {
+        "type": "STRING",
+        "value": "nested_type"
       },
       {
         "type": "STRING",
