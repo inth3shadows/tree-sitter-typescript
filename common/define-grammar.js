@@ -996,7 +996,7 @@ module.exports = function defineGrammar(dialect) {
       // `import('m')` stays a call_expression; `typeof import('m').c` is a
       // type_query around an import_type.
       import_type: $ => prec.right(seq(
-        alias($.import, 'import'),
+        $.import,
         '(',
         field('source', choice($.string, $.template_literal_type)),
         optional(seq(',', field('attributes', $.object))),

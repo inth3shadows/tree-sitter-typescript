@@ -1418,6 +1418,7 @@ type T = typeof array[number];
     (type_identifier)
     (type_query
       (import_type
+        (import)
         (string
           (string_fragment)))))
   (type_alias_declaration
@@ -3125,6 +3126,7 @@ type Foo = import('node:fs').ReadStream & {
     (type_identifier)
     (intersection_type
       (import_type
+        (import)
         (string
           (string_fragment))
         (type_identifier))
@@ -3150,6 +3152,7 @@ type Keys = keyof import('a').A;
     (type_identifier)
     (array_type
       (import_type
+        (import)
         (string
           (string_fragment))
         (type_identifier))))
@@ -3158,12 +3161,14 @@ type Keys = keyof import('a').A;
     (readonly_type
       (array_type
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_identifier)))))
   (type_alias_declaration
     (type_identifier)
     (import_type
+      (import)
       (string
         (string_fragment))
       (type_identifier)
@@ -3174,6 +3179,7 @@ type Keys = keyof import('a').A;
     (lookup_type
       (lookup_type
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_identifier))
@@ -3185,6 +3191,7 @@ type Keys = keyof import('a').A;
     (type_identifier)
     (index_type_query
       (import_type
+        (import)
         (string
           (string_fragment))
         (type_identifier)))))
@@ -4047,6 +4054,7 @@ let y = (import("m").a);
         (array_type
           (parenthesized_type
             (import_type
+              (import)
               (string
                 (string_fragment))
               (type_identifier)))))))
@@ -4056,6 +4064,7 @@ let y = (import("m").a);
       (parenthesized_type
         (union_type
           (import_type
+            (import)
             (string
               (string_fragment))
             (type_identifier))
@@ -4070,6 +4079,7 @@ let y = (import("m").a);
               (identifier)
               (type_annotation
                 (import_type
+                  (import)
                   (string
                     (string_fragment))
                   (type_identifier)))))
@@ -4110,6 +4120,7 @@ function g(x): asserts x is (import("m").A) {}
         (array_type
           (parenthesized_type
             (import_type
+              (import)
               (string
                 (string_fragment))
               (type_identifier)
@@ -4123,6 +4134,7 @@ function g(x): asserts x is (import("m").A) {}
           (parenthesized_type
             (lookup_type
               (import_type
+                (import)
                 (string
                   (string_fragment))
                 (type_identifier))
@@ -4137,6 +4149,7 @@ function g(x): asserts x is (import("m").A) {}
           (parenthesized_type
             (parenthesized_type
               (import_type
+                (import)
                 (string
                   (string_fragment))
                 (type_identifier))))))))
@@ -4146,6 +4159,7 @@ function g(x): asserts x is (import("m").A) {}
       (type_identifier)
       (parenthesized_type
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_identifier)))
@@ -4161,6 +4175,7 @@ function g(x): asserts x is (import("m").A) {}
           (type_identifier)
           (parenthesized_type
             (import_type
+              (import)
               (string
                 (string_fragment))
               (type_identifier))))
@@ -4172,6 +4187,7 @@ function g(x): asserts x is (import("m").A) {}
       (type_arguments
         (parenthesized_type
           (import_type
+            (import)
             (string
               (string_fragment))
             (type_identifier))))
@@ -4183,6 +4199,7 @@ function g(x): asserts x is (import("m").A) {}
       (type_arguments
         (parenthesized_type
           (import_type
+            (import)
             (string
               (string_fragment))
             (type_identifier))))
@@ -4192,6 +4209,7 @@ function g(x): asserts x is (import("m").A) {}
       (identifier)
       (parenthesized_type
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_identifier)))))
@@ -4206,6 +4224,7 @@ function g(x): asserts x is (import("m").A) {}
           (identifier)
           (parenthesized_type
             (import_type
+              (import)
               (string
                 (string_fragment))
               (type_identifier))))))
@@ -4227,6 +4246,7 @@ f<import("m").A>;
       (identifier)
       (type_arguments
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_identifier)
@@ -4239,6 +4259,7 @@ f<import("m").A>;
       (identifier)
       (type_arguments
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_identifier)))
@@ -4249,6 +4270,7 @@ f<import("m").A>;
       (identifier)
       (type_arguments
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_identifier))))))
@@ -4270,6 +4292,7 @@ let x: (import("m").A)[];
         (array_type
           (parenthesized_type
             (import_type
+              (import)
               (string
                 (string_fragment))
               (type_identifier))))))))
@@ -4484,6 +4507,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (nested_type_identifier
@@ -4496,6 +4520,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (object
@@ -4513,6 +4538,7 @@ interface I extends import('m').A {}
     (lookup_type
       (type_query
         (import_type
+          (import)
           (string
             (string_fragment))))
       (literal_type
@@ -4524,6 +4550,7 @@ interface I extends import('m').A {}
       (type_annotation
         (type_query
           (import_type
+            (import)
             (string
               (string_fragment))
             (type_identifier))))))
@@ -4541,6 +4568,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (template_literal_type
             (string_fragment))
           (type_identifier)))))
@@ -4548,6 +4576,7 @@ interface I extends import('m').A {}
     (type_identifier)
     (type_query
       (import_type
+        (import)
         (string
           (string_fragment))
         (nested_type_identifier
@@ -4560,6 +4589,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (nested_type_identifier
@@ -4570,6 +4600,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_arguments
@@ -4578,6 +4609,7 @@ interface I extends import('m').A {}
     (type_identifier)
     (extends_type_clause
       (import_type
+        (import)
         (string
           (string_fragment))
         (type_identifier)))
@@ -4607,6 +4639,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (nested_type_identifier
@@ -4619,6 +4652,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (object
@@ -4636,6 +4670,7 @@ interface I extends import('m').A {}
     (lookup_type
       (type_query
         (import_type
+          (import)
           (string
             (string_fragment))))
       (literal_type
@@ -4647,6 +4682,7 @@ interface I extends import('m').A {}
       (type_annotation
         (type_query
           (import_type
+            (import)
             (string
               (string_fragment))
             (type_identifier))))))
@@ -4664,6 +4700,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (template_literal_type
             (string_fragment))
           (type_identifier)))))
@@ -4671,6 +4708,7 @@ interface I extends import('m').A {}
     (type_identifier)
     (type_query
       (import_type
+        (import)
         (string
           (string_fragment))
         (nested_type_identifier
@@ -4683,6 +4721,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (nested_type_identifier
@@ -4693,6 +4732,7 @@ interface I extends import('m').A {}
       (identifier)
       (type_annotation
         (import_type
+          (import)
           (string
             (string_fragment))
           (type_arguments
@@ -4701,7 +4741,28 @@ interface I extends import('m').A {}
     (type_identifier)
     (extends_type_clause
       (import_type
+        (import)
         (string
           (string_fragment))
         (type_identifier)))
     (interface_body)))
+
+==================================================
+A comma after import type attributes is an error
+:language(typescript)
+:error
+==================================================
+
+let b: import('m', { with: {} },).A;
+
+---
+
+==================================================
+typeof import without parentheses is an error
+:language(typescript)
+:error
+==================================================
+
+type Q = typeof import<T>;
+
+---

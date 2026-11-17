@@ -584,6 +584,7 @@ g<typeof import('vscode')>();
       (type_arguments
         (type_query
           (import_type
+            (import)
             (string
               (string_fragment)))))
       (arguments
@@ -594,6 +595,7 @@ g<typeof import('vscode')>();
       (type_arguments
         (type_query
           (import_type
+            (import)
             (string
               (string_fragment)))))
       (arguments))))
@@ -1255,6 +1257,7 @@ interface I {
         (property_identifier)
         (type_annotation
           (import_type
+            (import)
             (string
               (string_fragment))
             (type_identifier)

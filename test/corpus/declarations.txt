@@ -1890,6 +1890,7 @@ interface I {
         (property_identifier)
         (type_annotation
           (import_type
+            (import)
             (string
               (string_fragment))
             (type_identifier))))

@@ -3009,6 +3009,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "import",
+          "named": true
+        }
+      ]
     }
   },
   {

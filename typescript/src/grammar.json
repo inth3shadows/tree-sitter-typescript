@@ -10916,13 +10916,8 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "import"
-            },
-            "named": false,
-            "value": "import"
+            "type": "SYMBOL",
+            "name": "import"
           },
           {
             "type": "STRING",
