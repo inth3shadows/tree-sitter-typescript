@@ -4088,3 +4088,144 @@ a < import("m").b > + c;
           (property_identifier)))
       (unary_expression
         (identifier)))))
+
+==================================================
+A non-null assertion after new belongs to the constructor
+==================================================
+
+new A!();
+new a.b!.c();
+new A!.b;
+new a!.b.c!.d(e);
+new A()!;
+(new A!).b = 2;
+new A!.b++;
+
+---
+
+(program
+  (expression_statement
+    (new_expression
+      (non_null_expression
+        (identifier))
+      (arguments)))
+  (expression_statement
+    (new_expression
+      (member_expression
+        (non_null_expression
+          (member_expression
+            (identifier)
+            (property_identifier)))
+        (property_identifier))
+      (arguments)))
+  (expression_statement
+    (new_expression
+      (member_expression
+        (non_null_expression
+          (identifier))
+        (property_identifier))))
+  (expression_statement
+    (new_expression
+      (member_expression
+        (non_null_expression
+          (member_expression
+            (member_expression
+              (non_null_expression
+                (identifier))
+              (property_identifier))
+            (property_identifier)))
+        (property_identifier))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (non_null_expression
+      (new_expression
+        (identifier)
+        (arguments))))
+  (expression_statement
+    (assignment_expression
+      (member_expression
+        (parenthesized_expression
+          (new_expression
+            (non_null_expression
+              (identifier))))
+        (property_identifier))
+      (number)))
+  (expression_statement
+    (update_expression
+      (new_expression
+        (member_expression
+          (non_null_expression
+            (identifier))
+          (property_identifier))))))
+
+==================================================
+A non-null assertion after new belongs to the constructor (typescript)
+:language(typescript)
+==================================================
+
+new A!();
+new a.b!.c();
+new A!.b;
+new a!.b.c!.d(e);
+new A()!;
+(new A!).b = 2;
+new A!.b++;
+
+---
+
+(program
+  (expression_statement
+    (new_expression
+      (non_null_expression
+        (identifier))
+      (arguments)))
+  (expression_statement
+    (new_expression
+      (member_expression
+        (non_null_expression
+          (member_expression
+            (identifier)
+            (property_identifier)))
+        (property_identifier))
+      (arguments)))
+  (expression_statement
+    (new_expression
+      (member_expression
+        (non_null_expression
+          (identifier))
+        (property_identifier))))
+  (expression_statement
+    (new_expression
+      (member_expression
+        (non_null_expression
+          (member_expression
+            (member_expression
+              (non_null_expression
+                (identifier))
+              (property_identifier))
+            (property_identifier)))
+        (property_identifier))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (non_null_expression
+      (new_expression
+        (identifier)
+        (arguments))))
+  (expression_statement
+    (assignment_expression
+      (member_expression
+        (parenthesized_expression
+          (new_expression
+            (non_null_expression
+              (identifier))))
+        (property_identifier))
+      (number)))
+  (expression_statement
+    (update_expression
+      (new_expression
+        (member_expression
+          (non_null_expression
+            (identifier))
+          (property_identifier))))))

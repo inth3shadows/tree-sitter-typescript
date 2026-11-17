@@ -522,7 +522,7 @@ module.exports = function defineGrammar(dialect) {
       // tsc parses a postfix `!` with member access, so it binds to the operand
       // before it: `a + b!` is `a + (b!)` and `!x!` is `!(x!)` (#98).
       non_null_expression: $ => prec.left('member', seq(
-        $.expression, '!',
+        choice($.expression, $.primary_expression), '!',
       )),
 
       lexical_declaration: $ => seq(

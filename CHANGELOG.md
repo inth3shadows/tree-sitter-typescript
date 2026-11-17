@@ -81,9 +81,8 @@ because editor queries match on node names.
   come closer and none moves away, and none errors before or after. In 52,867 unique
   real files on one machine, 2,242 `non_null_expression`s wrapped a binary
   expression. The parse table size is unchanged. Tree shape only: node types are
-  unchanged. Known limits: after `new`, `!` still wraps the `new_expression`
-  (`new A!()`, `new a.b!.c()`; #100), and `a as T!` wraps the cast where tsc reads a
-  JSDoc-style `T!` type.
+  unchanged. Known limit: `a as T!` wraps the cast where tsc reads a JSDoc-style `T!`
+  type. (`!` after `new` is fixed below, #100.)
 - A cast to a qualified type name with three or more segments keeps the whole name, as
   in tsc (#102): `x as a.b.C` is an `as_expression` whose type is the
   `nested_type_identifier` `a.b.C`; it was a `member_expression` reading `.C` off
@@ -107,6 +106,21 @@ because editor queries match on node names.
   `typetest/schema/Schema.tst.ts`); no file there changes otherwise. The parse table is
   unchanged. Known limit: a comment between `?` and `]` (`([B? /* c */])`) is still an
   ERROR, as a comment between `?` and `)` in `(a? /* c */) => 1` already was.
+- A non-null assertion after `new` belongs to the constructor, as in tsc (#100):
+  `new A!()` is a `new_expression` whose constructor is `A!`, and `new a.b!.c()` one whose
+  constructor is the member expression `a.b!.c`; both wrapped the finished
+  `new_expression` in the `!` (`(new a.b)!.c()`). `new A()!` still asserts the result.
+  `non_null_expression` takes a primary expression as its operand, as
+  `member_expression` does, so `!` binds before `new` closes. `queries/tags.scm` also tags
+  `Foo` in `new Foo!()` as a class reference. Of 14,625 files in the differential
+  corpora, 2 parse differently (2 sites, both `new x.y!.Z(...)`); none errors before or
+  after. The parse table size is unchanged. Tree shape only: node types are unchanged.
+  Known limits: a few forms with no match in the corpora parsed on `main` only because
+  the `!` closed the `new` early, and are now an ERROR like their forms without `!`:
+  `new new A!` (as `new new A` already was, #113), `new A! < b` (`<` is read as type
+  arguments, as in `new A < b`), and `new A!.b = 1`, `new A!.b += 1` and
+  `for (new A!.b in c)` (as `new A.b = 1` already was; tsc rejects these only in the
+  type check).
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
