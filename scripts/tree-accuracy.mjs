@@ -141,6 +141,8 @@ function tsNodes(tree) {
     // the inner part of a qualified name (`a.b` in `a.b.c.D`, `import x = a.b.c`) is the
     // JavaScript grammar's nested_identifier aliased to member_expression; tsc has a QualifiedName
     if (n.type === 'member_expression' && n.parent && n.parent.type === 'nested_identifier') cat = undefined;
+    // `asserts x is T` is one TypePredicate in tsc; here `asserts` (counted above) wraps a type_predicate
+    if (n.type === 'type_predicate' && n.parent && n.parent.type === 'asserts') cat = undefined;
     if (cat) out.add(`${cat}:${n.startIndex}:${n.endIndex}`);
     for (let i = 0; i < n.namedChildCount; i++) visit(n.namedChild(i));
   };
