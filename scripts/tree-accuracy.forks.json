@@ -1,5 +1,5 @@
 {
- "measuredAt": "2026-11-17T17:09Z (finished)",
+ "measuredAt": "2026-11-17 (re-measured with the import_type category)",
  "tsc": "5.9.3",
  "corpora": [
   "effect@7a87ff9b88b1",
@@ -16,21 +16,21 @@
    "files": 14533,
    "filesWithErrors": 0,
    "total": {
-    "tp": 6218912,
-    "fp": 227,
+    "tp": 6219001,
+    "fp": 49,
     "fn": 7
    },
-   "precision": 0.9999634997706274,
-   "recall": 0.9999988744024484,
+   "precision": 0.9999921209831083,
+   "recall": 0.9999988744185568,
    "categories": {
     "call": {
      "tp": 1891594,
-     "fp": 91,
+     "fp": 2,
      "fn": 0
     },
     "member": {
      "tp": 2634505,
-     "fp": 91,
+     "fp": 2,
      "fn": 2
     },
     "yield": {
@@ -152,11 +152,16 @@
      "tp": 54628,
      "fp": 0,
      "fn": 0
+    },
+    "import_type": {
+     "tp": 89,
+     "fp": 0,
+     "fn": 0
     }
    },
    "repo": "inth3shadows/tree-sitter-typescript",
    "branch": "main",
-   "sha": "8cfaea259748f58154b154e07a0fab6e096f7c19",
+   "sha": "a0bcea7c277f8edbd4bfbc5bd77a2fffa7571852",
    "date": "2026-11-17"
   },
   {
@@ -166,10 +171,10 @@
    "total": {
     "tp": 6213186,
     "fp": 6432,
-    "fn": 5733
+    "fn": 5822
    },
    "precision": 0.998965852886785,
-   "recall": 0.9990781356052394,
+   "recall": 0.9990638378339439,
    "categories": {
     "call": {
      "tp": 1889917,
@@ -300,6 +305,11 @@
      "tp": 54628,
      "fp": 0,
      "fn": 0
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "dokimasia/tree-sitter-typescript",
@@ -314,10 +324,10 @@
    "total": {
     "tp": 6211637,
     "fp": 8254,
-    "fn": 7282
+    "fn": 7371
    },
    "precision": 0.9986729670986195,
-   "recall": 0.9988290569470353,
+   "recall": 0.9988147627402956,
    "categories": {
     "call": {
      "tp": 1890039,
@@ -448,6 +458,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "marionebl/tree-sitter-typescript",
@@ -462,10 +477,10 @@
    "total": {
     "tp": 6210989,
     "fp": 8905,
-    "fn": 7930
+    "fn": 8019
    },
    "precision": 0.9985683035755915,
-   "recall": 0.9987248587736872,
+   "recall": 0.9987105660581237,
    "categories": {
     "call": {
      "tp": 1889913,
@@ -596,6 +611,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "lzehrung/tree-sitter-typescript",
@@ -610,10 +630,10 @@
    "total": {
     "tp": 6210232,
     "fp": 9586,
-    "fn": 8687
+    "fn": 8776
    },
    "precision": 0.9984587973474465,
-   "recall": 0.9986031334384642,
+   "recall": 0.9985888424649075,
    "categories": {
     "call": {
      "tp": 1889809,
@@ -744,6 +764,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "dive2Pro/tree-sitter-typescript",
@@ -758,10 +783,10 @@
    "total": {
     "tp": 6208630,
     "fp": 13796,
-    "fn": 10289
+    "fn": 10378
    },
    "precision": 0.9977828583256756,
-   "recall": 0.998345532398798,
+   "recall": 0.9983312451117606,
    "categories": {
     "call": {
      "tp": 1890777,
@@ -892,6 +917,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "TobiasBak/tree-sitter-typescript",
@@ -906,10 +936,10 @@
    "total": {
     "tp": 6207022,
     "fp": 17147,
-    "fn": 11897
+    "fn": 11986
    },
    "precision": 0.9972450940840456,
-   "recall": 0.9980869665612303,
+   "recall": 0.9980726829745195,
    "categories": {
     "call": {
      "tp": 1889820,
@@ -1040,6 +1070,11 @@
      "tp": 54627,
      "fp": 0,
      "fn": 1
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "vincentkoc/tree-sitter-typescript",
@@ -1054,10 +1089,10 @@
    "total": {
     "tp": 6206207,
     "fp": 16665,
-    "fn": 12712
+    "fn": 12801
    },
    "precision": 0.9973219760907825,
-   "recall": 0.997955914846294,
+   "recall": 0.9979416331350595,
    "categories": {
     "call": {
      "tp": 1889616,
@@ -1188,6 +1223,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "vmikhailov/tree-sitter-typescript",
@@ -1202,10 +1242,10 @@
    "total": {
     "tp": 6206197,
     "fp": 16902,
-    "fn": 12722
+    "fn": 12811
    },
    "precision": 0.9972839898577863,
-   "recall": 0.9979543068497917,
+   "recall": 0.9979400251615692,
    "categories": {
     "call": {
      "tp": 1889609,
@@ -1336,6 +1376,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "bavovna/tree-sitter-typescript",
@@ -1350,10 +1395,10 @@
    "total": {
     "tp": 6205937,
     "fp": 17384,
-    "fn": 12982
+    "fn": 13071
    },
    "precision": 0.9972066361352725,
-   "recall": 0.9979124989407323,
+   "recall": 0.9978982178508212,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1484,6 +1529,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "tree-sitter/tree-sitter-typescript",
@@ -1498,10 +1548,10 @@
    "total": {
     "tp": 6205937,
     "fp": 17384,
-    "fn": 12982
+    "fn": 13071
    },
    "precision": 0.9972066361352725,
-   "recall": 0.9979124989407323,
+   "recall": 0.9978982178508212,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1632,6 +1682,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "QuiltLang/tree-sitter-typescript",
@@ -1646,10 +1701,10 @@
    "total": {
     "tp": 6205937,
     "fp": 17384,
-    "fn": 12982
+    "fn": 13071
    },
    "precision": 0.9972066361352725,
-   "recall": 0.9979124989407323,
+   "recall": 0.9978982178508212,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1780,6 +1835,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "HerringtonDarkholme/tree-sitter-typescript",
@@ -1794,10 +1854,10 @@
    "total": {
     "tp": 6205937,
     "fp": 17384,
-    "fn": 12982
+    "fn": 13071
    },
    "precision": 0.9972066361352725,
-   "recall": 0.9979124989407323,
+   "recall": 0.9978982178508212,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1928,6 +1988,11 @@
      "tp": 54620,
      "fp": 0,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "NzSN/tree-sitter-typescript",
@@ -1942,10 +2007,10 @@
    "total": {
     "tp": 6203106,
     "fp": 14607,
-    "fn": 15813
+    "fn": 15902
    },
    "precision": 0.9976507439310884,
-   "recall": 0.9974572751309352,
+   "recall": 0.9974430005557157,
    "categories": {
     "call": {
      "tp": 1889325,
@@ -2076,6 +2141,11 @@
      "tp": 54620,
      "fp": 1,
      "fn": 8
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "etchpad/tree-sitter-typescript",
@@ -2090,10 +2160,10 @@
    "total": {
     "tp": 6205884,
     "fp": 17430,
-    "fn": 13035
+    "fn": 13124
    },
    "precision": 0.9971992414331013,
-   "recall": 0.9979039765592702,
+   "recall": 0.9978896955913226,
    "categories": {
     "call": {
      "tp": 1889434,
@@ -2224,6 +2294,11 @@
      "tp": 54628,
      "fp": 4,
      "fn": 0
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "BrokkAi/tree-sitter-typescript",
@@ -2238,10 +2313,10 @@
    "total": {
     "tp": 6204448,
     "fp": 18479,
-    "fn": 14471
+    "fn": 14560
    },
    "precision": 0.9970304970635201,
-   "recall": 0.9976730682615419,
+   "recall": 0.9976587905981147,
    "categories": {
     "call": {
      "tp": 1889128,
@@ -2372,6 +2447,11 @@
      "tp": 54628,
      "fp": 0,
      "fn": 0
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "SegaraRai/tree-sitter-typescript",
@@ -2386,10 +2466,10 @@
    "total": {
     "tp": 6076829,
     "fp": 76651,
-    "fn": 142090
+    "fn": 142179
    },
    "precision": 0.9875434713365445,
-   "recall": 0.9771519776990181,
+   "recall": 0.9771379937121805,
    "categories": {
     "call": {
      "tp": 1860704,
@@ -2520,6 +2600,11 @@
      "tp": 53152,
      "fp": 27,
      "fn": 1476
+    },
+    "import_type": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 89
     }
    },
    "repo": "plewg/tree-sitter-typescript",

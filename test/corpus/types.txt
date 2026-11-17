@@ -1417,11 +1417,10 @@ type T = typeof array[number];
   (type_alias_declaration
     (type_identifier)
     (type_query
-      (call_expression
+      (import_type
         (import)
-        (arguments
-          (string
-            (string_fragment))))))
+        (string
+          (string_fragment)))))
   (type_alias_declaration
     (type_identifier)
     (index_type_query
@@ -3126,13 +3125,11 @@ type Foo = import('node:fs').ReadStream & {
   (type_alias_declaration
     (type_identifier)
     (intersection_type
-      (member_expression
-        (call_expression
-          (import)
-          (arguments
-            (string
-              (string_fragment))))
-        (property_identifier))
+      (import_type
+        (import)
+        (string
+          (string_fragment))
+        (type_identifier))
       (object_type
         (method_signature
           (property_identifier)
@@ -3154,47 +3151,38 @@ type Keys = keyof import('a').A;
   (type_alias_declaration
     (type_identifier)
     (array_type
-      (member_expression
-        (call_expression
-          (import)
-          (arguments
-            (string
-              (string_fragment))))
-        (property_identifier))))
+      (import_type
+        (import)
+        (string
+          (string_fragment))
+        (type_identifier))))
   (type_alias_declaration
     (type_identifier)
     (readonly_type
       (array_type
-        (member_expression
-          (call_expression
-            (import)
-            (arguments
-              (string
-                (string_fragment))))
-          (property_identifier)))))
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_identifier)))))
   (type_alias_declaration
     (type_identifier)
-    (generic_type
-      (member_expression
-        (call_expression
-          (import)
-          (arguments
-            (string
-              (string_fragment))))
-        (property_identifier))
+    (import_type
+      (import)
+      (string
+        (string_fragment))
+      (type_identifier)
       (type_arguments
         (predefined_type))))
   (type_alias_declaration
     (type_identifier)
     (lookup_type
       (lookup_type
-        (member_expression
-          (call_expression
-            (import)
-            (arguments
-              (string
-                (string_fragment))))
-          (property_identifier))
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_identifier))
         (literal_type
           (string
             (string_fragment))))
@@ -3202,13 +3190,11 @@ type Keys = keyof import('a').A;
   (type_alias_declaration
     (type_identifier)
     (index_type_query
-      (member_expression
-        (call_expression
-          (import)
-          (arguments
-            (string
-              (string_fragment))))
-        (property_identifier)))))
+      (import_type
+        (import)
+        (string
+          (string_fragment))
+        (type_identifier)))))
 
 =========================
 Import assert
@@ -4067,25 +4053,21 @@ let y = (import("m").a);
       (type_annotation
         (array_type
           (parenthesized_type
-            (member_expression
-              (call_expression
-                (import)
-                (arguments
-                  (string
-                    (string_fragment))))
-              (property_identifier)))))))
+            (import_type
+              (import)
+              (string
+                (string_fragment))
+              (type_identifier)))))))
   (type_alias_declaration
     (type_identifier)
     (array_type
       (parenthesized_type
         (union_type
-          (member_expression
-            (call_expression
-              (import)
-              (arguments
-                (string
-                  (string_fragment))))
-            (property_identifier))
+          (import_type
+            (import)
+            (string
+              (string_fragment))
+            (type_identifier))
           (type_identifier)))))
   (lexical_declaration
     (variable_declarator
@@ -4096,13 +4078,11 @@ let y = (import("m").a);
             (required_parameter
               (identifier)
               (type_annotation
-                (member_expression
-                  (call_expression
-                    (import)
-                    (arguments
-                      (string
-                        (string_fragment))))
-                  (property_identifier)))))
+                (import_type
+                  (import)
+                  (string
+                    (string_fragment))
+                  (type_identifier)))))
           (predefined_type)))))
   (lexical_declaration
     (variable_declarator
@@ -4139,14 +4119,11 @@ function g(x): asserts x is (import("m").A) {}
       (type_annotation
         (array_type
           (parenthesized_type
-            (generic_type
-              (member_expression
-                (call_expression
-                  (import)
-                  (arguments
-                    (string
-                      (string_fragment))))
-                (property_identifier))
+            (import_type
+              (import)
+              (string
+                (string_fragment))
+              (type_identifier)
               (type_arguments
                 (type_identifier))))))))
   (lexical_declaration
@@ -4156,13 +4133,11 @@ function g(x): asserts x is (import("m").A) {}
         (array_type
           (parenthesized_type
             (lookup_type
-              (member_expression
-                (call_expression
-                  (import)
-                  (arguments
-                    (string
-                      (string_fragment))))
-                (property_identifier))
+              (import_type
+                (import)
+                (string
+                  (string_fragment))
+                (type_identifier))
               (literal_type
                 (string
                   (string_fragment)))))))))
@@ -4173,25 +4148,21 @@ function g(x): asserts x is (import("m").A) {}
         (array_type
           (parenthesized_type
             (parenthesized_type
-              (member_expression
-                (call_expression
-                  (import)
-                  (arguments
-                    (string
-                      (string_fragment))))
-                (property_identifier))))))))
+              (import_type
+                (import)
+                (string
+                  (string_fragment))
+                (type_identifier))))))))
   (type_alias_declaration
     (type_identifier)
     (conditional_type
       (type_identifier)
       (parenthesized_type
-        (member_expression
-          (call_expression
-            (import)
-            (arguments
-              (string
-                (string_fragment))))
-          (property_identifier)))
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_identifier)))
       (literal_type
         (number))
       (literal_type
@@ -4203,13 +4174,11 @@ function g(x): asserts x is (import("m").A) {}
         (mapped_type_clause
           (type_identifier)
           (parenthesized_type
-            (member_expression
-              (call_expression
-                (import)
-                (arguments
-                  (string
-                    (string_fragment))))
-              (property_identifier))))
+            (import_type
+              (import)
+              (string
+                (string_fragment))
+              (type_identifier))))
         (type_annotation
           (type_identifier)))))
   (expression_statement
@@ -4217,13 +4186,11 @@ function g(x): asserts x is (import("m").A) {}
       (identifier)
       (type_arguments
         (parenthesized_type
-          (member_expression
-            (call_expression
-              (import)
-              (arguments
-                (string
-                  (string_fragment))))
-            (property_identifier))))
+          (import_type
+            (import)
+            (string
+              (string_fragment))
+            (type_identifier))))
       (arguments
         (identifier))))
   (expression_statement
@@ -4231,25 +4198,21 @@ function g(x): asserts x is (import("m").A) {}
       (identifier)
       (type_arguments
         (parenthesized_type
-          (member_expression
-            (call_expression
-              (import)
-              (arguments
-                (string
-                  (string_fragment))))
-            (property_identifier))))
+          (import_type
+            (import)
+            (string
+              (string_fragment))
+            (type_identifier))))
       (arguments)))
   (expression_statement
     (satisfies_expression
       (identifier)
       (parenthesized_type
-        (member_expression
-          (call_expression
-            (import)
-            (arguments
-              (string
-                (string_fragment))))
-          (property_identifier)))))
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_identifier)))))
   (function_declaration
     (identifier)
     (formal_parameters
@@ -4260,13 +4223,11 @@ function g(x): asserts x is (import("m").A) {}
         (type_predicate
           (identifier)
           (parenthesized_type
-            (member_expression
-              (call_expression
-                (import)
-                (arguments
-                  (string
-                    (string_fragment))))
-              (property_identifier))))))
+            (import_type
+              (import)
+              (string
+                (string_fragment))
+              (type_identifier))))))
     (statement_block)))
 
 ==================================
@@ -4284,14 +4245,11 @@ f<import("m").A>;
     (call_expression
       (identifier)
       (type_arguments
-        (generic_type
-          (member_expression
-            (call_expression
-              (import)
-              (arguments
-                (string
-                  (string_fragment))))
-            (property_identifier))
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_identifier)
           (type_arguments
             (type_identifier))))
       (arguments
@@ -4300,26 +4258,22 @@ f<import("m").A>;
     (call_expression
       (identifier)
       (type_arguments
-        (member_expression
-          (call_expression
-            (import)
-            (arguments
-              (string
-                (string_fragment))))
-          (property_identifier)))
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_identifier)))
       (arguments
         (identifier))))
   (expression_statement
     (instantiation_expression
       (identifier)
       (type_arguments
-        (member_expression
-          (call_expression
-            (import)
-            (arguments
-              (string
-                (string_fragment))))
-          (property_identifier))))))
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_identifier))))))
 
 ==================================
 Parenthesized import types (tsx)
@@ -4337,13 +4291,11 @@ let x: (import("m").A)[];
       (type_annotation
         (array_type
           (parenthesized_type
-            (member_expression
-              (call_expression
-                (import)
-                (arguments
-                  (string
-                    (string_fragment))))
-              (property_identifier))))))))
+            (import_type
+              (import)
+              (string
+                (string_fragment))
+              (type_identifier))))))))
 
 ==================================================
 Optional tuple elements inside a parenthesized type
@@ -4531,3 +4483,286 @@ x = a?.[b];
         (identifier)
         (optional_chain)
         (identifier)))))
+
+==================================================
+Import types
+==================================================
+
+let a: import('m').A.B<T>;
+let b: import('m', { with: { 'resolution-mode': 'import' } }).C;
+type E = typeof import('m')['x'];
+let f: typeof import('m').default;
+const g = await import('m');
+let b: import(`m`).A;
+type F = typeof import('m').a.b<T>;
+let x: import('m').default.X;
+let y: import('m')<T>;
+interface I extends import('m').A {}
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))
+          (type_arguments
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (object
+            (pair
+              (property_identifier)
+              (object
+                (pair
+                  (string
+                    (string_fragment))
+                  (string
+                    (string_fragment))))))
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (lookup_type
+      (type_query
+        (import_type
+          (import)
+          (string
+            (string_fragment))))
+      (literal_type
+        (string
+          (string_fragment)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (type_query
+          (import_type
+            (import)
+            (string
+              (string_fragment))
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (await_expression
+        (call_expression
+          (import)
+          (arguments
+            (string
+              (string_fragment)))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (template_literal_type
+            (string_fragment))
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (type_query
+      (import_type
+        (import)
+        (string
+          (string_fragment))
+        (nested_type_identifier
+          (identifier)
+          (type_identifier))
+        (type_arguments
+          (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_arguments
+            (type_identifier))))))
+  (interface_declaration
+    (type_identifier)
+    (extends_type_clause
+      (import_type
+        (import)
+        (string
+          (string_fragment))
+        (type_identifier)))
+    (interface_body)))
+
+==================================================
+Import types (typescript)
+:language(typescript)
+==================================================
+
+let a: import('m').A.B<T>;
+let b: import('m', { with: { 'resolution-mode': 'import' } }).C;
+type E = typeof import('m')['x'];
+let f: typeof import('m').default;
+const g = await import('m');
+let b: import(`m`).A;
+type F = typeof import('m').a.b<T>;
+let x: import('m').default.X;
+let y: import('m')<T>;
+interface I extends import('m').A {}
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))
+          (type_arguments
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (object
+            (pair
+              (property_identifier)
+              (object
+                (pair
+                  (string
+                    (string_fragment))
+                  (string
+                    (string_fragment))))))
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (lookup_type
+      (type_query
+        (import_type
+          (import)
+          (string
+            (string_fragment))))
+      (literal_type
+        (string
+          (string_fragment)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (type_query
+          (import_type
+            (import)
+            (string
+              (string_fragment))
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (await_expression
+        (call_expression
+          (import)
+          (arguments
+            (string
+              (string_fragment)))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (template_literal_type
+            (string_fragment))
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (type_query
+      (import_type
+        (import)
+        (string
+          (string_fragment))
+        (nested_type_identifier
+          (identifier)
+          (type_identifier))
+        (type_arguments
+          (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (import)
+          (string
+            (string_fragment))
+          (type_arguments
+            (type_identifier))))))
+  (interface_declaration
+    (type_identifier)
+    (extends_type_clause
+      (import_type
+        (import)
+        (string
+          (string_fragment))
+        (type_identifier)))
+    (interface_body)))
+
+==================================================
+A comma after import type attributes is an error
+:language(typescript)
+:error
+==================================================
+
+let b: import('m', { with: {} },).A;
+
+---
+
+==================================================
+typeof import without parentheses is an error
+:language(typescript)
+:error
+==================================================
+
+type Q = typeof import<T>;
+
+---

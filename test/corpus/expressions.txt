@@ -583,11 +583,10 @@ g<typeof import('vscode')>();
       (identifier)
       (type_arguments
         (type_query
-          (call_expression
+          (import_type
             (import)
-            (arguments
-              (string
-                (string_fragment))))))
+            (string
+              (string_fragment)))))
       (arguments
         (identifier))))
   (expression_statement
@@ -595,11 +594,10 @@ g<typeof import('vscode')>();
       (identifier)
       (type_arguments
         (type_query
-          (call_expression
+          (import_type
             (import)
-            (arguments
-              (string
-                (string_fragment))))))
+            (string
+              (string_fragment)))))
       (arguments))))
 
 ==================================
@@ -1258,14 +1256,11 @@ interface I {
       (property_signature
         (property_identifier)
         (type_annotation
-          (generic_type
-            (member_expression
-              (call_expression
-                (import)
-                (arguments
-                  (string
-                    (string_fragment))))
-              (property_identifier))
+          (import_type
+            (import)
+            (string
+              (string_fragment))
+            (type_identifier)
             (type_arguments
               (type_identifier)))))
       (property_signature
@@ -4043,6 +4038,53 @@ a < b.c.d.e > -e;
               (identifier)
               (property_identifier))
             (property_identifier))
+          (property_identifier)))
+      (unary_expression
+        (identifier)))))
+
+==================================================
+An import call in a comparison that looks like type arguments
+==================================================
+
+a < import("m").b > + c;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
+          (property_identifier)))
+      (unary_expression
+        (identifier)))))
+
+==================================================
+An import call in a comparison that looks like type arguments (typescript)
+:language(typescript)
+==================================================
+
+a < import("m").b > + c;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (call_expression
+            (import)
+            (arguments
+              (string
+                (string_fragment))))
           (property_identifier)))
       (unary_expression
         (identifier)))))

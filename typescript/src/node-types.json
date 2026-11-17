@@ -276,10 +276,6 @@
         "named": true
       },
       {
-        "type": "call_expression",
-        "named": true
-      },
-      {
         "type": "conditional_type",
         "named": true
       },
@@ -300,6 +296,10 @@
         "named": true
       },
       {
+        "type": "import_type",
+        "named": true
+      },
+      {
         "type": "index_type_query",
         "named": true
       },
@@ -313,10 +313,6 @@
       },
       {
         "type": "lookup_type",
-        "named": true
-      },
-      {
-        "type": "member_expression",
         "named": true
       },
       {
@@ -2100,6 +2096,10 @@
             "named": true
           },
           {
+            "type": "import_type",
+            "named": true
+          },
+          {
             "type": "nested_type_identifier",
             "named": true
           },
@@ -2724,10 +2724,6 @@
         "required": true,
         "types": [
           {
-            "type": "member_expression",
-            "named": true
-          },
-          {
             "type": "nested_type_identifier",
             "named": true
           },
@@ -2958,6 +2954,70 @@
     }
   },
   {
+    "type": "import_type",
+    "named": true,
+    "fields": {
+      "attributes": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "object",
+            "named": true
+          }
+        ]
+      },
+      "qualifier": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "nested_type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          }
+        ]
+      },
+      "source": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "template_literal_type",
+            "named": true
+          }
+        ]
+      },
+      "type_arguments": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_arguments",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "import",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "index_signature",
     "named": true,
     "fields": {
@@ -3081,10 +3141,6 @@
         "types": [
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "import",
             "named": true
           },
           {
@@ -5190,11 +5246,11 @@
       "required": true,
       "types": [
         {
-          "type": "call_expression",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "import_type",
           "named": true
         },
         {
@@ -5908,11 +5964,11 @@
   },
   {
     "type": "number",
-    "named": true
+    "named": false
   },
   {
     "type": "number",
-    "named": false
+    "named": true
   },
   {
     "type": "object",

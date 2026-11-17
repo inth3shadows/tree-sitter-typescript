@@ -111,6 +111,25 @@ because editor queries match on node names.
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
   `function_type.return_type` already may.
+- New node `import_type` for an import used as a type, as tsc's ImportType: an `import`
+  child and the fields `source` (`string` or `template_literal_type`), `attributes`
+  (`object`, optional), `qualifier` (`type_identifier` or `nested_type_identifier`,
+  optional) and `type_arguments` (optional). `let x: import('m').A.B<T>` was a `generic_type` named by a
+  `member_expression` of a `call_expression` on `import`; `type T = import('m')` was a
+  `call_expression`; `typeof import('m').c` was a `type_query` of a `member_expression`
+  of that call and is now a `type_query` of an `import_type`. A runtime `import('m')`
+  is unchanged, still a `call_expression` on `import`. Query migration: in a type,
+  `(call_expression function: (import))` becomes `(import_type)`, and a
+  `member_expression` on it becomes its `qualifier`. In 52,883 unique real files on one
+  machine, 10,372 `import()` calls sat in a type (95% of them in `.d.ts` files), against
+  1,030 runtime dynamic imports. An interface may now extend an import type
+  (`interface I extends import('m').A {}`), as tsc's parser accepts; it was an ERROR. The
+  parse table shrinks by 159 states (tsx 227). Known limits: an import type whose
+  specifier is not a string or template literal (`import(x).A`), or whose qualifier is a
+  private name (`import('m').#x`), is an ERROR; tsc's checker rejects both. An empty
+  attributes object, `import('m', {})`, parses, though tsc requires `with` or `assert`. As for any
+  type name, a line break before `<` after an import type still continues the type
+  (`x as import('m')⏎< y`).
 
 ## 0.24.0
 

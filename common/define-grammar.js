@@ -103,7 +103,6 @@ module.exports = function defineGrammar(dialect) {
       [$.type_query, $._type_query_subscript_expression],
       [$.nested_type_identifier, $.generic_type, $.primary_type, $.lookup_type, $.index_type_query, $.type],
       [$.as_expression, $.satisfies_expression, $.primary_type],
-      [$._type_query_call_expression, $.primary_expression],
       [$.override_modifier, $.primary_expression],
       [$.decorator_call_expression, $.decorator],
       [$.literal_type, $.pattern],
@@ -170,16 +169,12 @@ module.exports = function defineGrammar(dialect) {
 
       [$.template_literal_type, $.template_string],
 
-      // `f<typeof import('m')>()` is a call with a type argument, and `a < typeof import('m')` is a
-      // comparison, so the parser keeps both until one of them fails.
-      [$.call_expression, $._type_query_call_expression],
-
-      // An import type and an expression read the same tokens wherever a type and
-      // a pattern can both start, e.g. after `(` in a type, which may open a
-      // parenthesized type or a function type's parameters:
-      // `(import("m").A)[]` vs `(p) => R`.
-      [$.member_expression, $._type_query_member_expression_in_type_annotation],
-      [$.call_expression, $._type_query_call_expression_in_type_annotation],
+      // `import('m'` starts a runtime call or an import type wherever an
+      // expression and a type can both start: after `(` in a type, which may
+      // open a parenthesized type or a function type's parameters
+      // (`(import("m").A)[]` vs `(p) => R`), and in `f<typeof import('m')>()`
+      // vs `a < typeof import('m')`. The parser keeps both until one fails.
+      [$.primary_expression, $.import_type],
 
       // `using` followed by a name declares, but `using` is also an identifier:
       // `using as = f()` vs `using as T` (#57, #69).
@@ -911,6 +906,7 @@ module.exports = function defineGrammar(dialect) {
           $._type_identifier,
           $.nested_type_identifier,
           $.generic_type,
+          $.import_type,
         ))),
       ),
 
@@ -995,33 +991,19 @@ module.exports = function defineGrammar(dialect) {
         $.type,
       ),
 
-      // Oh boy
-      // These special type queries are used in type annotations, whereas the other ones are used
-      // where `typeof` is required beforehand. They are not ordered against member_expression and
-      // call_expression by precedence: that is a GLR conflict (see `conflicts`), because a static
-      // precedence drops `(import('x').y)[]` (#56). This allows for parsing of annotations such as
-      // foo: import('x').y.z;
-      // but was a nightmare to get working.
-      _type_query_member_expression_in_type_annotation: $ => seq(
-        field('object', choice(
-          $.import,
-          alias($._type_query_member_expression_in_type_annotation, $.member_expression),
-          alias($._type_query_call_expression_in_type_annotation, $.call_expression),
-        )),
-        '.',
-        field('property', choice(
-          $.private_property_identifier,
-          alias($.identifier, $.property_identifier),
-          alias('abstract', $.property_identifier),
-        )),
-      ),
-      _type_query_call_expression_in_type_annotation: $ => seq(
-        field('function', choice(
-          $.import,
-          alias($._type_query_member_expression_in_type_annotation, $.member_expression),
-        )),
-        field('arguments', $.arguments),
-      ),
+      // An import type, as tsc's ImportType: `import('m')`, `import('m').A.B<T>`,
+      // `import('m', { with: { 'resolution-mode': 'import' } }).A`. A runtime
+      // `import('m')` stays a call_expression; `typeof import('m').c` is a
+      // type_query around an import_type.
+      import_type: $ => prec.right(seq(
+        $.import,
+        '(',
+        field('source', choice($.string, $.template_literal_type)),
+        optional(seq(',', field('attributes', $.object))),
+        ')',
+        optional(seq('.', field('qualifier', choice($._type_identifier, $.nested_type_identifier)))),
+        optional(field('type_arguments', $.type_arguments)),
+      )),
 
       asserts: $ => seq(
         alias($._asserts_keyword, 'asserts'),
@@ -1094,8 +1076,7 @@ module.exports = function defineGrammar(dialect) {
         $.intersection_type,
         $.union_type,
         'const',
-        prec(-1, alias($._type_query_member_expression_in_type_annotation, $.member_expression)),
-        prec(-1, alias($._type_query_call_expression_in_type_annotation, $.call_expression)),
+        $.import_type,
       ),
 
       // A tagged template may contain escapes that are invalid elsewhere (ES2018), e.g.
@@ -1156,7 +1137,6 @@ module.exports = function defineGrammar(dialect) {
         field('name', choice(
           $._type_identifier,
           $.nested_type_identifier,
-          alias($._type_query_member_expression_in_type_annotation, $.member_expression),
         )),
         field('type_arguments', $.type_arguments),
       )),
@@ -1193,7 +1173,6 @@ module.exports = function defineGrammar(dialect) {
           $._type_query_identifier,
           $.this,
           alias($._type_query_member_expression, $.member_expression),
-          alias($._type_query_call_expression, $.call_expression),
         )),
         '.',
         field('property', choice(
@@ -1208,19 +1187,11 @@ module.exports = function defineGrammar(dialect) {
           $.this,
           alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
-          alias($._type_query_call_expression, $.call_expression),
         )),
         '[', field('index', choice($.predefined_type, $.string, $.number)), ']',
       ),
-      _type_query_call_expression: $ => seq(
-        // Only import calls belong in a type query. Other calls must keep
-        // their runtime-expression branch, e.g. f < typeof abstract(x) > (x).
-        field('function', $.import),
-        field('arguments', $.arguments),
-      ),
       _type_query_instantiation_expression: $ => seq(
         field('function', choice(
-          $.import,
           $._type_query_identifier,
           alias($._type_query_member_expression, $.member_expression),
         )),
@@ -1231,7 +1202,7 @@ module.exports = function defineGrammar(dialect) {
         choice(
           alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
-          alias($._type_query_call_expression, $.call_expression),
+          $.import_type,
           alias($._type_query_instantiation_expression, $.instantiation_expression),
           $._type_query_identifier,
           $.this,
