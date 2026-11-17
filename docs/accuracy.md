@@ -43,7 +43,7 @@ MISSING node.
 | #94 `await x as T` | 79cc301 | 99.963 | 99.970 | 2,332 | 1,882 | 1 |
 | #96 `as` / `satisfies` precedence | 84574d1 | 99.964 | 99.971 | 2,232 | 1,782 | 1 |
 | #99 `a + b!` | 713d1ba | 99.989 | 99.996 | 697 | 247 | 1 |
-| #102 `x as a.b.C` | 57c8417 | 99.994 | 99.999 | 351 | 89 | 1 |
+| #102 `x as a.b.C` | 3d86d76 | 99.994 | 99.999 | 351 | 89 | 1 |
 
 Every merged fix either improved both numbers or left them unchanged. #86 and #89 fixed `asserts`
 forms that these corpora do not use. From upstream v0.23.2 to #102, wrong nodes fell by 98%
