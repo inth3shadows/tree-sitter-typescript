@@ -21,3 +21,6 @@
 
 (new_expression
   constructor: (identifier) @name) @reference.class
+
+(new_expression
+  constructor: (non_null_expression (identifier) @name)) @reference.class

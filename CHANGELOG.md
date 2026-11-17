@@ -111,8 +111,16 @@ because editor queries match on node names.
   constructor is the member expression `a.b!.c`; both wrapped the finished
   `new_expression` in the `!` (`(new a.b)!.c()`). `new A()!` still asserts the result.
   `non_null_expression` takes a primary expression as its operand, as
-  `member_expression` does, so `!` binds before `new` closes. The parse table size is
-  unchanged. Tree shape only: node types are unchanged.
+  `member_expression` does, so `!` binds before `new` closes. A `new_expression` may
+  again be another `new`'s constructor, as in JavaScript: `new new A!` and
+  `new new A()()` are a `new_expression` around a `new_expression`, as in tsc; the second
+  was a `new_expression` around a `call_expression`. `queries/tags.scm` also tags `Foo` in
+  `new Foo!()` as a class reference. Of 14,625 files in the differential corpora, 2 parse
+  differently (2 sites, both `new x.y!.Z(...)`); none errors before or after. The parse
+  table grows by 4 states (tsx 4). Tree shape only: node types are unchanged. Known
+  limits: as `new A < b` already did, `new A! < b` reads `<` as type arguments; and as
+  `new A.b = 1` already was, `new A!.b = 1` (an assignment tsc rejects only in the type
+  check) is an ERROR.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
