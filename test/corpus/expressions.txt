@@ -3636,3 +3636,158 @@ Type assertions before member, call and subscript chains
         (identifier)
         (optional_chain)
         (property_identifier)))))
+
+==================================================
+Casts to a qualified name with three or more segments
+==================================================
+
+x as a.b.C;
+x satisfies a.b.c.D;
+x as a.b.C | D;
+(x as a.b.C).d;
+x as a.b.C as d.e.F;
+(x as a.b).C;
+
+---
+
+(program
+  (expression_statement
+    (as_expression
+      (identifier)
+      (nested_type_identifier
+        (nested_identifier
+          (identifier)
+          (property_identifier))
+        (type_identifier))))
+  (expression_statement
+    (satisfies_expression
+      (identifier)
+      (nested_type_identifier
+        (nested_identifier
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier))
+        (type_identifier))))
+  (expression_statement
+    (as_expression
+      (identifier)
+      (union_type
+        (nested_type_identifier
+          (nested_identifier
+            (identifier)
+            (property_identifier))
+          (type_identifier))
+        (type_identifier))))
+  (expression_statement
+    (member_expression
+      (parenthesized_expression
+        (as_expression
+          (identifier)
+          (nested_type_identifier
+            (nested_identifier
+              (identifier)
+              (property_identifier))
+            (type_identifier))))
+      (property_identifier)))
+  (expression_statement
+    (as_expression
+      (as_expression
+        (identifier)
+        (nested_type_identifier
+          (nested_identifier
+            (identifier)
+            (property_identifier))
+          (type_identifier)))
+      (nested_type_identifier
+        (nested_identifier
+          (identifier)
+          (property_identifier))
+        (type_identifier))))
+  (expression_statement
+    (member_expression
+      (parenthesized_expression
+        (as_expression
+          (identifier)
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))))
+      (property_identifier))))
+
+==================================================
+Casts to a qualified name with three or more segments (typescript)
+:language(typescript)
+==================================================
+
+x as a.b.C;
+x satisfies a.b.c.D;
+x as a.b.C | D;
+(x as a.b.C).d;
+x as a.b.C as d.e.F;
+(x as a.b).C;
+
+---
+
+(program
+  (expression_statement
+    (as_expression
+      (identifier)
+      (nested_type_identifier
+        (nested_identifier
+          (identifier)
+          (property_identifier))
+        (type_identifier))))
+  (expression_statement
+    (satisfies_expression
+      (identifier)
+      (nested_type_identifier
+        (nested_identifier
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier))
+        (type_identifier))))
+  (expression_statement
+    (as_expression
+      (identifier)
+      (union_type
+        (nested_type_identifier
+          (nested_identifier
+            (identifier)
+            (property_identifier))
+          (type_identifier))
+        (type_identifier))))
+  (expression_statement
+    (member_expression
+      (parenthesized_expression
+        (as_expression
+          (identifier)
+          (nested_type_identifier
+            (nested_identifier
+              (identifier)
+              (property_identifier))
+            (type_identifier))))
+      (property_identifier)))
+  (expression_statement
+    (as_expression
+      (as_expression
+        (identifier)
+        (nested_type_identifier
+          (nested_identifier
+            (identifier)
+            (property_identifier))
+          (type_identifier)))
+      (nested_type_identifier
+        (nested_identifier
+          (identifier)
+          (property_identifier))
+        (type_identifier))))
+  (expression_statement
+    (member_expression
+      (parenthesized_expression
+        (as_expression
+          (identifier)
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))))
+      (property_identifier))))

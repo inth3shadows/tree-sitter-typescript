@@ -885,6 +885,13 @@ module.exports = function defineGrammar(dialect) {
         $._semicolon,
       ),
 
+      // After `x as a.b`, a `.` can continue the type name or start a member
+      // access on the finished cast; the two readings are a declared conflict
+      // with equal static precedence. Each nested_identifier counts +1, so the
+      // longest qualified name wins: `x as a.b.C` is a cast to `a.b.C`, as in
+      // tsc, not `(x as a.b).C` (#102).
+      nested_identifier: ($, previous) => prec.dynamic(1, previous),
+
       nested_type_identifier: $ => prec('member', seq(
         field('module', choice($.identifier, $.nested_identifier)),
         '.',
