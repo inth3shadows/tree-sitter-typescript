@@ -43,19 +43,21 @@ MISSING node.
 | #94 `await x as T` | 79cc301 | 99.963 | 99.970 | 2,332 | 1,882 | 1 |
 | #96 `as` / `satisfies` precedence | 84574d1 | 99.964 | 99.971 | 2,232 | 1,782 | 1 |
 | #99 `a + b!` | 713d1ba | 99.989 | 99.996 | 697 | 247 | 1 |
+| #102 `x as a.b.C` | 3d86d76 | 99.994 | 99.999 | 351 | 89 | 1 |
 
 Every merged fix either improved both numbers or left them unchanged. #86 and #89 fixed `asserts`
-forms that these corpora do not use. From upstream v0.23.2 to #99, wrong nodes fell by 96%
-(17,404 to 697) and missed nodes by 98% (12,978 to 247). The raw numbers, per category, are in
+forms that these corpora do not use. From upstream v0.23.2 to #102, wrong nodes fell by 98%
+(17,404 to 351) and missed nodes by 99% (12,978 to 89). The raw numbers, per category, are in
 `scripts/tree-accuracy.history.json`.
 
-What remains at #99, by category (wrong / missed):
+What remains at #102, by category (wrong / missed):
 
-- **cast** (152 / 152) and most of **member** (300 / 2): `x as a.b.C` reads as `(x as a.b).C`
-  (#102). Every sampled member mismatch was this pattern.
 - **call** (155 / 69): every sampled case is in the one file with an ERROR, effect's
   `typetest/schema/Schema.tst.ts`.
-- **type_predicate** (40 / 0) and **instantiation** (36 / 0): not yet examined.
+- **member** (148 / 2): no single pattern yet. Samples include the inner part of a qualified
+  name in a type (`z.core` in `z.core.$ZodType`, `Schema.Annotations`), which this grammar
+  builds as a `member_expression` and tsc as a `QualifiedName`, and members of `import()` types.
+- **type_predicate** (40 / 0): not yet examined.
 
 ## Other forks
 

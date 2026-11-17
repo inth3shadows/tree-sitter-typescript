@@ -10281,7 +10281,7 @@
     },
     "nested_type_identifier": {
       "type": "PREC",
-      "value": "member",
+      "value": "nested_type",
       "content": {
         "type": "SEQ",
         "members": [
@@ -13555,10 +13555,6 @@
       "primary_expression"
     ],
     [
-      "nested_identifier",
-      "nested_type_identifier"
-    ],
-    [
       "_call_signature",
       "function_type"
     ],
@@ -13891,6 +13887,10 @@
       {
         "type": "STRING",
         "value": "member"
+      },
+      {
+        "type": "STRING",
+        "value": "nested_type"
       },
       {
         "type": "STRING",

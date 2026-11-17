@@ -84,6 +84,21 @@ because editor queries match on node names.
   unchanged. Known limits: after `new`, `!` still wraps the `new_expression`
   (`new A!()`, `new a.b!.c()`; #100), and `a as T!` wraps the cast where tsc reads a
   JSDoc-style `T!` type.
+- A cast to a qualified type name with three or more segments keeps the whole name, as
+  in tsc (#102): `x as a.b.C` is an `as_expression` whose type is the
+  `nested_type_identifier` `a.b.C`; it was a `member_expression` reading `.C` off
+  `x as a.b`. The same holds for `satisfies`, for longer names (`x satisfies a.b.c.D`),
+  and when type arguments or a union follow (`x as a.b.C<T>`, `x as a.b.C | D`). Two
+  segments (`x as a.B`) and `(x as a.b).C` are unchanged. Of 14,625 files in the
+  differential corpora, 46 parse differently (152 sites, all this case); compared with
+  tsc's tree, every one comes closer, and none errors before or after. Comparisons with
+  dotted operands (`i < a.b.c > -1`, `a < x.y.z.w && c > (d)`) stay comparisons. The
+  parse table size is unchanged. Tree shape only: node types are unchanged. Known
+  limits: where a cast to a short name already fails, a longer one now fails the same
+  way, since it no longer ends early: `[a as a.b.C] = x` gets a missing `!`, as
+  `[a as B] = x` does (#106), and ``x as a.b.C`t` ``, which tsc rejects, is an ERROR,
+  as ``x as B`t` `` is. On other input tsc rejects, such as `x as a.b.C.d()`, the
+  qualified name runs to the last segment and the call wraps the cast.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
