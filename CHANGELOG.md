@@ -122,7 +122,13 @@ because editor queries match on node names.
   `(call_expression function: (import))` becomes `(import_type)`, and a
   `member_expression` on it becomes its `qualifier`. In 52,883 unique real files on one
   machine, 10,372 `import()` calls sat in a type (95% of them in `.d.ts` files), against
-  1,030 runtime dynamic imports. The parse table shrinks by 85 states (tsx 159).
+  1,030 runtime dynamic imports. An interface may now extend an import type
+  (`interface I extends import('m').A {}`), as tsc's parser accepts; it was an ERROR. The
+  parse table shrinks by 159 states (tsx 227). Known limits: an import type whose
+  specifier is not a string or template literal (`import(x).A`), or whose qualifier is a
+  private name (`import('m').#x`), is an ERROR; tsc's checker rejects both. As for any
+  type name, a line break before `<` after an import type still continues the type
+  (`x as import('m')⏎< y`).
 
 ## 0.24.0
 

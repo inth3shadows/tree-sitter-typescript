@@ -4470,6 +4470,11 @@ let b: import('m', { with: { 'resolution-mode': 'import' } }).C;
 type E = typeof import('m')['x'];
 let f: typeof import('m').default;
 const g = await import('m');
+let b: import(`m`).A;
+type F = typeof import('m').a.b<T>;
+let x: import('m').default.X;
+let y: import('m')<T>;
+interface I extends import('m').A {}
 
 ---
 
@@ -4530,7 +4535,53 @@ const g = await import('m');
           (import)
           (arguments
             (string
-              (string_fragment))))))))
+              (string_fragment)))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (template_literal_type
+            (string_fragment))
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (type_query
+      (import_type
+        (string
+          (string_fragment))
+        (nested_type_identifier
+          (identifier)
+          (type_identifier))
+        (type_arguments
+          (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (string
+            (string_fragment))
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (string
+            (string_fragment))
+          (type_arguments
+            (type_identifier))))))
+  (interface_declaration
+    (type_identifier)
+    (extends_type_clause
+      (import_type
+        (string
+          (string_fragment))
+        (type_identifier)))
+    (interface_body)))
 
 ==================================================
 Import types (typescript)
@@ -4542,6 +4593,11 @@ let b: import('m', { with: { 'resolution-mode': 'import' } }).C;
 type E = typeof import('m')['x'];
 let f: typeof import('m').default;
 const g = await import('m');
+let b: import(`m`).A;
+type F = typeof import('m').a.b<T>;
+let x: import('m').default.X;
+let y: import('m')<T>;
+interface I extends import('m').A {}
 
 ---
 
@@ -4602,4 +4658,50 @@ const g = await import('m');
           (import)
           (arguments
             (string
-              (string_fragment))))))))
+              (string_fragment)))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (template_literal_type
+            (string_fragment))
+          (type_identifier)))))
+  (type_alias_declaration
+    (type_identifier)
+    (type_query
+      (import_type
+        (string
+          (string_fragment))
+        (nested_type_identifier
+          (identifier)
+          (type_identifier))
+        (type_arguments
+          (type_identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (string
+            (string_fragment))
+          (nested_type_identifier
+            (identifier)
+            (type_identifier))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (import_type
+          (string
+            (string_fragment))
+          (type_arguments
+            (type_identifier))))))
+  (interface_declaration
+    (type_identifier)
+    (extends_type_clause
+      (import_type
+        (string
+          (string_fragment))
+        (type_identifier)))
+    (interface_body)))

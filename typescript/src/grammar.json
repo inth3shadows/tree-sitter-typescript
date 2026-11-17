@@ -10402,6 +10402,10 @@
                   {
                     "type": "SYMBOL",
                     "name": "generic_type"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "import_type"
                   }
                 ]
               }
@@ -10432,6 +10436,10 @@
                         {
                           "type": "SYMBOL",
                           "name": "generic_type"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "import_type"
                         }
                       ]
                     }
@@ -10924,8 +10932,17 @@
             "type": "FIELD",
             "name": "source",
             "content": {
-              "type": "SYMBOL",
-              "name": "string"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "string"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "template_literal_type"
+                }
+              ]
             }
           },
           {
@@ -10945,18 +10962,6 @@
                       "type": "SYMBOL",
                       "name": "object"
                     }
-                  },
-                  {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "STRING",
-                        "value": ","
-                      },
-                      {
-                        "type": "BLANK"
-                      }
-                    ]
                   }
                 ]
               },
@@ -11976,10 +11981,6 @@
                 },
                 "named": true,
                 "value": "member_expression"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "import_type"
               }
             ]
           }
@@ -12024,10 +12025,6 @@
           "content": {
             "type": "CHOICE",
             "members": [
-              {
-                "type": "SYMBOL",
-                "name": "import"
-              },
               {
                 "type": "SYMBOL",
                 "name": "_type_query_identifier"
@@ -13469,10 +13466,6 @@
       "binary_expression"
     ],
     [
-      "primary_expression",
-      "import_type"
-    ],
-    [
       "call_expression",
       "instantiation_expression",
       "binary_expression",
@@ -13625,6 +13618,10 @@
     [
       "template_literal_type",
       "template_string"
+    ],
+    [
+      "primary_expression",
+      "import_type"
     ],
     [
       "primary_expression",

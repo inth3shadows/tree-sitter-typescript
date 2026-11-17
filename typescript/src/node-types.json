@@ -2096,6 +2096,10 @@
             "named": true
           },
           {
+            "type": "import_type",
+            "named": true
+          },
+          {
             "type": "nested_type_identifier",
             "named": true
           },
@@ -2799,7 +2803,7 @@
   },
   {
     "type": "import",
-    "named": false,
+    "named": true,
     "fields": {}
   },
   {
@@ -2984,6 +2988,10 @@
           {
             "type": "string",
             "named": true
+          },
+          {
+            "type": "template_literal_type",
+            "named": true
           }
         ]
       },
@@ -3123,10 +3131,6 @@
         "types": [
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "import",
             "named": true
           },
           {
@@ -4719,10 +4723,6 @@
         "types": [
           {
             "type": "expression",
-            "named": true
-          },
-          {
-            "type": "import_type",
             "named": true
           }
         ]

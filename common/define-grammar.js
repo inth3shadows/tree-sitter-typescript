@@ -120,10 +120,6 @@ module.exports = function defineGrammar(dialect) {
       // vs `<in out T>`; the token after `out` decides.
       [$.variance],
       [$.call_expression, $.instantiation_expression, $.binary_expression],
-      // `import('m'` starts a runtime call or an import type wherever an
-      // expression and a type can both start, e.g. after `(` in a type:
-      // `(import('m').A)[]`; the parser keeps both until one fails.
-      [$.primary_expression, $.import_type],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.unary_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.update_expression],
       [$.call_expression, $.instantiation_expression, $.binary_expression, $.await_expression],
@@ -173,13 +169,12 @@ module.exports = function defineGrammar(dialect) {
 
       [$.template_literal_type, $.template_string],
 
-      // `f<typeof import('m')>()` is a call with a type argument, and `a < typeof import('m')` is a
-      // comparison, so the parser keeps both until one of them fails.
-
-      // An import type and an expression read the same tokens wherever a type and
-      // a pattern can both start, e.g. after `(` in a type, which may open a
-      // parenthesized type or a function type's parameters:
-      // `(import("m").A)[]` vs `(p) => R`.
+      // `import('m'` starts a runtime call or an import type wherever an
+      // expression and a type can both start: after `(` in a type, which may
+      // open a parenthesized type or a function type's parameters
+      // (`(import("m").A)[]` vs `(p) => R`), and in `f<typeof import('m')>()`
+      // vs `a < typeof import('m')`. The parser keeps both until one fails.
+      [$.primary_expression, $.import_type],
 
       // `using` followed by a name declares, but `using` is also an identifier:
       // `using as = f()` vs `using as T` (#57, #69).
@@ -911,6 +906,7 @@ module.exports = function defineGrammar(dialect) {
           $._type_identifier,
           $.nested_type_identifier,
           $.generic_type,
+          $.import_type,
         ))),
       ),
 
@@ -1002,8 +998,8 @@ module.exports = function defineGrammar(dialect) {
       import_type: $ => prec.right(seq(
         alias($.import, 'import'),
         '(',
-        field('source', $.string),
-        optional(seq(',', field('attributes', $.object), optional(','))),
+        field('source', choice($.string, $.template_literal_type)),
+        optional(seq(',', field('attributes', $.object))),
         ')',
         optional(seq('.', field('qualifier', choice($._type_identifier, $.nested_type_identifier)))),
         optional(field('type_arguments', $.type_arguments)),
@@ -1191,13 +1187,11 @@ module.exports = function defineGrammar(dialect) {
           $.this,
           alias($._type_query_subscript_expression, $.subscript_expression),
           alias($._type_query_member_expression, $.member_expression),
-          $.import_type,
         )),
         '[', field('index', choice($.predefined_type, $.string, $.number)), ']',
       ),
       _type_query_instantiation_expression: $ => seq(
         field('function', choice(
-          $.import,
           $._type_query_identifier,
           alias($._type_query_member_expression, $.member_expression),
         )),
