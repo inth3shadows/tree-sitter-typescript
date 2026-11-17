@@ -66,6 +66,7 @@ const TSC = new Map([
   [K.TypeOperator, 'type_operator'],
   [K.TypePredicate, 'type_predicate'],
   [K.ParenthesizedType, 'parenthesized_type'],
+  [K.ImportType, 'import_type'],
 ]);
 // tsc subtrees left out: type queries (`typeof a.b` is a QualifiedName there), JSX.
 const TSC_SKIP = new Set([K.TypeQuery, K.JsxElement, K.JsxSelfClosingElement, K.JsxFragment]);
@@ -93,6 +94,7 @@ const TSN = new Map(Object.entries({
   conditional_type: 'conditional_type',
   array_type: 'array_type', tuple_type: 'tuple_type',
   readonly_type: 'type_operator', index_type_query: 'type_operator',
+  import_type: 'import_type',
   type_predicate: 'type_predicate', asserts: 'type_predicate',
   parenthesized_type: 'parenthesized_type',
 }));
@@ -105,6 +107,8 @@ function tscNodes(text, isTsx) {
   const out = new Set();
   const visit = (n) => {
     if (TSC_SKIP.has(n.kind)) return;
+    // `typeof import('m')` is an ImportType in tsc and a type_query (left out) here
+    if (n.kind === K.ImportType && n.isTypeOf) return;
     // interface `extends` and class `implements` lists are types on our side
     if (n.kind === K.HeritageClause && (n.token === K.ImplementsKeyword || (n.parent && n.parent.kind === K.InterfaceDeclaration))) return;
     let cat = TSC.get(n.kind);

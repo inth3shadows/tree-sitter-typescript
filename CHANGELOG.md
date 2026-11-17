@@ -111,6 +111,18 @@ because editor queries match on node names.
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
   `function_type.return_type` already may.
+- New node `import_type` for an import used as a type, as tsc's ImportType, with
+  fields `source` (`string`), `attributes` (`object`, optional), `qualifier`
+  (`type_identifier` or `nested_type_identifier`, optional) and `type_arguments`
+  (optional). `let x: import('m').A.B<T>` was a `generic_type` named by a
+  `member_expression` of a `call_expression` on `import`; `type T = import('m')` was a
+  `call_expression`; `typeof import('m').c` was a `type_query` of a `member_expression`
+  of that call and is now a `type_query` of an `import_type`. A runtime `import('m')`
+  is unchanged, still a `call_expression` on `import`. Query migration: in a type,
+  `(call_expression function: (import))` becomes `(import_type)`, and a
+  `member_expression` on it becomes its `qualifier`. In 52,883 unique real files on one
+  machine, 10,372 `import()` calls sat in a type (95% of them in `.d.ts` files), against
+  1,030 runtime dynamic imports. The parse table shrinks by 85 states (tsx 159).
 
 ## 0.24.0
 

@@ -1889,13 +1889,10 @@ interface I {
       (property_signature
         (property_identifier)
         (type_annotation
-          (member_expression
-            (call_expression
-              (import)
-              (arguments
-                (string
-                  (string_fragment))))
-            (property_identifier))))
+          (import_type
+            (string
+              (string_fragment))
+            (type_identifier))))
       (call_signature
         (type_parameters
           (type_parameter
