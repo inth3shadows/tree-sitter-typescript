@@ -673,7 +673,10 @@ static bool scan_ternary_qmark(TSLexer *lexer) {
             advance(lexer);
         }
 
-        if (lexer->lookahead == ':' || lexer->lookahead == ')' || lexer->lookahead == ',') {
+        /* A ternary `?` is never followed by `]`; there it ends an optional
+           tuple element, as in `([B?])` (#62). */
+        if (lexer->lookahead == ':' || lexer->lookahead == ')' || lexer->lookahead == ',' ||
+            lexer->lookahead == ']') {
             return false;
         }
 

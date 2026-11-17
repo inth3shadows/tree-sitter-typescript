@@ -99,6 +99,13 @@ because editor queries match on node names.
   `[a as B] = x` does (#106), and ``x as a.b.C`t` ``, which tsc rejects, is an ERROR,
   as ``x as B`t` `` is. On other input tsc rejects, such as `x as a.b.C.d()`, the
   qualified name runs to the last segment and the call wraps the cast.
+- An optional tuple element before `]` parses inside a parenthesized type, as in tsc
+  (#107): `([B?])`, `({ a: [number?] })` and `M<readonly [(readonly [E?])?]>` were an
+  ERROR, because the scanner read `?]` as the start of a ternary. It no longer does: a
+  ternary `?` is never followed by `]`. This was the cause of the last file in the
+  differential corpora that tsc accepts and this grammar rejected (effect's
+  `typetest/schema/Schema.tst.ts`); no file there changes otherwise. The parse table is
+  unchanged.
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as
