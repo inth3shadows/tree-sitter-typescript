@@ -3803,6 +3803,8 @@ i < a.b.c >> 1;
 a < b.c.d > [e];
 x < a.b.c | d > -1;
 a < b.c.d > +e;
+a < b.c.d >> e;
+a < b.c.d.e > -e;
 
 ---
 
@@ -3889,6 +3891,29 @@ a < b.c.d > +e;
         (member_expression
           (member_expression
             (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (unary_expression
+        (identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (binary_expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier))
+        (identifier))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (member_expression
+              (identifier)
+              (property_identifier))
             (property_identifier))
           (property_identifier)))
       (unary_expression
@@ -3906,6 +3931,8 @@ i < a.b.c >> 1;
 a < b.c.d > [e];
 x < a.b.c | d > -1;
 a < b.c.d > +e;
+a < b.c.d >> e;
+a < b.c.d.e > -e;
 
 ---
 
@@ -3992,6 +4019,29 @@ a < b.c.d > +e;
         (member_expression
           (member_expression
             (identifier)
+            (property_identifier))
+          (property_identifier)))
+      (unary_expression
+        (identifier))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (binary_expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier))
+        (identifier))))
+  (expression_statement
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (member_expression
+          (member_expression
+            (member_expression
+              (identifier)
+              (property_identifier))
             (property_identifier))
           (property_identifier)))
       (unary_expression
