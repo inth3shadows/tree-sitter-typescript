@@ -47,7 +47,7 @@ MISSING node.
 | #99 `a + b!` | 713d1ba | 99.989 | 99.995 | 676 | 336 | 1 |
 | #102 `x as a.b.C` | 3d86d76 | 99.995 | 99.997 | 330 | 178 | 1 |
 | #107 `([B?])` | 43fed12 | 99.996 | 99.998 | 227 | 96 | 0 |
-| #110 `import('m').A` type | 69e93e3 | 99.999 | 100.000 | 49 | 7 | 0 |
+| #110 `import('m').A` type | a0a2347 | 99.999 | 100.000 | 49 | 7 | 0 |
 
 Every merged fix either improved both numbers or left them unchanged. #86 and #89 fixed `asserts`
 forms that these corpora do not use. From upstream v0.23.2 to #110, wrong nodes fell from 17,384
@@ -71,11 +71,11 @@ and tsc as above. The table includes upstream `master` and every fork on GitHub 
 differs from upstream: 15 of the 192 forks fetched that day. The others are upstream as it was at
 some past commit. Each row is the branch tip with its committed `typescript/src` and `tsx/src`
 compiled to wasm (tree-sitter-cli 0.25.10). Rows are sorted by wrong + missed. This fork's row is
-the #110 build (69e93e3).
+the #110 build (a0a2347).
 
 | Fork | Branch | Commit | Committed | Precision % | Recall % | Wrong | Missed | Error files |
 |---|---|---|---|---|---|---|---|---|
-| **this fork, main** | `main` | 69e93e3 | 2026-11-17 | 99.999 | 100.000 | 49 | 7 | 0 |
+| **this fork, main** | `main` | a0a2347 | 2026-11-17 | 99.999 | 100.000 | 49 | 7 | 0 |
 | dokimasia | `master` | 839d520 | 2026-10-21 | 99.897 | 99.906 | 6,432 | 5,822 | 127 |
 | marionebl | `master` | 53071c9 | 2026-03-27 | 99.867 | 99.881 | 8,254 | 7,371 | 17 |
 | lzehrung | `codegraph-main` | f0a42fe | 2026-11-11 | 99.857 | 99.871 | 8,905 | 8,019 | 141 |
