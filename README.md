@@ -25,8 +25,8 @@ fixes ended up here.
   fails 259 files; this fork fails none.
 - **Tree accuracy** ([docs/accuracy.md](docs/accuracy.md)): the same corpora, but node by node.
   Each expression and type node is compared with the node tsc builds (kind and exact span). From
-  upstream v0.23.2 to this fork's main, wrong nodes fell from 17,404 to 351 and missed nodes from
-  12,978 to 89, out of 6.2 million. Measured on 2026-11-17 against upstream `master` and the 15
+  upstream v0.23.2 to this fork's main, wrong nodes fell from 17,404 to 248 and missed nodes from
+  12,978 to 7, out of 6.2 million. Measured on 2026-11-17 against upstream `master` and the 15
   other forks that change the grammar, this fork had the fewest wrong and missed nodes (697 and
   247 then, before #102). The next best had 6,452 and 5,733.
 - **Corpus tests** (`test/corpus/`) pin node shapes, and node tests in `bindings/node/` pin
