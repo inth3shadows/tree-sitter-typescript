@@ -4098,10 +4098,8 @@ new a.b!.c();
 new A!.b;
 new a!.b.c!.d(e);
 new A()!;
-x = new new A!;
-new new A!();
-new new A()();
 (new A!).b = 2;
+new A!.b++;
 
 ---
 
@@ -4146,32 +4144,20 @@ new new A()();
         (arguments))))
   (expression_statement
     (assignment_expression
-      (identifier)
-      (new_expression
-        (new_expression
-          (non_null_expression
-            (identifier))))))
-  (expression_statement
-    (new_expression
-      (new_expression
-        (non_null_expression
-          (identifier))
-        (arguments))))
-  (expression_statement
-    (new_expression
-      (new_expression
-        (identifier)
-        (arguments))
-      (arguments)))
-  (expression_statement
-    (assignment_expression
       (member_expression
         (parenthesized_expression
           (new_expression
             (non_null_expression
               (identifier))))
         (property_identifier))
-      (number))))
+      (number)))
+  (expression_statement
+    (update_expression
+      (new_expression
+        (member_expression
+          (non_null_expression
+            (identifier))
+          (property_identifier))))))
 
 ==================================================
 A non-null assertion after new belongs to the constructor (typescript)
@@ -4183,10 +4169,8 @@ new a.b!.c();
 new A!.b;
 new a!.b.c!.d(e);
 new A()!;
-x = new new A!;
-new new A!();
-new new A()();
 (new A!).b = 2;
+new A!.b++;
 
 ---
 
@@ -4231,29 +4215,17 @@ new new A()();
         (arguments))))
   (expression_statement
     (assignment_expression
-      (identifier)
-      (new_expression
-        (new_expression
-          (non_null_expression
-            (identifier))))))
-  (expression_statement
-    (new_expression
-      (new_expression
-        (non_null_expression
-          (identifier))
-        (arguments))))
-  (expression_statement
-    (new_expression
-      (new_expression
-        (identifier)
-        (arguments))
-      (arguments)))
-  (expression_statement
-    (assignment_expression
       (member_expression
         (parenthesized_expression
           (new_expression
             (non_null_expression
               (identifier))))
         (property_identifier))
-      (number))))
+      (number)))
+  (expression_statement
+    (update_expression
+      (new_expression
+        (member_expression
+          (non_null_expression
+            (identifier))
+          (property_identifier))))))

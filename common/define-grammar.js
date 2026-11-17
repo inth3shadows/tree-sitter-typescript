@@ -291,7 +291,7 @@ module.exports = function defineGrammar(dialect) {
       new_expression: $ => prec.right('new', seq(
         'new',
         optional($._no_asi_marker),
-        field('constructor', choice($.primary_expression, $.new_expression)),
+        field('constructor', $.primary_expression),
         field('type_arguments', optional($.type_arguments)),
         field('arguments', optional($.arguments)),
       )),

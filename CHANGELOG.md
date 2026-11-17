@@ -111,16 +111,16 @@ because editor queries match on node names.
   constructor is the member expression `a.b!.c`; both wrapped the finished
   `new_expression` in the `!` (`(new a.b)!.c()`). `new A()!` still asserts the result.
   `non_null_expression` takes a primary expression as its operand, as
-  `member_expression` does, so `!` binds before `new` closes. A `new_expression` may
-  again be another `new`'s constructor, as in JavaScript: `new new A!` and
-  `new new A()()` are a `new_expression` around a `new_expression`, as in tsc; the second
-  was a `new_expression` around a `call_expression`. `queries/tags.scm` also tags `Foo` in
-  `new Foo!()` as a class reference. Of 14,625 files in the differential corpora, 2 parse
-  differently (2 sites, both `new x.y!.Z(...)`); none errors before or after. The parse
-  table grows by 4 states (tsx 4). Tree shape only: node types are unchanged. Known
-  limits: as `new A < b` already did, `new A! < b` reads `<` as type arguments; and as
-  `new A.b = 1` already was, `new A!.b = 1` (an assignment tsc rejects only in the type
-  check) is an ERROR.
+  `member_expression` does, so `!` binds before `new` closes. `queries/tags.scm` also tags
+  `Foo` in `new Foo!()` as a class reference. Of 14,625 files in the differential
+  corpora, 2 parse differently (2 sites, both `new x.y!.Z(...)`); none errors before or
+  after. The parse table size is unchanged. Tree shape only: node types are unchanged.
+  Known limits: a few forms with no match in the corpora parsed on `main` only because
+  the `!` closed the `new` early, and are now an ERROR like their forms without `!`:
+  `new new A!` (as `new new A` already was, #113), `new A! < b` (`<` is read as type
+  arguments, as in `new A < b`), and `new A!.b = 1`, `new A!.b += 1` and
+  `for (new A!.b in c)` (as `new A.b = 1` already was; tsc rejects these only in the
+  type check).
 
 ### Node types
 - `constructor_type.type` may also be `type_predicate` or `asserts` (#85), as

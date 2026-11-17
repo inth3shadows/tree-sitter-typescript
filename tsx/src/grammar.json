@@ -4893,17 +4893,8 @@
             "type": "FIELD",
             "name": "constructor",
             "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "primary_expression"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "new_expression"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "primary_expression"
             }
           },
           {
