@@ -134,6 +134,9 @@ function tsNodes(tree) {
     // statement conditions, `if (x)`, are parenthesized here and bare in tsc
     if (n.type === 'parenthesized_expression' && n.parent && COND_PARENTS.has(n.parent.type)) cat = undefined;
     if ((n.type === 'union_type' || n.type === 'intersection_type') && n.parent && n.parent.type === n.type) cat = undefined;
+    // the inner part of a qualified name (`a.b` in `a.b.c.D`, `import x = a.b.c`) is the
+    // JavaScript grammar's nested_identifier aliased to member_expression; tsc has a QualifiedName
+    if (n.type === 'member_expression' && n.parent && n.parent.type === 'nested_identifier') cat = undefined;
     if (cat) out.add(`${cat}:${n.startIndex}:${n.endIndex}`);
     for (let i = 0; i < n.namedChildCount; i++) visit(n.namedChild(i));
   };

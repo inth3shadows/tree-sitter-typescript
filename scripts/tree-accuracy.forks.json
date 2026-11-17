@@ -1,5 +1,5 @@
 {
- "measuredAt": "2026-11-17T11:27Z/2026-11-17T11:55Z",
+ "measuredAt": "2026-11-17T17:09Z (finished)",
  "tsc": "5.9.3",
  "corpora": [
   "effect@7a87ff9b88b1",
@@ -12,29 +12,25 @@
  "note": "Each build is that branch tip with its committed typescript/src and tsx/src compiled to wasm.",
  "builds": [
   {
-   "repo": "inth3shadows/tree-sitter-typescript",
-   "branch": "main",
-   "sha": "713d1ba774ef8b7fdfebdcb131669c9bade96b89",
-   "date": "2026-11-16",
    "name": "inth3shadows/tree-sitter-typescript@main",
    "files": 14533,
-   "filesWithErrors": 1,
+   "filesWithErrors": 0,
    "total": {
-    "tp": 6218672,
-    "fp": 697,
-    "fn": 247
+    "tp": 6218912,
+    "fp": 227,
+    "fn": 7
    },
-   "precision": 0.9998879307531038,
-   "recall": 0.9999602824863936,
+   "precision": 0.9999634997706274,
+   "recall": 0.9999988744024484,
    "categories": {
     "call": {
-     "tp": 1891525,
-     "fp": 155,
-     "fn": 69
+     "tp": 1891594,
+     "fp": 91,
+     "fn": 0
     },
     "member": {
      "tp": 2634505,
-     "fp": 300,
+     "fp": 91,
      "fn": 2
     },
     "yield": {
@@ -48,13 +44,13 @@
      "fn": 2
     },
     "arrow": {
-     "tp": 301079,
+     "tp": 301083,
      "fp": 1,
-     "fn": 5
+     "fn": 1
     },
     "binary": {
      "tp": 488494,
-     "fp": 2,
+     "fp": 0,
      "fn": 0
     },
     "unary": {
@@ -63,14 +59,14 @@
      "fn": 0
     },
     "cast": {
-     "tp": 37127,
-     "fp": 152,
-     "fn": 152
+     "tp": 37279,
+     "fp": 0,
+     "fn": 0
     },
     "union_type": {
-     "tp": 94529,
-     "fp": 3,
-     "fn": 4
+     "tp": 94533,
+     "fp": 0,
+     "fn": 0
     },
     "spread": {
      "tp": 42361,
@@ -109,7 +105,7 @@
     },
     "subscript": {
      "tp": 68881,
-     "fp": 2,
+     "fp": 0,
      "fn": 0
     },
     "type_predicate": {
@@ -118,18 +114,18 @@
      "fn": 0
     },
     "tuple_type": {
-     "tp": 5402,
+     "tp": 5406,
      "fp": 0,
-     "fn": 4
+     "fn": 0
     },
     "parenthesized_type": {
-     "tp": 4082,
+     "tp": 4083,
      "fp": 0,
-     "fn": 1
+     "fn": 0
     },
     "instantiation": {
      "tp": 141,
-     "fp": 36,
+     "fp": 0,
      "fn": 0
     },
     "conditional_type": {
@@ -138,9 +134,9 @@
      "fn": 0
     },
     "type_operator": {
-     "tp": 16583,
-     "fp": 2,
-     "fn": 6
+     "tp": 16589,
+     "fp": 0,
+     "fn": 0
     },
     "constructor_type": {
      "tp": 125,
@@ -157,22 +153,22 @@
      "fp": 0,
      "fn": 0
     }
-   }
+   },
+   "repo": "inth3shadows/tree-sitter-typescript",
+   "branch": "main",
+   "sha": "8cfaea259748f58154b154e07a0fab6e096f7c19",
+   "date": "2026-11-17"
   },
   {
-   "repo": "dokimasia/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "839d520b3f2a221734d7144bbf384e7b0a47d504",
-   "date": "2026-10-21",
    "name": "dokimasia/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 127,
    "total": {
     "tp": 6213186,
-    "fp": 6452,
+    "fp": 6432,
     "fn": 5733
    },
-   "precision": 0.9989626405909797,
+   "precision": 0.998965852886785,
    "recall": 0.9990781356052394,
    "categories": {
     "call": {
@@ -182,7 +178,7 @@
     },
     "member": {
      "tp": 2633947,
-     "fp": 987,
+     "fp": 967,
      "fn": 560
     },
     "yield": {
@@ -305,22 +301,22 @@
      "fp": 0,
      "fn": 0
     }
-   }
+   },
+   "repo": "dokimasia/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "839d520b3f2a221734d7144bbf384e7b0a47d504",
+   "date": "2026-10-21"
   },
   {
-   "repo": "marionebl/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "53071c97beb59f6ddc197a3473d22882ad756918",
-   "date": "2026-03-27",
    "name": "marionebl/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 17,
    "total": {
     "tp": 6211637,
-    "fp": 8274,
+    "fp": 8254,
     "fn": 7282
    },
-   "precision": 0.9986697558855746,
+   "precision": 0.9986729670986195,
    "recall": 0.9988290569470353,
    "categories": {
     "call": {
@@ -330,7 +326,7 @@
     },
     "member": {
      "tp": 2634057,
-     "fp": 768,
+     "fp": 748,
      "fn": 450
     },
     "yield": {
@@ -453,22 +449,22 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "marionebl/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "53071c97beb59f6ddc197a3473d22882ad756918",
+   "date": "2026-03-27"
   },
   {
-   "repo": "lzehrung/tree-sitter-typescript",
-   "branch": "codegraph-main",
-   "sha": "f0a42fe031d137374bafada517cf11165e9c5c87",
-   "date": "2026-11-11",
    "name": "lzehrung/tree-sitter-typescript@codegraph-main",
    "files": 14533,
    "filesWithErrors": 141,
    "total": {
     "tp": 6210989,
-    "fp": 8925,
+    "fp": 8905,
     "fn": 7930
    },
-   "precision": 0.9985650927006386,
+   "precision": 0.9985683035755915,
    "recall": 0.9987248587736872,
    "categories": {
     "call": {
@@ -478,7 +474,7 @@
     },
     "member": {
      "tp": 2633944,
-     "fp": 989,
+     "fp": 969,
      "fn": 563
     },
     "yield": {
@@ -601,23 +597,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "lzehrung/tree-sitter-typescript",
+   "branch": "codegraph-main",
+   "sha": "f0a42fe031d137374bafada517cf11165e9c5c87",
+   "date": "2026-11-11"
   },
   {
-   "repo": "dive2Pro/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "a867410aafe39d27702d6aa9d077062bdbe6e16e",
-   "date": "2026-01-13",
    "name": "dive2Pro/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 162,
    "total": {
-    "tp": 6210234,
-    "fp": 9606,
-    "fn": 8685
+    "tp": 6210232,
+    "fp": 9586,
+    "fn": 8687
    },
-   "precision": 0.9984555872819879,
-   "recall": 0.9986034550377646,
+   "precision": 0.9984587973474465,
+   "recall": 0.9986031334384642,
    "categories": {
     "call": {
      "tp": 1889809,
@@ -625,9 +621,9 @@
      "fn": 1785
     },
     "member": {
-     "tp": 2633822,
-     "fp": 1119,
-     "fn": 685
+     "tp": 2633820,
+     "fp": 1099,
+     "fn": 687
     },
     "yield": {
      "tp": 35992,
@@ -749,23 +745,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "dive2Pro/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "a867410aafe39d27702d6aa9d077062bdbe6e16e",
+   "date": "2026-01-13"
   },
   {
-   "repo": "TobiasBak/tree-sitter-typescript",
-   "branch": "parse-fixes",
-   "sha": "795c3152b8dc3a0a3d8732589eae4cf4196b77f5",
-   "date": "2026-11-10",
    "name": "TobiasBak/tree-sitter-typescript@parse-fixes",
    "files": 14533,
    "filesWithErrors": 168,
    "total": {
-    "tp": 6208634,
-    "fp": 13817,
-    "fn": 10285
+    "tp": 6208630,
+    "fp": 13796,
+    "fn": 10289
    },
-   "precision": 0.9977794923575934,
-   "recall": 0.9983461755973988,
+   "precision": 0.9977828583256756,
+   "recall": 0.998345532398798,
    "categories": {
     "call": {
      "tp": 1890777,
@@ -773,9 +769,9 @@
      "fn": 817
     },
     "member": {
-     "tp": 2633697,
-     "fp": 1505,
-     "fn": 810
+     "tp": 2633693,
+     "fp": 1484,
+     "fn": 814
     },
     "yield": {
      "tp": 36048,
@@ -897,23 +893,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "TobiasBak/tree-sitter-typescript",
+   "branch": "parse-fixes",
+   "sha": "795c3152b8dc3a0a3d8732589eae4cf4196b77f5",
+   "date": "2026-11-10"
   },
   {
-   "repo": "vincentkoc/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "2ec69f5037f56a99a0d0c0e1a191d0eef50afe49",
-   "date": "2026-11-03",
    "name": "vincentkoc/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 247,
    "total": {
-    "tp": 6207026,
-    "fp": 17167,
-    "fn": 11893
+    "tp": 6207022,
+    "fp": 17147,
+    "fn": 11897
    },
-   "precision": 0.9972418914387777,
-   "recall": 0.9980876097598312,
+   "precision": 0.9972450940840456,
+   "recall": 0.9980869665612303,
    "categories": {
     "call": {
      "tp": 1889820,
@@ -921,9 +917,9 @@
      "fn": 1774
     },
     "member": {
-     "tp": 2633658,
-     "fp": 1688,
-     "fn": 849
+     "tp": 2633654,
+     "fp": 1668,
+     "fn": 853
     },
     "yield": {
      "tp": 36048,
@@ -1045,23 +1041,23 @@
      "fp": 0,
      "fn": 1
     }
-   }
+   },
+   "repo": "vincentkoc/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "2ec69f5037f56a99a0d0c0e1a191d0eef50afe49",
+   "date": "2026-11-03"
   },
   {
-   "repo": "vmikhailov/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "4f96ecded78cb426fd13f3a7fce9d48ba01d96f5",
-   "date": "2026-11-10",
    "name": "vmikhailov/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 224,
    "total": {
-    "tp": 6206211,
-    "fp": 16685,
-    "fn": 12708
+    "tp": 6206207,
+    "fp": 16665,
+    "fn": 12712
    },
-   "precision": 0.9973187724814941,
-   "recall": 0.9979565580448949,
+   "precision": 0.9973219760907825,
+   "recall": 0.997955914846294,
    "categories": {
     "call": {
      "tp": 1889616,
@@ -1069,9 +1065,9 @@
      "fn": 1978
     },
     "member": {
-     "tp": 2633683,
-     "fp": 1622,
-     "fn": 824
+     "tp": 2633679,
+     "fp": 1602,
+     "fn": 828
     },
     "yield": {
      "tp": 36048,
@@ -1193,23 +1189,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "vmikhailov/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "4f96ecded78cb426fd13f3a7fce9d48ba01d96f5",
+   "date": "2026-11-10"
   },
   {
-   "repo": "bavovna/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "e0a41f4f1c65bf0dfdb3c5f587d1d86acecc9a7b",
-   "date": "2026-10-24",
    "name": "bavovna/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 231,
    "total": {
-    "tp": 6206201,
-    "fp": 16922,
-    "fn": 12718
+    "tp": 6206197,
+    "fp": 16902,
+    "fn": 12722
    },
-   "precision": 0.9972807865118527,
-   "recall": 0.9979549500483926,
+   "precision": 0.9972839898577863,
+   "recall": 0.9979543068497917,
    "categories": {
     "call": {
      "tp": 1889609,
@@ -1217,9 +1213,9 @@
      "fn": 1985
     },
     "member": {
-     "tp": 2633680,
-     "fp": 1623,
-     "fn": 827
+     "tp": 2633676,
+     "fp": 1603,
+     "fn": 831
     },
     "yield": {
      "tp": 36048,
@@ -1341,23 +1337,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "bavovna/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "e0a41f4f1c65bf0dfdb3c5f587d1d86acecc9a7b",
+   "date": "2026-10-24"
   },
   {
-   "repo": "tree-sitter/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
-   "date": "2025-01-30",
    "name": "tree-sitter/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 231,
    "total": {
-    "tp": 6205941,
-    "fp": 17404,
-    "fn": 12978
+    "tp": 6205937,
+    "fp": 17384,
+    "fn": 12982
    },
-   "precision": 0.9972034332019195,
-   "recall": 0.9979131421393332,
+   "precision": 0.9972066361352725,
+   "recall": 0.9979124989407323,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1365,9 +1361,9 @@
      "fn": 2112
     },
     "member": {
-     "tp": 2633641,
-     "fp": 1666,
-     "fn": 866
+     "tp": 2633637,
+     "fp": 1646,
+     "fn": 870
     },
     "yield": {
      "tp": 35993,
@@ -1489,23 +1485,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "tree-sitter/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+   "date": "2025-01-30"
   },
   {
-   "repo": "QuiltLang/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "25f4db1700b970293b83c5964581ff8ef718106f",
-   "date": "2026-06-12",
    "name": "QuiltLang/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 231,
    "total": {
-    "tp": 6205941,
-    "fp": 17404,
-    "fn": 12978
+    "tp": 6205937,
+    "fp": 17384,
+    "fn": 12982
    },
-   "precision": 0.9972034332019195,
-   "recall": 0.9979131421393332,
+   "precision": 0.9972066361352725,
+   "recall": 0.9979124989407323,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1513,9 +1509,9 @@
      "fn": 2112
     },
     "member": {
-     "tp": 2633641,
-     "fp": 1666,
-     "fn": 866
+     "tp": 2633637,
+     "fp": 1646,
+     "fn": 870
     },
     "yield": {
      "tp": 35993,
@@ -1637,23 +1633,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "QuiltLang/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "25f4db1700b970293b83c5964581ff8ef718106f",
+   "date": "2026-06-12"
   },
   {
-   "repo": "HerringtonDarkholme/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "c6a1b87d0b5251be8cddbd8a77c3ec477293bb59",
-   "date": "2025-04-29",
    "name": "HerringtonDarkholme/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 229,
    "total": {
-    "tp": 6205941,
-    "fp": 17404,
-    "fn": 12978
+    "tp": 6205937,
+    "fp": 17384,
+    "fn": 12982
    },
-   "precision": 0.9972034332019195,
-   "recall": 0.9979131421393332,
+   "precision": 0.9972066361352725,
+   "recall": 0.9979124989407323,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1661,9 +1657,9 @@
      "fn": 2112
     },
     "member": {
-     "tp": 2633641,
-     "fp": 1666,
-     "fn": 866
+     "tp": 2633637,
+     "fp": 1646,
+     "fn": 870
     },
     "yield": {
      "tp": 35993,
@@ -1785,23 +1781,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "HerringtonDarkholme/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "c6a1b87d0b5251be8cddbd8a77c3ec477293bb59",
+   "date": "2025-04-29"
   },
   {
-   "repo": "NzSN/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "ad3165c3686331d6db0188c420281650ce32a430",
-   "date": "2025-02-14",
    "name": "NzSN/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 231,
    "total": {
-    "tp": 6205941,
-    "fp": 17404,
-    "fn": 12978
+    "tp": 6205937,
+    "fp": 17384,
+    "fn": 12982
    },
-   "precision": 0.9972034332019195,
-   "recall": 0.9979131421393332,
+   "precision": 0.9972066361352725,
+   "recall": 0.9979124989407323,
    "categories": {
     "call": {
      "tp": 1889482,
@@ -1809,9 +1805,9 @@
      "fn": 2112
     },
     "member": {
-     "tp": 2633641,
-     "fp": 1666,
-     "fn": 866
+     "tp": 2633637,
+     "fp": 1646,
+     "fn": 870
     },
     "yield": {
      "tp": 35993,
@@ -1933,23 +1929,23 @@
      "fp": 0,
      "fn": 8
     }
-   }
+   },
+   "repo": "NzSN/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "ad3165c3686331d6db0188c420281650ce32a430",
+   "date": "2025-02-14"
   },
   {
-   "repo": "etchpad/tree-sitter-typescript",
-   "branch": "development",
-   "sha": "bf45087ef5d4987e7ef8f76d59104486d9a8f064",
-   "date": "2026-03-06",
    "name": "etchpad/tree-sitter-typescript@development",
    "files": 14533,
    "filesWithErrors": 239,
    "total": {
-    "tp": 6203108,
-    "fp": 14628,
-    "fn": 15811
+    "tp": 6203106,
+    "fp": 14607,
+    "fn": 15813
    },
-   "precision": 0.9976473751860806,
-   "recall": 0.9974575967302356,
+   "precision": 0.9976507439310884,
+   "recall": 0.9974572751309352,
    "categories": {
     "call": {
      "tp": 1889325,
@@ -1957,9 +1953,9 @@
      "fn": 2269
     },
     "member": {
-     "tp": 2633354,
-     "fp": 2095,
-     "fn": 1153
+     "tp": 2633352,
+     "fp": 2074,
+     "fn": 1155
     },
     "yield": {
      "tp": 35992,
@@ -2081,23 +2077,23 @@
      "fp": 1,
      "fn": 8
     }
-   }
+   },
+   "repo": "etchpad/tree-sitter-typescript",
+   "branch": "development",
+   "sha": "bf45087ef5d4987e7ef8f76d59104486d9a8f064",
+   "date": "2026-03-06"
   },
   {
-   "repo": "BrokkAi/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "bb76a11fd0dcee4381e1b283ed8359432e5071b1",
-   "date": "2026-10-16",
    "name": "BrokkAi/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 224,
    "total": {
-    "tp": 6205888,
-    "fp": 17450,
-    "fn": 13031
+    "tp": 6205884,
+    "fp": 17430,
+    "fn": 13035
    },
-   "precision": 0.9971960385246631,
-   "recall": 0.9979046197578711,
+   "precision": 0.9971992414331013,
+   "recall": 0.9979039765592702,
    "categories": {
     "call": {
      "tp": 1889434,
@@ -2105,9 +2101,9 @@
      "fn": 2160
     },
     "member": {
-     "tp": 2633615,
-     "fp": 1683,
-     "fn": 892
+     "tp": 2633611,
+     "fp": 1663,
+     "fn": 896
     },
     "yield": {
      "tp": 36025,
@@ -2229,23 +2225,23 @@
      "fp": 4,
      "fn": 0
     }
-   }
+   },
+   "repo": "BrokkAi/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "bb76a11fd0dcee4381e1b283ed8359432e5071b1",
+   "date": "2026-10-16"
   },
   {
-   "repo": "SegaraRai/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "82b3609d6fb079bd728f88979d2ca27dd27a19bd",
-   "date": "2026-09-02",
    "name": "SegaraRai/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 180,
    "total": {
-    "tp": 6204452,
-    "fp": 18499,
-    "fn": 14467
+    "tp": 6204448,
+    "fp": 18479,
+    "fn": 14471
    },
-   "precision": 0.9970272946066906,
-   "recall": 0.9976737114601428,
+   "precision": 0.9970304970635201,
+   "recall": 0.9976730682615419,
    "categories": {
     "call": {
      "tp": 1889128,
@@ -2253,9 +2249,9 @@
      "fn": 2466
     },
     "member": {
-     "tp": 2633243,
-     "fp": 2071,
-     "fn": 1264
+     "tp": 2633239,
+     "fp": 2051,
+     "fn": 1268
     },
     "yield": {
      "tp": 35993,
@@ -2377,23 +2373,23 @@
      "fp": 0,
      "fn": 0
     }
-   }
+   },
+   "repo": "SegaraRai/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "82b3609d6fb079bd728f88979d2ca27dd27a19bd",
+   "date": "2026-09-02"
   },
   {
-   "repo": "plewg/tree-sitter-typescript",
-   "branch": "master",
-   "sha": "051c106b8eee3c008e9f44ae03e3d34d3b43d70b",
-   "date": "2026-08-20",
    "name": "plewg/tree-sitter-typescript@master",
    "files": 14533,
    "filesWithErrors": 6698,
    "total": {
-    "tp": 6077216,
-    "fp": 76697,
-    "fn": 141703
+    "tp": 6076829,
+    "fp": 76651,
+    "fn": 142090
    },
-   "precision": 0.9875368728807183,
-   "recall": 0.9772142071636566,
+   "precision": 0.9875434713365445,
+   "recall": 0.9771519776990181,
    "categories": {
     "call": {
      "tp": 1860704,
@@ -2401,9 +2397,9 @@
      "fn": 30890
     },
     "member": {
-     "tp": 2587906,
-     "fp": 18342,
-     "fn": 46601
+     "tp": 2587519,
+     "fp": 18296,
+     "fn": 46988
     },
     "yield": {
      "tp": 35934,
@@ -2525,7 +2521,11 @@
      "fp": 27,
      "fn": 1476
     }
-   }
+   },
+   "repo": "plewg/tree-sitter-typescript",
+   "branch": "master",
+   "sha": "051c106b8eee3c008e9f44ae03e3d34d3b43d70b",
+   "date": "2026-08-20"
   }
  ]
 }
