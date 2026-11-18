@@ -13156,36 +13156,74 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SEQ",
+              "type": "CHOICE",
               "members": [
                 {
-                  "type": "FIELD",
-                  "name": "sign",
-                  "content": {
-                    "type": "CHOICE",
-                    "members": [
-                      {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "static"
+                    },
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_modifier_marker"
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "STRING",
+                          "value": "readonly"
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "FIELD",
+                      "name": "sign",
+                      "content": {
                         "type": "CHOICE",
                         "members": [
                           {
-                            "type": "STRING",
-                            "value": "-"
+                            "type": "CHOICE",
+                            "members": [
+                              {
+                                "type": "STRING",
+                                "value": "-"
+                              },
+                              {
+                                "type": "STRING",
+                                "value": "+"
+                              }
+                            ]
                           },
                           {
-                            "type": "STRING",
-                            "value": "+"
+                            "type": "BLANK"
                           }
                         ]
-                      },
-                      {
-                        "type": "BLANK"
                       }
-                    ]
-                  }
-                },
-                {
-                  "type": "STRING",
-                  "value": "readonly"
+                    },
+                    {
+                      "type": "STRING",
+                      "value": "readonly"
+                    }
+                  ]
                 }
               ]
             },

@@ -13,6 +13,10 @@ because editor queries match on node names.
   native build no longer cancels the others.
 
 ### Fixes
+- A class's static index signature, `static [k: string]: T` (also `static readonly`), is an
+  `index_signature` (#123). It was a field with a computed name and an ERROR. As with
+  `property_signature`, `static` is also accepted on an object-type index signature, which
+  tsc rejects.
 - Import forms that tsc accepts no longer have an ERROR (#122):
   - `export import a = require("m")` and `export import type a = require("m")` are an
     `export_statement` around the `import_statement` that `import a = require("m")` gives.

@@ -1658,6 +1658,104 @@ class Foo {
               (arguments))))))))
 
 =======================================
+Static index signatures (#123)
+=======================================
+
+class C {
+  static [x: string]: number;
+  static readonly [y: number]: string
+  static
+  [w: string]: number;
+  static [k];
+  static [k]: number;
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (index_signature
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))
+      (index_signature
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))
+      (index_signature
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (computed_property_name
+          (identifier)))
+      (public_field_definition
+        (computed_property_name
+          (identifier))
+        (type_annotation
+          (predefined_type))))))
+
+=======================================
+Static index signatures: line breaks, comments and type members (#123)
+=======================================
+
+class C {
+  static
+  readonly
+  [x: string]: number;
+  static /* a */
+  // b
+  [y: string]: number;
+}
+let t: { static
+  [k: string]: number };
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (public_field_definition
+        (property_identifier))
+      (index_signature
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))
+      (index_signature
+        (comment)
+        (comment)
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (type_annotation
+        (object_type
+          (index_signature
+            (identifier)
+            (predefined_type)
+            (type_annotation
+              (predefined_type))))))))
+
+=======================================
+A sign never follows static in an index signature (#123)
+:error
+=======================================
+
+class C { static -readonly [k: string]: number }
+
+---
+
+=======================================
 Global namespace declarations
 =======================================
 
