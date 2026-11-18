@@ -18,7 +18,8 @@ because editor queries match on node names.
     `export_statement` around the `import_statement` that `import a = require("m")` gives.
     They had a MISSING `;` or an ERROR. Any import may follow `export`, as tsc's parser
     allows (its checker rejects most): `export import x from "m"` parses too.
-  - `export import a = require;` (an alias of a namespace named `require`) still parses.
+  - `import a = require` with `("m")` on the next line stays a require import, and the
+    exported form, which was an alias followed by a separate statement, is one too.
   - `import type a = N.b` and `export import type a = N.b` are an `import_alias`.
   - `import defer * as ns from "m"` (TypeScript 5.9), `import defer x from "m"` and
     `import defer "m"` take `defer` as the import phase, and `import.defer("m")` is a
@@ -30,8 +31,9 @@ because editor queries match on node names.
 
   Over TypeScript's own test suite (v5.9.3, 12,663 files tsc parses cleanly), files with an
   ERROR fall from 337 to 317, and no file newly errors. On the corpora, no tree changes. The
-  parse table grows by 87 states (tsx 87). Known limit: `export import a = require.b`,
-  like `import a = require.b`, is still an error.
+  parse table grows by 69 states (tsx 69). Known limit: an alias of a namespace named
+  `require` (`import a = require;`, `import a = require.b`) is an error, now with or without
+  `export`; it was one without `export` before.
 
 ### Node types
 - `export_statement`'s `declaration` field can be an `import_statement` (#122).

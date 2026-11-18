@@ -741,7 +741,10 @@ import type from "m";
 export import x from "m";
 export import type * as ns2 from "m";
 import defer "m";
-export import r = require;
+import r = require
+("m");
+export import r2 = require
+("m");
 const m = import.defer("m");
 
 ---
@@ -842,10 +845,17 @@ const m = import.defer("m");
   (import_statement
     (string
       (string_fragment)))
-  (export_statement
-    (import_alias
+  (import_statement
+    (import_require_clause
       (identifier)
-      (identifier)))
+      (string
+        (string_fragment))))
+  (export_statement
+    (import_statement
+      (import_require_clause
+        (identifier)
+        (string
+          (string_fragment)))))
   (lexical_declaration
     (variable_declarator
       (identifier)

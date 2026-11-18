@@ -433,10 +433,10 @@ module.exports = function defineGrammar(dialect) {
 
       export_specifier: ($, previous) => specifier($, previous, $._module_export_name),
 
-      // `type`, `defer` and `from` name a default import (`import type from from "m"`)
       // `import.defer("m")` (TypeScript 5.9) beside `import.meta` and `new.target`
       meta_property: _ => choice(seq('new', '.', 'target'), seq('import', '.', choice('meta', 'defer'))),
 
+      // `type`, `defer` and `from` name a default import (`import type from from "m"`)
       _import_identifier: $ => choice($.identifier, keywordName($, 'type'), keywordName($, 'defer'), keywordName($, 'from')),
 
       import_specifier: ($, previous) => specifier($, previous, $.identifier),
@@ -950,8 +950,7 @@ module.exports = function defineGrammar(dialect) {
         optional('type'),
         $._import_identifier,
         '=',
-        // `require` is a keyword here (for `= require("m")`) but also names a namespace
-        choice($.identifier, keywordName($, 'require'), $.nested_identifier),
+        choice($.identifier, $.nested_identifier),
         $._semicolon,
       ),
 

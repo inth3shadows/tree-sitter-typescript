@@ -10427,15 +10427,6 @@
               "name": "identifier"
             },
             {
-              "type": "ALIAS",
-              "content": {
-                "type": "STRING",
-                "value": "require"
-              },
-              "named": true,
-              "value": "identifier"
-            },
-            {
               "type": "SYMBOL",
               "name": "nested_identifier"
             }
