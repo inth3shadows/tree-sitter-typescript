@@ -1427,15 +1427,14 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       index_signature: $ => seq(
-        // A class's static index signature (tsc 4.3+); `static` on a type member is
-        // a tsc error, accepted here as property_signature accepts it.
-        optional(seq('static', optional($._modifier_marker))),
-        optional(
-          seq(
-            field('sign', optional(choice('-', '+'))),
-            'readonly',
-          ),
-        ),
+        optional(choice(
+          // A class's static index signature (tsc 4.3+). `static` on a type member is a
+          // tsc error, accepted here (property_signature accepts it too). The marker
+          // keeps `static` on its own line part of the member, as in tsc. A sign is for
+          // mapped types only, so it never follows `static`.
+          seq('static', optional($._modifier_marker), optional('readonly')),
+          seq(field('sign', optional(choice('-', '+'))), 'readonly'),
+        )),
         '[',
         choice(
           seq(
