@@ -15,10 +15,10 @@
    "filesWithErrors": 231,
    "total": {
     "tp": 6205937,
-    "fp": 17384,
+    "fp": 17344,
     "fn": 13071
    },
-   "precision": 0.9972066361352725,
+   "precision": 0.9972130456587128,
    "recall": 0.9978982178508212,
    "categories": {
     "call": {
@@ -113,7 +113,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -165,10 +165,10 @@
    "filesWithErrors": 17,
    "total": {
     "tp": 6211637,
-    "fp": 8254,
+    "fp": 8214,
     "fn": 7371
    },
-   "precision": 0.9986729670986195,
+   "precision": 0.9986793895866637,
    "recall": 0.9988147627402956,
    "categories": {
     "call": {
@@ -263,7 +263,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -315,10 +315,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6211918,
-    "fp": 7520,
+    "fp": 7480,
     "fn": 7090
    },
-   "precision": 0.9987908875367839,
+   "precision": 0.9987973112510247,
    "recall": 0.9988599467953732,
    "categories": {
     "call": {
@@ -408,7 +408,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -465,10 +465,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6214116,
-    "fp": 5281,
+    "fp": 5241,
     "fn": 4892
    },
-   "precision": 0.9991508823122242,
+   "precision": 0.9991573083841304,
    "recall": 0.9992133793685424,
    "categories": {
     "call": {
@@ -558,7 +558,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -615,10 +615,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6214116,
-    "fp": 5281,
+    "fp": 5241,
     "fn": 4892
    },
-   "precision": 0.9991508823122242,
+   "precision": 0.9991573083841304,
    "recall": 0.9992133793685424,
    "categories": {
     "call": {
@@ -708,7 +708,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -765,10 +765,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6216653,
-    "fp": 2695,
+    "fp": 2655,
     "fn": 2355
    },
-   "precision": 0.9995666748347254,
+   "precision": 0.9995731036314651,
    "recall": 0.999621322243033,
    "categories": {
     "call": {
@@ -858,7 +858,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -915,10 +915,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6217037,
-    "fp": 2311,
+    "fp": 2271,
     "fn": 1971
    },
-   "precision": 0.9996284176412061,
+   "precision": 0.9996348468350498,
    "recall": 0.9996830684250607,
    "categories": {
     "call": {
@@ -1008,7 +1008,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -1065,10 +1065,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6217137,
-    "fp": 2211,
+    "fp": 2171,
     "fn": 1871
    },
-   "precision": 0.9996444964970604,
+   "precision": 0.9996509257943167,
    "recall": 0.9996991481599637,
    "categories": {
     "call": {
@@ -1158,7 +1158,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -1215,10 +1215,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6218672,
-    "fp": 676,
+    "fp": 636,
     "fn": 336
    },
-   "precision": 0.9998913069344246,
+   "precision": 0.9998977378190629,
    "recall": 0.9999459720907258,
    "categories": {
     "call": {
@@ -1308,7 +1308,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -1365,10 +1365,10 @@
    "filesWithErrors": 1,
    "total": {
     "tp": 6218830,
-    "fp": 330,
+    "fp": 290,
     "fn": 178
    },
-   "precision": 0.9999469381717145,
+   "precision": 0.999953369608562,
    "recall": 0.9999713780718725,
    "categories": {
     "call": {
@@ -1458,7 +1458,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -1515,10 +1515,10 @@
    "filesWithErrors": 0,
    "total": {
     "tp": 6218912,
-    "fp": 227,
+    "fp": 187,
     "fn": 96
    },
-   "precision": 0.9999634997706274,
+   "precision": 0.9999699313357128,
    "recall": 0.999984563454493,
    "categories": {
     "call": {
@@ -1608,7 +1608,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -1665,10 +1665,10 @@
    "filesWithErrors": 0,
    "total": {
     "tp": 6219001,
-    "fp": 49,
+    "fp": 9,
     "fn": 7
    },
-   "precision": 0.9999921209831083,
+   "precision": 0.9999985528243241,
    "recall": 0.9999988744185568,
    "categories": {
     "call": {
@@ -1758,7 +1758,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -1808,6 +1808,456 @@
     }
    },
    "commit": "a0bcea7"
+  },
+  {
+   "name": "fork-111",
+   "files": 14533,
+   "filesWithErrors": 0,
+   "total": {
+    "tp": 6219001,
+    "fp": 9,
+    "fn": 7
+   },
+   "precision": 0.9999985528243241,
+   "recall": 0.9999988744185568,
+   "categories": {
+    "call": {
+     "tp": 1891594,
+     "fp": 2,
+     "fn": 0
+    },
+    "member": {
+     "tp": 2634505,
+     "fp": 2,
+     "fn": 2
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 0,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136429,
+     "fp": 2,
+     "fn": 2
+    },
+    "arrow": {
+     "tp": 301083,
+     "fp": 1,
+     "fn": 1
+    },
+    "binary": {
+     "tp": 488494,
+     "fp": 0,
+     "fn": 0
+    },
+    "unary": {
+     "tp": 116447,
+     "fp": 0,
+     "fn": 0
+    },
+    "cast": {
+     "tp": 37279,
+     "fp": 0,
+     "fn": 0
+    },
+    "union_type": {
+     "tp": 94533,
+     "fp": 0,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42361,
+     "fp": 0,
+     "fn": 0
+    },
+    "function_type": {
+     "tp": 21144,
+     "fp": 0,
+     "fn": 0
+    },
+    "ternary": {
+     "tp": 61309,
+     "fp": 0,
+     "fn": 0
+    },
+    "non_null": {
+     "tp": 20368,
+     "fp": 2,
+     "fn": 2
+    },
+    "parenthesized": {
+     "tp": 50372,
+     "fp": 0,
+     "fn": 0
+    },
+    "await": {
+     "tp": 126334,
+     "fp": 0,
+     "fn": 0
+    },
+    "intersection_type": {
+     "tp": 3372,
+     "fp": 0,
+     "fn": 0
+    },
+    "subscript": {
+     "tp": 68881,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_predicate": {
+     "tp": 2764,
+     "fp": 0,
+     "fn": 0
+    },
+    "tuple_type": {
+     "tp": 5406,
+     "fp": 0,
+     "fn": 0
+    },
+    "parenthesized_type": {
+     "tp": 4083,
+     "fp": 0,
+     "fn": 0
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 0,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2803,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_operator": {
+     "tp": 16589,
+     "fp": 0,
+     "fn": 0
+    },
+    "constructor_type": {
+     "tp": 125,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_assertion": {
+     "tp": 1820,
+     "fp": 0,
+     "fn": 0
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 0,
+     "fn": 0
+    },
+    "import_type": {
+     "tp": 89,
+     "fp": 0,
+     "fn": 0
+    }
+   },
+   "commit": "24749bf"
+  },
+  {
+   "name": "fork-112",
+   "files": 14533,
+   "filesWithErrors": 0,
+   "total": {
+    "tp": 6219007,
+    "fp": 1,
+    "fn": 1
+   },
+   "precision": 0.999999839202651,
+   "recall": 0.999999839202651,
+   "categories": {
+    "call": {
+     "tp": 1891594,
+     "fp": 0,
+     "fn": 0
+    },
+    "member": {
+     "tp": 2634507,
+     "fp": 0,
+     "fn": 0
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 0,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136431,
+     "fp": 0,
+     "fn": 0
+    },
+    "arrow": {
+     "tp": 301083,
+     "fp": 1,
+     "fn": 1
+    },
+    "binary": {
+     "tp": 488494,
+     "fp": 0,
+     "fn": 0
+    },
+    "unary": {
+     "tp": 116447,
+     "fp": 0,
+     "fn": 0
+    },
+    "cast": {
+     "tp": 37279,
+     "fp": 0,
+     "fn": 0
+    },
+    "union_type": {
+     "tp": 94533,
+     "fp": 0,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42361,
+     "fp": 0,
+     "fn": 0
+    },
+    "function_type": {
+     "tp": 21144,
+     "fp": 0,
+     "fn": 0
+    },
+    "ternary": {
+     "tp": 61309,
+     "fp": 0,
+     "fn": 0
+    },
+    "non_null": {
+     "tp": 20370,
+     "fp": 0,
+     "fn": 0
+    },
+    "parenthesized": {
+     "tp": 50372,
+     "fp": 0,
+     "fn": 0
+    },
+    "await": {
+     "tp": 126334,
+     "fp": 0,
+     "fn": 0
+    },
+    "intersection_type": {
+     "tp": 3372,
+     "fp": 0,
+     "fn": 0
+    },
+    "subscript": {
+     "tp": 68881,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_predicate": {
+     "tp": 2764,
+     "fp": 0,
+     "fn": 0
+    },
+    "tuple_type": {
+     "tp": 5406,
+     "fp": 0,
+     "fn": 0
+    },
+    "parenthesized_type": {
+     "tp": 4083,
+     "fp": 0,
+     "fn": 0
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 0,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2803,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_operator": {
+     "tp": 16589,
+     "fp": 0,
+     "fn": 0
+    },
+    "constructor_type": {
+     "tp": 125,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_assertion": {
+     "tp": 1820,
+     "fp": 0,
+     "fn": 0
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 0,
+     "fn": 0
+    },
+    "import_type": {
+     "tp": 89,
+     "fp": 0,
+     "fn": 0
+    }
+   },
+   "commit": "d558bd2"
+  },
+  {
+   "name": "fork-116",
+   "files": 14533,
+   "filesWithErrors": 0,
+   "total": {
+    "tp": 6219008,
+    "fp": 0,
+    "fn": 0
+   },
+   "precision": 1,
+   "recall": 1,
+   "categories": {
+    "call": {
+     "tp": 1891594,
+     "fp": 0,
+     "fn": 0
+    },
+    "member": {
+     "tp": 2634507,
+     "fp": 0,
+     "fn": 0
+    },
+    "yield": {
+     "tp": 36048,
+     "fp": 0,
+     "fn": 0
+    },
+    "new": {
+     "tp": 136431,
+     "fp": 0,
+     "fn": 0
+    },
+    "arrow": {
+     "tp": 301084,
+     "fp": 0,
+     "fn": 0
+    },
+    "binary": {
+     "tp": 488494,
+     "fp": 0,
+     "fn": 0
+    },
+    "unary": {
+     "tp": 116447,
+     "fp": 0,
+     "fn": 0
+    },
+    "cast": {
+     "tp": 37279,
+     "fp": 0,
+     "fn": 0
+    },
+    "union_type": {
+     "tp": 94533,
+     "fp": 0,
+     "fn": 0
+    },
+    "spread": {
+     "tp": 42361,
+     "fp": 0,
+     "fn": 0
+    },
+    "function_type": {
+     "tp": 21144,
+     "fp": 0,
+     "fn": 0
+    },
+    "ternary": {
+     "tp": 61309,
+     "fp": 0,
+     "fn": 0
+    },
+    "non_null": {
+     "tp": 20370,
+     "fp": 0,
+     "fn": 0
+    },
+    "parenthesized": {
+     "tp": 50372,
+     "fp": 0,
+     "fn": 0
+    },
+    "await": {
+     "tp": 126334,
+     "fp": 0,
+     "fn": 0
+    },
+    "intersection_type": {
+     "tp": 3372,
+     "fp": 0,
+     "fn": 0
+    },
+    "subscript": {
+     "tp": 68881,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_predicate": {
+     "tp": 2764,
+     "fp": 0,
+     "fn": 0
+    },
+    "tuple_type": {
+     "tp": 5406,
+     "fp": 0,
+     "fn": 0
+    },
+    "parenthesized_type": {
+     "tp": 4083,
+     "fp": 0,
+     "fn": 0
+    },
+    "instantiation": {
+     "tp": 141,
+     "fp": 0,
+     "fn": 0
+    },
+    "conditional_type": {
+     "tp": 2803,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_operator": {
+     "tp": 16589,
+     "fp": 0,
+     "fn": 0
+    },
+    "constructor_type": {
+     "tp": 125,
+     "fp": 0,
+     "fn": 0
+    },
+    "type_assertion": {
+     "tp": 1820,
+     "fp": 0,
+     "fn": 0
+    },
+    "array_type": {
+     "tp": 54628,
+     "fp": 0,
+     "fn": 0
+    },
+    "import_type": {
+     "tp": 89,
+     "fp": 0,
+     "fn": 0
+    }
+   },
+   "commit": "2387388"
   }
  ]
 }

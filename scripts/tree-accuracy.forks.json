@@ -1,5 +1,5 @@
 {
- "measuredAt": "2026-11-17 (re-measured with the import_type category)",
+ "measuredAt": "2026-11-18 (re-measured with the asserts and deep qualified-name conventions)",
  "tsc": "5.9.3",
  "corpora": [
   "effect@7a87ff9b88b1",
@@ -10,28 +10,29 @@
  "files": 14533,
  "treeSitterCli": "0.25.10",
  "note": "Each build is that branch tip with its committed typescript/src and tsx/src compiled to wasm.",
+ "skippedTscErrors": 0,
  "builds": [
   {
    "name": "inth3shadows/tree-sitter-typescript@main",
    "files": 14533,
    "filesWithErrors": 0,
    "total": {
-    "tp": 6219001,
-    "fp": 49,
-    "fn": 7
+    "tp": 6219008,
+    "fp": 0,
+    "fn": 0
    },
-   "precision": 0.9999921209831083,
-   "recall": 0.9999988744185568,
+   "precision": 1,
+   "recall": 1,
    "categories": {
     "call": {
      "tp": 1891594,
-     "fp": 2,
+     "fp": 0,
      "fn": 0
     },
     "member": {
-     "tp": 2634505,
-     "fp": 2,
-     "fn": 2
+     "tp": 2634507,
+     "fp": 0,
+     "fn": 0
     },
     "yield": {
      "tp": 36048,
@@ -39,14 +40,14 @@
      "fn": 0
     },
     "new": {
-     "tp": 136429,
-     "fp": 2,
-     "fn": 2
+     "tp": 136431,
+     "fp": 0,
+     "fn": 0
     },
     "arrow": {
-     "tp": 301083,
-     "fp": 1,
-     "fn": 1
+     "tp": 301084,
+     "fp": 0,
+     "fn": 0
     },
     "binary": {
      "tp": 488494,
@@ -84,9 +85,9 @@
      "fn": 0
     },
     "non_null": {
-     "tp": 20368,
-     "fp": 2,
-     "fn": 2
+     "tp": 20370,
+     "fp": 0,
+     "fn": 0
     },
     "parenthesized": {
      "tp": 50372,
@@ -110,7 +111,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -161,8 +162,8 @@
    },
    "repo": "inth3shadows/tree-sitter-typescript",
    "branch": "main",
-   "sha": "a0bcea7c277f8edbd4bfbc5bd77a2fffa7571852",
-   "date": "2026-11-17"
+   "sha": "2387388517f16dbc0286b85a1cb89366f67596a4",
+   "date": "2026-11-18"
   },
   {
    "name": "dokimasia/tree-sitter-typescript@master",
@@ -170,10 +171,10 @@
    "filesWithErrors": 127,
    "total": {
     "tp": 6213186,
-    "fp": 6432,
+    "fp": 6392,
     "fn": 5822
    },
-   "precision": 0.998965852886785,
+   "precision": 0.9989722775403733,
    "recall": 0.9990638378339439,
    "categories": {
     "call": {
@@ -268,7 +269,7 @@
     },
     "type_predicate": {
      "tp": 2763,
-     "fp": 40,
+     "fp": 0,
      "fn": 1
     },
     "tuple_type": {
@@ -323,10 +324,10 @@
    "filesWithErrors": 17,
    "total": {
     "tp": 6211637,
-    "fp": 8254,
+    "fp": 8214,
     "fn": 7371
    },
-   "precision": 0.9986729670986195,
+   "precision": 0.9986793895866637,
    "recall": 0.9988147627402956,
    "categories": {
     "call": {
@@ -421,7 +422,7 @@
     },
     "type_predicate": {
      "tp": 2764,
-     "fp": 40,
+     "fp": 0,
      "fn": 0
     },
     "tuple_type": {
@@ -476,10 +477,10 @@
    "filesWithErrors": 141,
    "total": {
     "tp": 6210989,
-    "fp": 8905,
+    "fp": 8865,
     "fn": 8019
    },
-   "precision": 0.9985683035755915,
+   "precision": 0.9985747253874447,
    "recall": 0.9987105660581237,
    "categories": {
     "call": {
@@ -574,7 +575,7 @@
     },
     "type_predicate": {
      "tp": 2763,
-     "fp": 40,
+     "fp": 0,
      "fn": 1
     },
     "tuple_type": {
@@ -629,10 +630,10 @@
    "filesWithErrors": 162,
    "total": {
     "tp": 6210232,
-    "fp": 9586,
+    "fp": 9546,
     "fn": 8776
    },
-   "precision": 0.9984587973474465,
+   "precision": 0.9984652185335232,
    "recall": 0.9985888424649075,
    "categories": {
     "call": {
@@ -727,7 +728,7 @@
     },
     "type_predicate": {
      "tp": 2763,
-     "fp": 40,
+     "fp": 0,
      "fn": 1
     },
     "tuple_type": {
@@ -782,10 +783,10 @@
    "filesWithErrors": 168,
    "total": {
     "tp": 6208630,
-    "fp": 13796,
+    "fp": 13756,
     "fn": 10378
    },
-   "precision": 0.9977828583256756,
+   "precision": 0.9977892724752209,
    "recall": 0.9983312451117606,
    "categories": {
     "call": {
@@ -875,7 +876,7 @@
     },
     "type_predicate": {
      "tp": 2738,
-     "fp": 53,
+     "fp": 13,
      "fn": 26
     },
     "tuple_type": {
@@ -935,10 +936,10 @@
    "filesWithErrors": 247,
    "total": {
     "tp": 6207022,
-    "fp": 17147,
+    "fp": 17107,
     "fn": 11986
    },
-   "precision": 0.9972450940840456,
+   "precision": 0.997251502981381,
    "recall": 0.9980726829745195,
    "categories": {
     "call": {
@@ -1028,7 +1029,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -1088,10 +1089,10 @@
    "filesWithErrors": 224,
    "total": {
     "tp": 6206207,
-    "fp": 16665,
+    "fp": 16625,
     "fn": 12801
    },
-   "precision": 0.9973219760907825,
+   "precision": 0.9973283868180918,
    "recall": 0.9979416331350595,
    "categories": {
     "call": {
@@ -1181,7 +1182,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -1241,10 +1242,10 @@
    "filesWithErrors": 231,
    "total": {
     "tp": 6206197,
-    "fp": 16902,
+    "fp": 16862,
     "fn": 12811
    },
-   "precision": 0.9972839898577863,
+   "precision": 0.9972904001070856,
    "recall": 0.9979400251615692,
    "categories": {
     "call": {
@@ -1334,7 +1335,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -1394,10 +1395,10 @@
    "filesWithErrors": 231,
    "total": {
     "tp": 6205937,
-    "fp": 17384,
+    "fp": 17344,
     "fn": 13071
    },
-   "precision": 0.9972066361352725,
+   "precision": 0.9972130456587128,
    "recall": 0.9978982178508212,
    "categories": {
     "call": {
@@ -1492,7 +1493,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -1547,10 +1548,10 @@
    "filesWithErrors": 231,
    "total": {
     "tp": 6205937,
-    "fp": 17384,
+    "fp": 17344,
     "fn": 13071
    },
-   "precision": 0.9972066361352725,
+   "precision": 0.9972130456587128,
    "recall": 0.9978982178508212,
    "categories": {
     "call": {
@@ -1645,7 +1646,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -1700,10 +1701,10 @@
    "filesWithErrors": 229,
    "total": {
     "tp": 6205937,
-    "fp": 17384,
+    "fp": 17344,
     "fn": 13071
    },
-   "precision": 0.9972066361352725,
+   "precision": 0.9972130456587128,
    "recall": 0.9978982178508212,
    "categories": {
     "call": {
@@ -1798,7 +1799,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -1853,10 +1854,10 @@
    "filesWithErrors": 231,
    "total": {
     "tp": 6205937,
-    "fp": 17384,
+    "fp": 17344,
     "fn": 13071
    },
-   "precision": 0.9972066361352725,
+   "precision": 0.9972130456587128,
    "recall": 0.9978982178508212,
    "categories": {
     "call": {
@@ -1951,7 +1952,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -2006,10 +2007,10 @@
    "filesWithErrors": 239,
    "total": {
     "tp": 6203106,
-    "fp": 14607,
+    "fp": 14567,
     "fn": 15902
    },
-   "precision": 0.9976507439310884,
+   "precision": 0.997657162092635,
    "recall": 0.9974430005557157,
    "categories": {
     "call": {
@@ -2104,7 +2105,7 @@
     },
     "type_predicate": {
      "tp": 2738,
-     "fp": 58,
+     "fp": 18,
      "fn": 26
     },
     "tuple_type": {
@@ -2159,10 +2160,10 @@
    "filesWithErrors": 224,
    "total": {
     "tp": 6205884,
-    "fp": 17430,
+    "fp": 17390,
     "fn": 13124
    },
-   "precision": 0.9971992414331013,
+   "precision": 0.9972056509162219,
    "recall": 0.9978896955913226,
    "categories": {
     "call": {
@@ -2257,7 +2258,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -2312,10 +2313,10 @@
    "filesWithErrors": 180,
    "total": {
     "tp": 6204448,
-    "fp": 18479,
+    "fp": 18439,
     "fn": 14560
    },
-   "precision": 0.9970304970635201,
+   "precision": 0.9970369058605757,
    "recall": 0.9976587905981147,
    "categories": {
     "call": {
@@ -2410,7 +2411,7 @@
     },
     "type_predicate": {
      "tp": 2739,
-     "fp": 53,
+     "fp": 13,
      "fn": 25
     },
     "tuple_type": {
@@ -2464,12 +2465,12 @@
    "files": 14533,
    "filesWithErrors": 6698,
    "total": {
-    "tp": 6076829,
-    "fp": 76651,
-    "fn": 142179
+    "tp": 6076796,
+    "fp": 76601,
+    "fn": 142212
    },
-   "precision": 0.9875434713365445,
-   "recall": 0.9771379937121805,
+   "precision": 0.9875514289099175,
+   "recall": 0.9771326873996624,
    "categories": {
     "call": {
      "tp": 1860704,
@@ -2477,9 +2478,9 @@
      "fn": 30890
     },
     "member": {
-     "tp": 2587519,
-     "fp": 18296,
-     "fn": 46988
+     "tp": 2587486,
+     "fp": 18285,
+     "fn": 47021
     },
     "yield": {
      "tp": 35934,
@@ -2563,7 +2564,7 @@
     },
     "type_predicate": {
      "tp": 2660,
-     "fp": 53,
+     "fp": 14,
      "fn": 104
     },
     "tuple_type": {
