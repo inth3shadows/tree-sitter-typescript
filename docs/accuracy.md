@@ -89,6 +89,43 @@ counted once; #112 fixed `new a.b!.C()` (#100), which accounted for the `new`, `
 the comment after it (#115). The [span check](#span-check) finds no
 remaining mismatch on the corpora either.
 
+## TypeScript test suite
+
+`scripts/ts-suite.mjs` (`npm run ts-suite`) turns TypeScript's own tests into a corpus for
+`--files`. It fetches microsoft/TypeScript v5.9.3 (c63de15) into the differential's cache,
+`tests/cases/compiler` and `tests/cases/conformance` only, and splits each test on its
+`// @filename:` directives into one file per part. Lines break as in TypeScript's test harness
+(at CRLF if the file has one, else at LF, else at CR), and a byte-order mark does not hide a
+directive on line 1, so the parts are tsc's units for all but one test. Each part keeps its
+bytes, including the `// @option` lines tsc drops; in a test with mixed line breaks such a
+line can hold code tsc did not compile. It writes two lists:
+
+- `list.txt`: every part with a TypeScript extension.
+- `list-clean.txt`: the parts of tests with no `.errors.txt` baseline, which compile with no
+  errors. An error file in this list is a grammar bug. In `list.txt`, it may instead be a
+  construct tsc's parser accepts and its checker rejects, such as a misplaced modifier.
+
+Run it with a bigger stack, because a few stress tests nest deeply enough to overflow the
+tree walkers:
+
+```sh
+npm run ts-suite
+node --stack-size=60000 scripts/tree-accuracy.mjs --spans \
+  --files ~/.cache/tree-sitter-typescript-differential/typescript-suite-c63de15a992d-split/list-clean.txt
+```
+
+At 25a2d5f (#130):
+
+| List | Files tsc parses cleanly | Precision % | Recall % | Wrong | Missed | Error files |
+|---|---|---|---|---|---|---|
+| `list.txt` | 12,700 | 99.807 | 99.548 | 294 | 691 | 306 |
+| `list-clean.txt` | 6,997 | 99.895 | 99.379 | 72 | 428 | 26 |
+
+Unlike the corpora, these files test edge cases on purpose, so the numbers are a list of
+constructs to check, not a measure of real-world accuracy. #122 to #128 came from the
+error files in `list-clean.txt`. Its wrong and missed nodes, which have no ERROR, have not
+been triaged yet.
+
 ## Other forks
 
 Measured 2026-11-18 with the rules above, with the same files
