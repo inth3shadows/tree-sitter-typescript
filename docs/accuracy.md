@@ -35,12 +35,16 @@ named node here, compared by span alone. It finds wrong trees in node kinds the 
 not cover. Leaves, list wrappers that only one side has, and the layout conventions of each
 grammar (decorators beside a method, `?:` annotations, `for (let …;` declaration lists, a
 same-line comment after a statement, and others listed in the script) are left out on both
-sides. `--show-span KINDS --show N` prints unmatched spans of the named kinds. Span numbers
-are not part of the results below; on the corpora, every unmatched span the check found was
-either a convention, now filtered, or a bug that is now fixed (#115).
+sides. A comment after the `}` of a method, function, arrow or static block body still counts:
+there it belongs outside the body (#115). `--show-span KINDS` prints up to `--show N` (default
+5) unmatched spans of each named kind, by tree-sitter or tsc kind name. Span numbers are not
+part of the results below; on the corpora, every unmatched span the check found was either a
+convention, now filtered, or a bug that is now fixed (#115).
 
-`--files LIST` measures the files named in a list (one path per line, deduplicated by content)
-instead of the corpora. Over 41,485 parse-clean local TypeScript files, it found no class of
+`--files LIST` measures the files named in a list instead of the corpora: one path per line,
+relative to the list's directory, identical content measured once per dialect. Files it leaves
+out (no TypeScript extension, unreadable, over 2 MB) are reported, and a list with nothing to
+measure is an error. Over 41,485 parse-clean local TypeScript files, it found no class of
 wrong tree beyond the corpora's, apart from one parse of `unique symbol[]`, a type tsc's
 checker rejects.
 
@@ -74,7 +78,9 @@ forms that these corpora do not use. From upstream v0.23.2 to #116, wrong nodes 
 17,344 to 0 and missed nodes from 13,071 to 0, and no file tsc accepts has an ERROR. The raw
 numbers, per category, are in `scripts/tree-accuracy.history.json`. All rows were re-measured on
 2026-11-18, when the `asserts` predicate and the deeper parts of qualified names became
-conventions (the latter changes no row here; it matters for longer names in other code); builds before #110 have no import-type node, so each misses tsc's 89 `ImportType`s.
+conventions (the latter changes only plewg's row: 33 member nodes inside its parse errors,
+where its error recovery builds a `nested_identifier`; it matters for longer names in other
+code); builds before #110 have no import-type node, so each misses tsc's 89 `ImportType`s.
 
 The last mismatches went as follows: 40 `type_predicate`s were the `asserts` convention, now
 counted once; #112 fixed `new a.b!.C()` (#100), which accounted for the `new`, `non_null`,
@@ -110,7 +116,7 @@ measurement.
 | etchpad | `development` | bf45087 | 2026-03-06 | 99.766 | 99.744 | 14,567 | 15,902 | 239 |
 | BrokkAi | `master` | bb76a11 | 2026-10-16 | 99.721 | 99.789 | 17,390 | 13,124 | 224 |
 | SegaraRai | `master` | 82b3609 | 2026-09-02 | 99.704 | 99.766 | 18,439 | 14,560 | 180 |
-| plewg | `master` | 051c106 | 2026-08-20 | 98.755 | 97.713 | 76,601 | 142,212 | 6698 |
+| plewg | `master` | 051c106 | 2026-08-20 | 98.755 | 97.713 | 76,601 | 142,212 | 6,698 |
 
 - marionebl's tip is the commit this fork started from, and its numbers match the fork-seed row
   above exactly. Upstream `master` matches the v0.23.2 release.
