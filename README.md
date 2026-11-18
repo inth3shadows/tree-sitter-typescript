@@ -19,8 +19,9 @@ fixes ended up here.
 
 - **tsc differential** ([docs/differential.md](docs/differential.md)): `tsc`'s syntax
   diagnostics are the ground truth, and every `.ts`/`.tsx` file in pinned corpora (Effect, Zod,
-  Excalidraw and VS Code `src/`, about 14.5k files) plus one-construct fixtures in
-  `test/tsc-fixtures/` is parsed with both grammars. A file that tsc accepts and the grammar
+  Excalidraw and VS Code `src/`, about 14.5k files; a second set adds Angular, NestJS, Vue
+  and TanStack Query, about 9.6k more) plus one-construct fixtures in `test/tsc-fixtures/` is
+  parsed with both grammars. A file that tsc accepts and the grammar
   rejects fails CI unless it is already in the baseline. On those corpora, upstream v0.23.2
   fails 259 files; this fork fails none.
 - **Tree accuracy** ([docs/accuracy.md](docs/accuracy.md)): the same corpora, but node by node.

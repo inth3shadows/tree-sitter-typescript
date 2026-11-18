@@ -18,8 +18,10 @@
  * constant floor, so the change between builds is the signal.
  *
  * Usage:
- *   node scripts/tree-accuracy.mjs [--build NAME=TS_WASM,TSX_WASM]... [--corpus NAME]...
+ *   node scripts/tree-accuracy.mjs [--build NAME=TS_WASM,TSX_WASM]... [--corpus NAME]... [--set SET]
  *                                  [--files LIST] [--spans] [--show-span KINDS] [--json FILE] [--show N]
+ *   --set SET     measure the corpora whose "set" is SET (corpora.json) instead of the default
+ *                 corpora, which have no set; --corpus NAME picks corpora from any set
  *   --files LIST  measure the files named in LIST instead of the corpora: one path per line,
  *                 relative to LIST's directory; identical content is measured once per
  *                 dialect, and files left out are reported
@@ -352,7 +354,7 @@ function corpusDir(c, cacheRoot) {
 }
 
 function parseArgs(argv) {
-  const a = {builds: [], corpora: [], json: null, show: 0, showCat: null, files: null, spans: false};
+  const a = {builds: [], corpora: [], set: null, json: null, show: 0, showCat: null, files: null, spans: false};
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     const v = () => {
@@ -364,6 +366,7 @@ function parseArgs(argv) {
       if (!name || !tsW || !tsxW) throw new Error('--build takes NAME=TS_WASM,TSX_WASM');
       a.builds.push({name, ts: tsW, tsx: tsxW});
     } else if (k === '--corpus') a.corpora.push(v());
+    else if (k === '--set') a.set = v();
     else if (k === '--json') a.json = v();
     else if (k === '--show') a.show = Number(v());
     else if (k === '--show-category') a.showCat = v();
@@ -397,8 +400,15 @@ async function main() {
       span: {tp: 0, fp: 0, fn: 0, fpKinds: {}, fnKinds: {}}});
   }
   const cacheRoot = process.env.TS_DIFF_CACHE || path.join(os.homedir(), '.cache', 'tree-sitter-typescript-differential');
-  let corpora = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'ts-differential.corpora.json'), 'utf8')).filter((c) => !c.local);
-  if (args.corpora.length) corpora = corpora.filter((c) => args.corpora.includes(c.name));
+  const all = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'ts-differential.corpora.json'), 'utf8')).filter((c) => !c.local);
+  // The default corpora have no set, so their numbers stay comparable with the measured
+  // history; a set (such as "extra") is measured with --set, or one corpus with --corpus.
+  let corpora;
+  if (args.corpora.length) corpora = all.filter((c) => args.corpora.includes(c.name));
+  else corpora = all.filter((c) => (c.set ?? null) === args.set);
+  if (!args.files && corpora.length < (args.corpora.length || 1)) {
+    throw new Error(`no such corpus or set (have: ${all.map((c) => c.name + (c.set ? ` [${c.set}]` : '')).join(', ')})`);
+  }
   let files = 0;
   let skipped = 0;
   const sources = [];

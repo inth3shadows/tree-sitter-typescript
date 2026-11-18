@@ -54,7 +54,11 @@ yield diagnostics and `let x: number = 1;` none under `ScriptKind.TS`, and under
 `hasError` and `let x: number = 1;` must not.
 
 Corpora (`scripts/ts-differential.corpora.json`, pinned by SHA): Effect, Zod,
-Excalidraw, VS Code `src/`, plus the fixtures.
+Excalidraw, VS Code `src/`, plus the fixtures. A second set, marked `"set": "extra"`, adds
+Angular `packages/`, NestJS, Vue core and TanStack Query (9,632 more files). The differential
+checks both sets; tree accuracy measures the extra set only with `--set extra`, so its default
+numbers stay comparable with the measured history. The extra set's 4 baselined files are
+#62, #124 and #133.
 
 ## Run it
 
