@@ -1,8 +1,8 @@
 {
-  "name": "tree-sitter-typescript",
-  "version": "0.25.0",
+  "name": "tree-sitter-typescript-next",
+  "version": "0.25.1",
   "description": "TypeScript and TSX grammars for tree-sitter",
-  "repository": "https://github.com/tree-sitter/tree-sitter-typescript",
+  "repository": "https://github.com/inth3shadows/tree-sitter-typescript",
   "license": "MIT",
   "author": "Max Brunsfeld <maxbrunsfeld@gmail.com>",
   "maintainers": [

@@ -4,7 +4,13 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
-## Unreleased
+## 0.25.1
+
+### Packaging
+- The npm package is published as `tree-sitter-typescript-next`; installed under upstream's
+  name with an alias (`npm install tree-sitter-typescript@npm:tree-sitter-typescript-next`),
+  it replaces `tree-sitter-typescript` without code changes. Its Bun prebuild path follows
+  the new name.
 
 ### Fixes
 - A same-line comment after the closing brace of a method, a function or arrow

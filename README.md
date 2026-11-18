@@ -41,10 +41,10 @@ fixes ended up here.
 - Generated with tree-sitter-cli 0.25.10 (ABI 15).
 - **Node types**: every change to `node-types.json` is listed in the [CHANGELOG](CHANGELOG.md),
   because editor queries match on node names. Most fixes change no node types.
-- The Rust crate is published on crates.io as
-  [`tree-sitter-typescript-next`](https://crates.io/crates/tree-sitter-typescript-next) (see
-  [Usage](#usage)). No npm or PyPI releases yet; depend on a commit of this repository. If you
-  need one, open an issue.
+- Published as `tree-sitter-typescript-next` on
+  [npm](https://www.npmjs.com/package/tree-sitter-typescript-next) and
+  [crates.io](https://crates.io/crates/tree-sitter-typescript-next) (see [Usage](#usage)). No
+  PyPI release yet; if you need one, open an issue.
 - Issues and PRs are welcome. A reproduction that `tsc` accepts is the most useful bug report.
 
 ## Usage
@@ -60,12 +60,19 @@ require("tree-sitter-typescript").tsx; // TSX grammar
 
 For Javascript files with [flow] type annotations you can use the `tsx` parser.
 
+On npm the package is named `tree-sitter-typescript-next`. Installed under upstream's name with
+an alias, it replaces `tree-sitter-typescript` without code changes:
+
+```sh
+npm install tree-sitter-typescript@npm:tree-sitter-typescript-next
+```
+
 In Rust, the crate is named `tree-sitter-typescript-next`, but its library keeps upstream's
 name, so it replaces `tree-sitter-typescript` without code changes:
 
 ```toml
 [dependencies]
-tree-sitter-typescript = { package = "tree-sitter-typescript-next", version = "0.24" }
+tree-sitter-typescript = { package = "tree-sitter-typescript-next", version = "0.25" }
 ```
 
 ```rust
