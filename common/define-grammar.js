@@ -743,9 +743,10 @@ module.exports = function defineGrammar(dialect) {
       // The body of a method, a function or arrow expression, or a static block takes no
       // automatic semicolon after its `}`, which would pull a same-line comment after it
       // into the body (#115). The comment then belongs to what holds the body (class_body,
-      // an object, a call's arguments, or the statement), as in tree-sitter-javascript.
-      // A block that is itself a statement, or a function declaration's body, keeps the
-      // automatic semicolon and the comment (#38).
+      // an object, a call's arguments, or the statement). tree-sitter-javascript 0.23.1
+      // agrees for methods, static blocks and object or class-field values, and keeps the
+      // comment in the body elsewhere. A block that is itself a statement, or a function
+      // declaration's body, keeps the automatic semicolon and the comment (#38).
       _method_body: $ => seq('{', repeat($.statement), '}'),
 
       // As tree-sitter-javascript's, with the body above.

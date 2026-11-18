@@ -1365,7 +1365,9 @@ const p = { f: function () {} // m
 foo(() => {} // n
 )
 x = () => {} // o
+const q = function* () {} // p
 function g() {} // i
+export default function () {} // q
 
 ---
 
@@ -1456,11 +1458,23 @@ function g() {} // i
         (formal_parameters)
         (statement_block)))
     (comment))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (generator_function
+        (formal_parameters)
+        (statement_block)))
+    (comment))
   (function_declaration
     (identifier)
     (formal_parameters)
     (statement_block
-      (comment))))
+      (comment)))
+  (export_statement
+    (function_expression
+      (formal_parameters)
+      (statement_block))
+    (comment)))
 
 =======================================
 Classes with static blocks
