@@ -721,6 +721,108 @@ module M {
           (identifier))))))
 
 ==================================
+Import forms tsc accepts: export import require, defer, and type, defer or from as names (#122)
+==================================
+
+export import a = require("m");
+export import type b = require("m");
+import type c = require("m");
+export import type d = N.e;
+import defer * as ns from "m";
+import defer f from "m";
+import defer { g } from "m";
+import defer from "m";
+import defer, { h } from "m";
+import defer = require("m");
+import type from from "m";
+import type from = require("m");
+import from from "m";
+import type from "m";
+
+---
+
+(program
+  (export_statement
+    (import_statement
+      (import_require_clause
+        (identifier)
+        (string
+          (string_fragment)))))
+  (export_statement
+    (import_statement
+      (import_require_clause
+        (identifier)
+        (string
+          (string_fragment)))))
+  (import_statement
+    (import_require_clause
+      (identifier)
+      (string
+        (string_fragment))))
+  (export_statement
+    (import_alias
+      (identifier)
+      (nested_identifier
+        (identifier)
+        (property_identifier))))
+  (import_statement
+    (import_clause
+      (namespace_import
+        (identifier)))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          (identifier))))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (identifier)
+      (named_imports
+        (import_specifier
+          (identifier))))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_require_clause
+      (identifier)
+      (string
+        (string_fragment))))
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_require_clause
+      (identifier)
+      (string
+        (string_fragment))))
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment))))
+
+==================================
 Property signatures with accessibility modifiers
 ==================================
 

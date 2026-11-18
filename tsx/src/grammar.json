@@ -163,6 +163,19 @@
                   }
                 },
                 {
+                  "type": "FIELD",
+                  "name": "declaration",
+                  "content": {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_import_require_declaration"
+                    },
+                    "named": true,
+                    "value": "import_statement"
+                  }
+                },
+                {
                   "type": "SEQ",
                   "members": [
                     {
@@ -888,6 +901,10 @@
                 {
                   "type": "STRING",
                   "value": "typeof"
+                },
+                {
+                  "type": "STRING",
+                  "value": "defer"
                 }
               ]
             },
@@ -8936,6 +8953,24 @@
           },
           "named": true,
           "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "defer"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "from"
+          },
+          "named": true,
+          "value": "identifier"
         }
       ]
     },
@@ -9951,12 +9986,41 @@
         ]
       }
     },
+    "_import_require_declaration": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "import"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "type"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "import_require_clause"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_semicolon"
+        }
+      ]
+    },
     "import_require_clause": {
       "type": "SEQ",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "identifier"
+          "name": "_import_identifier"
         },
         {
           "type": "STRING",
@@ -10320,8 +10384,20 @@
           "value": "import"
         },
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "type"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "SYMBOL",
-          "name": "identifier"
+          "name": "_import_identifier"
         },
         {
           "type": "STRING",
@@ -13514,6 +13590,15 @@
     [
       "class_static_block",
       "_property_name"
+    ],
+    [
+      "import_statement",
+      "_import_identifier"
+    ],
+    [
+      "import_statement",
+      "_import_identifier",
+      "import_alias"
     ],
     [
       "optional_tuple_parameter",

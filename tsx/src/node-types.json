@@ -1981,6 +1981,10 @@
           {
             "type": "declaration",
             "named": true
+          },
+          {
+            "type": "import_statement",
+            "named": true
           }
         ]
       },
@@ -6076,6 +6080,10 @@
     "named": false
   },
   {
+    "type": "defer",
+    "named": false
+  },
+  {
     "type": "delete",
     "named": false
   },
@@ -6214,11 +6222,11 @@
   },
   {
     "type": "number",
-    "named": false
+    "named": true
   },
   {
     "type": "number",
-    "named": true
+    "named": false
   },
   {
     "type": "object",
