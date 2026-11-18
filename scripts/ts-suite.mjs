@@ -32,6 +32,8 @@ const CASES = ['tests/cases/compiler', 'tests/cases/conformance'];
 const BASELINES = 'tests/baselines/reference';
 const EXT = ['.ts', '.tsx', '.mts', '.cts'];
 const MARKER = '.ts-suite-complete';
+const OUT_MARKER = '.ts-suite-out';
+const BOM = '\u00ef\u00bb\u00bf'; // a UTF-8 byte-order mark, read as latin1
 const FILENAME = /^\s*\/\/\s*@filename\s*:\s*(.+?)\s*$/i;
 
 function git(cwd, args) {
@@ -43,9 +45,19 @@ function git(cwd, args) {
   }).toString();
 }
 
+const markerText = () => JSON.stringify({ sha: SHA, cases: CASES }) + '\n';
+const markerMatches = (dir) => {
+  try {
+    return fs.readFileSync(path.join(dir, MARKER), 'utf8') === markerText();
+  } catch {
+    return false;
+  }
+};
+
 function fetchSuite(cacheRoot) {
   const dir = path.join(cacheRoot, `typescript-suite-${SHA.slice(0, 12)}`);
-  if (fs.existsSync(path.join(dir, MARKER))) return dir;
+  // The marker names the sha and the sparse dirs, so a checkout of other dirs is refetched.
+  if (markerMatches(dir)) return dir;
   fs.mkdirSync(cacheRoot, { recursive: true });
   const tmp = `${dir}.partial-${process.pid}`;
   fs.rmSync(tmp, { recursive: true, force: true });
@@ -64,8 +76,15 @@ function fetchSuite(cacheRoot) {
     fs.rmSync(tmp, { recursive: true, force: true });
     throw new Error(`fetch failed: ${e.stderr ? e.stderr.toString().trim() : e.message}`);
   }
-  fs.writeFileSync(path.join(tmp, MARKER), SHA + '\n');
-  fs.renameSync(tmp, dir);
+  fs.writeFileSync(path.join(tmp, MARKER), markerText());
+  try {
+    fs.renameSync(tmp, dir);
+  } catch (e) {
+    // A concurrent run may have finished the same checkout first.
+    fs.rmSync(tmp, { recursive: true, force: true });
+    if (markerMatches(dir)) return dir;
+    throw new Error(`cannot move the fetched checkout into ${dir} (${e.code ?? e.message}); remove that directory and retry`);
+  }
   return dir;
 }
 
@@ -89,18 +108,34 @@ function* walk(dir) {
   }
 }
 
-const hasExt = (name) => EXT.some((e) => name.toLowerCase().endsWith(e));
+// Case-sensitive, as tree-accuracy.mjs checks extensions.
+const hasExt = (name) => EXT.some((e) => name.endsWith(e));
 
 function main() {
   const argv = process.argv.slice(2);
   const cacheRoot = process.env.TS_DIFF_CACHE || path.join(os.homedir(), '.cache', 'tree-sitter-typescript-differential');
   let out = path.join(cacheRoot, `typescript-suite-${SHA.slice(0, 12)}-split`);
+  let ownOut = true; // the default is this script's own cache dir
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--out' && argv[i + 1]) out = path.resolve(argv[++i]);
-    else throw new Error(`unknown argument: ${argv[i]} (usage: ts-suite.mjs [--out DIR])`);
+    if (argv[i] === '--out') {
+      const v = argv[++i];
+      if (!v || v.startsWith('-')) throw new Error('--out needs a directory');
+      out = path.resolve(v);
+      ownOut = false;
+    } else {
+      throw new Error(`unknown argument: ${argv[i]} (usage: ts-suite.mjs [--out DIR])`);
+    }
+  }
+  // Only a directory this script made (or an empty or new one) is cleared.
+  if (!ownOut && fs.existsSync(out) && fs.readdirSync(out).length > 0 && !fs.existsSync(path.join(out, OUT_MARKER))) {
+    throw new Error(`${out} is not empty and was not made by ts-suite.mjs; pass an empty or new --out`);
   }
   const repo = fetchSuite(cacheRoot);
   const errored = testsWithErrors(repo);
+  fs.mkdirSync(out, { recursive: true });
+  fs.writeFileSync(path.join(out, OUT_MARKER), '');
+  // The lists go first, so an interrupted run leaves no list naming deleted parts.
+  for (const l of ['list.txt', 'list-clean.txt']) fs.rmSync(path.join(out, l), { force: true });
   fs.rmSync(path.join(out, 'cases'), { recursive: true, force: true });
   const all = [];
   const clean = [];
@@ -109,18 +144,20 @@ function main() {
     for (const file of walk(path.join(repo, c))) {
       if (!hasExt(file)) continue;
       tests++;
-      // latin1 keeps the bytes as they are: some tests are UTF-16 or not valid UTF-8. A part
-      // keeps its own line breaks (CRLF, CR or LF; some tests use each), so line-break
-      // handling is measured too; only the break before the next directive is dropped.
+      // latin1 keeps the bytes as they are (a file that is not valid UTF-8 is written back
+      // unchanged; UTF-16 tests are then skipped by tree-accuracy, which reads UTF-8).
       const text = fs.readFileSync(file, 'latin1');
-      const tok = text.split(/(\r\n|\r|\n)/);
-      const lines = tok.filter((_, i) => i % 2 === 0);
+      // As tsc's harness (splitContentByNewlines): split on CRLF if the file has one, else
+      // LF, else CR. A mixed-break file is then one unit where tsc sees no directive line.
+      const sep = text.includes('\r\n') ? '\r\n' : text.includes('\n') ? '\n' : '\r';
+      const lines = text.split(sep);
+      // The harness reads the file without its BOM, so a directive may start line 1.
+      const directive = (l, i) => FILENAME.exec(i === 0 && l.startsWith(BOM) ? l.slice(BOM.length) : l);
       const starts = [];
-      lines.forEach((l, i) => { if (FILENAME.test(l)) starts.push(i); });
-      const body = (from, to) => tok.slice(2 * from, 2 * to - 1).join('');
+      lines.forEach((l, i) => { if (directive(l, i)) starts.push(i); });
       const parts = starts.length === 0
         ? [[path.basename(file), text]]
-        : starts.map((s, k) => [FILENAME.exec(lines[s])[1], body(s + 1, starts[k + 1] ?? lines.length)]);
+        : starts.map((s, k) => [directive(lines[s], s)[1], lines.slice(s + 1, starts[k + 1]).join(sep)]);
       const rel = path.relative(path.join(repo, 'tests', 'cases'), file);
       const base = path.basename(file).replace(/\.[^.]+$/, '');
       parts.forEach(([name, body], j) => {

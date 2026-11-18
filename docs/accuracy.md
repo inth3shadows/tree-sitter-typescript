@@ -94,8 +94,9 @@ remaining mismatch on the corpora either.
 `scripts/ts-suite.mjs` (`npm run ts-suite`) turns TypeScript's own tests into a corpus for
 `--files`. It fetches microsoft/TypeScript v5.9.3 (c63de15) into the differential's cache,
 `tests/cases/compiler` and `tests/cases/conformance` only, and splits each test on its
-`// @filename:` directives into one file per part, keeping each part's bytes and line breaks.
-It writes two lists:
+`// @filename:` directives into one file per part, as TypeScript's test harness does: lines
+break at CRLF if the file has one, else at LF, else at CR, and a byte-order mark does not hide
+a directive on line 1. Each part keeps its bytes. It writes two lists:
 
 - `list.txt`: every part with a TypeScript extension.
 - `list-clean.txt`: the parts of tests with no `.errors.txt` baseline, which compile with no
@@ -111,12 +112,12 @@ node --stack-size=60000 scripts/tree-accuracy.mjs --spans \
   --files ~/.cache/tree-sitter-typescript-differential/typescript-suite-c63de15a992d-split/list-clean.txt
 ```
 
-At da80b94 (#129):
+At 25a2d5f (#130):
 
 | List | Files tsc parses cleanly | Precision % | Recall % | Wrong | Missed | Error files |
 |---|---|---|---|---|---|---|
-| `list.txt` | 12,703 | 99.807 | 99.548 | 294 | 691 | 317 |
-| `list-clean.txt` | 7,000 | 99.895 | 99.379 | 72 | 428 | 30 |
+| `list.txt` | 12,700 | 99.807 | 99.548 | 294 | 691 | 306 |
+| `list-clean.txt` | 6,997 | 99.895 | 99.379 | 72 | 428 | 26 |
 
 Unlike the corpora, these files test edge cases on purpose, so the numbers are a list of
 constructs to check, not a measure of real-world accuracy. #122 to #128 came from the
