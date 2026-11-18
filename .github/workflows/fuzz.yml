@@ -13,6 +13,9 @@ on:
       - tsx/src/scanner.c
       - common/scanner.h
 
+permissions:
+  contents: read
+
 jobs:
   fuzz:
     runs-on: ubuntu-latest
@@ -22,8 +25,10 @@ jobs:
         language: [typescript, tsx]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - name: Fuzz ${{matrix.language}} parser
-        uses: tree-sitter/fuzz-action@v4
+        uses: tree-sitter/fuzz-action@6a1dcff00aefd038ba418bd63732a9add4901266 # v4
         with:
           directory: ${{matrix.language}}
