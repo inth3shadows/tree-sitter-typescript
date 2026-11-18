@@ -147,8 +147,10 @@ function main() {
       // latin1 keeps the bytes as they are (a file that is not valid UTF-8 is written back
       // unchanged; UTF-16 tests are then skipped by tree-accuracy, which reads UTF-8).
       const text = fs.readFileSync(file, 'latin1');
-      // As tsc's harness (splitContentByNewlines): split on CRLF if the file has one, else
-      // LF, else CR. A mixed-break file is then one unit where tsc sees no directive line.
+      // Lines as tsc's harness splits them (splitContentByNewlines): at CRLF if the file has
+      // one, else LF, else CR. The parts match tsc's units at v5.9.3 but for one test, whose
+      // directive tsc finds after an LF inside a CRLF line. Unlike tsc, a part keeps the other
+      // `// @option` lines, which in a mixed-break file can hold code.
       const sep = text.includes('\r\n') ? '\r\n' : text.includes('\n') ? '\n' : '\r';
       const lines = text.split(sep);
       // The harness reads the file without its BOM, so a directive may start line 1.
