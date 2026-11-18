@@ -19,7 +19,14 @@
  *
  * Usage:
  *   node scripts/tree-accuracy.mjs [--build NAME=TS_WASM,TSX_WASM]... [--corpus NAME]...
- *                                  [--json FILE] [--show N]
+ *                                  [--files LIST] [--spans] [--show-span KINDS] [--json FILE] [--show N]
+ *   --files LIST  measure the files named in LIST (one path per line, deduplicated by
+ *                 content) instead of the corpora
+ *   --spans       also compare every node's span, whatever its kind (tsc nodes vs this
+ *                 grammar's named nodes), and list the node kinds whose spans most often
+ *                 have no match: a triage aid for wrong trees the categories do not see
+ *   --show-span KINDS  with --show N: list up to N unmatched spans of each node kind in the
+ *                 comma-separated KINDS (tree-sitter or tsc kind names), one per file
  *   Default build: this checkout's tree-sitter-typescript.wasm / tree-sitter-tsx.wasm
  *   (run `npm run build:wasm` first). Corpora come from the differential's cache
  *   (TS_DIFF_CACHE or ~/.cache/tree-sitter-typescript-differential); run
@@ -105,6 +112,7 @@ function tscNodes(text, isTsx) {
   const sf = ts.createSourceFile('x' + (isTsx ? '.tsx' : '.ts'), text, ts.ScriptTarget.Latest, true, isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   if (sf.parseDiagnostics.length) return null;
   const out = new Set();
+  out.sf = sf;
   const visit = (n) => {
     if (TSC_SKIP.has(n.kind)) return;
     // `typeof import('m')` is an ImportType in tsc and a type_query (left out) here
@@ -140,7 +148,12 @@ function tsNodes(tree) {
     if ((n.type === 'union_type' || n.type === 'intersection_type') && n.parent && n.parent.type === n.type) cat = undefined;
     // the inner part of a qualified name (`a.b` in `a.b.c.D`, `import x = a.b.c`) is the
     // JavaScript grammar's nested_identifier aliased to member_expression; tsc has a QualifiedName
-    if (n.type === 'member_expression' && n.parent && n.parent.type === 'nested_identifier') cat = undefined;
+    // (`a.b.c.d.E` nests a member_expression inside it once per extra part)
+    if (n.type === 'member_expression') {
+      let q = n.parent;
+      while (q && q.type === 'member_expression') q = q.parent;
+      if (q && q.type === 'nested_identifier') cat = undefined;
+    }
     // `asserts x is T` is one TypePredicate in tsc; here `asserts` (counted above) wraps a type_predicate
     if (n.type === 'type_predicate' && n.parent && n.parent.type === 'asserts') cat = undefined;
     if (cat) out.add(`${cat}:${n.startIndex}:${n.endIndex}`);
@@ -149,6 +162,153 @@ function tsNodes(tree) {
   visit(tree.rootNode);
   cursor.delete();
   return {out, errors};
+}
+
+// Span-only comparison: every tsc node and every named tree-sitter node, kind ignored.
+// Leaves (tokens, names, literals) are left out on both sides, and so are list wrappers that
+// only one side has: tree-sitter's argument, parameter and body containers, tsc's
+// declaration lists and template spans.
+const TSC_SPAN_SKIP = new Set([K.SourceFile, K.EndOfFileToken, K.VariableDeclarationList, K.TemplateSpan, K.HeritageClause, K.ThisType,
+  K.JsxAttributes, K.TemplateLiteralTypeSpan, K.MetaProperty,
+  // `import x = require('m')`: tsc's reference is `require('m')`, the clause here is `x = require('m')`
+  K.ExternalModuleReference]);
+const TSN_SPAN_SKIP = new Set(['program', 'comment', 'html_comment', 'ERROR',
+  'arguments', 'formal_parameters', 'type_arguments', 'type_parameters', 'type_annotation',
+  'template_substitution', 'class_body', 'interface_body', 'enum_body', 'else_clause',
+  'extends_clause', 'implements_clause', 'class_heritage', 'extends_type_clause',
+  'constraint', 'default_type', 'string', 'regex', 'literal_type', 'finally_clause',
+  'type_predicate_annotation', 'template_type', 'opting_type_annotation', 'adding_type_annotation',
+  'omitting_type_annotation', 'asserts_annotation',
+  // `[K in keyof A as N]`: here the clause spans `as N`, tsc's TypeParameter stops before it
+  'mapped_type_clause', 'import_require_clause']);
+// a trailing `;` or `,` belongs to a member in tsc and not here; drop it on both sides, with
+// the whitespace and block comments before it (`a: T /* c */;` ends after `T` here)
+const spanKey = (text, st, en) => {
+  while (en > st && (text[en - 1] === ';' || text[en - 1] === ',')) {
+    en--;
+    for (;;) {
+      while (en > st && /\s/.test(text[en - 1])) en--;
+      if (en - 2 <= st || text[en - 1] !== '/' || text[en - 2] !== '*') break;
+      const open = text.lastIndexOf('/*', en - 3);
+      if (open < st) break;
+      en = open;
+    }
+  }
+  return `${st}:${en}`;
+};
+const METHODISH = new Set([K.MethodDeclaration, K.GetAccessor, K.SetAccessor, K.Constructor]);
+function tscSpans(sf) {
+  const out = new Map();
+  const text = sf.text;
+  const visit = (n) => {
+    // a bare type name is a TypeReference (or ExpressionWithTypeArguments) around a name in tsc
+    // a bare type name is a TypeReference around a name in tsc, and a class's `extends A<T>`
+    // has no node for `A<T>` here
+    const p = n.parent;
+    const bareRef = n.kind === K.TypeReference && !n.typeArguments || n.kind === K.ExpressionWithTypeArguments && p?.kind === K.HeritageClause;
+    // a node that is only a wrapper around one name (`{a}`, `for (const a of b)`), or has no
+    // child node (`{}`, `break`), is a leaf here; flat unions count once, as above
+    const kids = [];
+    ts.forEachChild(n, (c) => {
+      kids.push(c);
+    });
+    // a bodiless `constructor()` and an empty `class {}` have no child node in tsc but a
+    // name or a class_body here
+    // (a wrapper around one childless node is a leaf, as below for tree-sitter: `yield;`)
+    const leafish = kids.length === 0 && n.kind !== K.Constructor && n.kind !== K.ClassExpression ||
+      (kids.length === 1 && ts.forEachChild(kids[0], () => true) === undefined &&
+      spanKey(text, kids[0].getStart(sf), kids[0].end) === spanKey(text, n.getStart(sf), n.end));
+    const innerFlat = (n.kind === K.UnionType || n.kind === K.IntersectionType) && n.parent && n.parent.kind === n.kind ||
+      // `unique symbol` is one token here; `import type {a}` starts its clause after `type` here
+      n.kind === K.TypeOperator && n.operator === K.UniqueKeyword || n.kind === K.ImportClause && n.isTypeOnly ||
+      // nodes with no wrapper here: `[x: string]`, `catch (e: any)`, a mapped type's `K in A`
+      n.kind === K.Parameter && p?.kind === K.IndexSignature || n.kind === K.VariableDeclaration && p?.kind === K.CatchClause ||
+      n.kind === K.TypeParameter && (p?.kind === K.MappedType || p?.kind === K.InferType) ||
+      // `a, b, c` is one flat sequence_expression here; `namespace a.b {}` is one internal_module
+      n.kind === K.BinaryExpression && n.operatorToken.kind === K.CommaToken && p?.kind === K.BinaryExpression && p.operatorToken.kind === K.CommaToken ||
+      n.kind === K.ModuleDeclaration && p?.kind === K.ModuleDeclaration;
+    // `for (let i = 0; ...)` has no VariableStatement; its list is the lexical_declaration here
+    const forInit = n.kind === K.VariableDeclarationList && p?.kind === K.ForStatement;
+    if ((!TSC_SPAN_SKIP.has(n.kind) || forInit) && !ts.isJSDoc(n) && n.kind > K.LastToken && !bareRef && !leafish && !innerFlat) {
+      // an exported declaration starts at `export` in tsc, as export_statement does here
+      let st = n.getStart(sf);
+      // a class method's decorators are its siblings here, so its span starts after them
+      if (METHODISH.has(n.kind) && ts.isClassLike(p)) {
+        const decs = ts.getDecorators(n);
+        if (decs?.length) st = ts.skipTrivia(text, decs[decs.length - 1].end);
+      }
+      const k = spanKey(text, st, n.end);
+      if (!out.has(k)) out.set(k, K[n.kind]);
+    }
+    ts.forEachChild(n, visit);
+  };
+  visit(sf);
+  return out;
+}
+// A same-line comment after a statement or `}` is inside that node here, as in
+// tree-sitter-javascript; tsc never puts trivia in a node. A node's span ends at its last
+// non-comment child. The exception: a class method's body keeps it, because there the
+// comment belongs to class_body in tree-sitter-javascript and that difference is a bug here.
+function contentEnd(n, memo) {
+  let e = memo.get(n.id);
+  if (e !== undefined) return e;
+  e = n.endIndex;
+  if (!(n.type === 'statement_block' && n.parent?.type === 'method_definition')) {
+    for (let i = n.childCount - 1; i >= 0; i--) {
+      const c = n.child(i);
+      if (c.type !== 'comment' && c.type !== 'html_comment') {
+        e = contentEnd(c, memo); break;
+      }
+    }
+  }
+  memo.set(n.id, e);
+  return e;
+}
+function tsSpans(tree, text) {
+  const out = new Map();
+  const memo = new Map();
+  const visit = (n) => {
+    const p = n.parent;
+    const kids = n.namedChildren.filter((c) => c.type !== 'comment' && c.type !== 'html_comment');
+    const skip = TSN_SPAN_SKIP.has(n.type) || kids.length === 0 ||
+      // a rest parameter is one Parameter in tsc, with its annotation
+      (n.type === 'rest_pattern' && p && (p.type === 'required_parameter' || p.type === 'optional_parameter')) ||
+      (p && p.type === 'ambient_declaration' && n.type !== 'statement_block' && p.namedChild(0)?.id === n.id) ||
+      // the declaration inside export_statement: tsc's declaration spans the export
+      (p && p.type === 'export_statement' && p.childForFieldName('declaration')?.id === n.id) ||
+      (n.type === 'parenthesized_expression' && p && COND_PARENTS.has(p.type)) ||
+      (n.type === 'template_string' && !n.namedChildren.some((c) => c.type === 'template_substitution')) ||
+      ((n.type === 'union_type' || n.type === 'intersection_type') && p && p.type === n.type) ||
+      (n.type === 'literal_type' && n.namedChild(0)?.type === 'undefined') ||
+      // a mapped type is an index_signature in an object_type here and one MappedType in tsc
+      (n.type === 'index_signature' && n.namedChildren.some((c) => c.type === 'mapped_type_clause')) ||
+      // a directive (`"use client"`) is a leaf in tsc
+      (n.type === 'expression_statement' && kids.length === 1 && kids[0].type === 'string') ||
+      // `typeof import("a")` is one ImportType in tsc; `implements A<T>` and an interface's
+      // `extends A<T>` are heritage entries; `{...props}` is one JsxSpreadAttribute
+      (n.type === 'import_type' && p?.type === 'type_query') ||
+      (n.type === 'generic_type' && (p?.type === 'implements_clause' || p?.type === 'extends_type_clause')) ||
+      (n.type === 'spread_element' && p?.type === 'jsx_expression') ||
+      // `export default function () {}` is one FunctionDeclaration in tsc, spanning the export
+      ((n.type === 'function_expression' || n.type === 'class') && p?.type === 'export_statement' && p.childForFieldName('value')?.id === n.id) ||
+      (n.type === 'type_predicate' && p?.type === 'asserts') ||
+      // `typeof f<T>` is one TypeQuery; `{a: b = 1}` is one BindingElement; `with {type: "json"}`
+      // is one ImportAttributes; `\`a\`` is a literal
+      (n.type === 'instantiation_expression' && p?.type === 'type_query') ||
+      (n.type === 'assignment_pattern' && p?.type === 'pair_pattern') ||
+      (n.type === 'object' && p?.type === 'import_attribute') ||
+      (n.type === 'template_literal_type' && !n.namedChildren.some((c) => c.type === 'template_type')) ||
+      (n.type === 'nested_identifier' && (p?.type === 'internal_module' || p?.type === 'module')) ||
+      (n.namedChildCount === 1 && n.namedChild(0).namedChildCount === 0 &&
+        spanKey(text, n.namedChild(0).startIndex, n.namedChild(0).endIndex) === spanKey(text, n.startIndex, n.endIndex));
+    if (!skip) {
+      const k = spanKey(text, n.startIndex, contentEnd(n, memo));
+      if (!out.has(k)) out.set(k, n.type);
+    }
+    for (let i = 0; i < n.namedChildCount; i++) visit(n.namedChild(i));
+  };
+  visit(tree.rootNode);
+  return out;
 }
 
 function listFiles(base, rel) {
@@ -176,7 +336,7 @@ function corpusDir(c, cacheRoot) {
 }
 
 function parseArgs(argv) {
-  const a = {builds: [], corpora: [], json: null, show: 0, showCat: null};
+  const a = {builds: [], corpora: [], json: null, show: 0, showCat: null, files: null, spans: false};
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     const v = () => {
@@ -191,7 +351,11 @@ function parseArgs(argv) {
     else if (k === '--json') a.json = v();
     else if (k === '--show') a.show = Number(v());
     else if (k === '--show-category') a.showCat = v();
-    else throw new Error(`unknown argument ${k}`);
+    else if (k === '--files') a.files = v();
+    else if (k === '--spans') a.spans = true;
+    else if (k === '--show-span') {
+      a.showSpan = new Set(v().split(',')); a.spans = true;
+    } else throw new Error(`unknown argument ${k}`);
   }
   if (!a.builds.length) a.builds.push({name: 'this', ts: path.join(ROOT, 'tree-sitter-typescript.wasm'), tsx: path.join(ROOT, 'tree-sitter-tsx.wasm')});
   return a;
@@ -210,17 +374,43 @@ async function main() {
     const mk = async (w) => {
       const p = new Parser(); p.setLanguage(await Language.load(fs.readFileSync(w))); return p;
     };
-    builds.push({...b, p: {ts: await mk(b.ts), tsx: await mk(b.tsx)}, cats: {}, files: 0, errFiles: 0, samples: []});
+    builds.push({...b, p: {ts: await mk(b.ts), tsx: await mk(b.tsx)}, cats: {}, files: 0, errFiles: 0, samples: [], spanShown: {},
+      span: {tp: 0, fp: 0, fn: 0, fpKinds: {}, fnKinds: {}}});
   }
   const cacheRoot = process.env.TS_DIFF_CACHE || path.join(os.homedir(), '.cache', 'tree-sitter-typescript-differential');
   let corpora = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'ts-differential.corpora.json'), 'utf8')).filter((c) => !c.local);
   if (args.corpora.length) corpora = corpora.filter((c) => args.corpora.includes(c.name));
   let files = 0;
   let skipped = 0;
-  for (const c of corpora) {
-    const base = corpusDir(c, cacheRoot);
-    for (const f of listFiles(base, '')) {
-      const text = fs.readFileSync(path.join(base, f), 'utf8');
+  const sources = [];
+  if (args.files) {
+    const seen = new Set();
+    const list = fs.readFileSync(args.files, 'utf8').split('\n').filter((l) => l && EXTS.has(path.extname(l)));
+    const group = {name: 'files', files: []};
+    for (const f of list) {
+      let text;
+      try {
+        text = fs.readFileSync(f, 'utf8');
+      } catch {
+        continue;
+      }
+      if (text.length > 2_000_000) continue;
+      const h = crypto.createHash('sha1').update(text).digest('hex');
+      if (seen.has(h)) continue;
+      seen.add(h); group.files.push(f);
+    }
+    sources.push({name: 'files', base: '', files: group.files});
+    corpora = [{name: `files:${path.basename(args.files)}`, sha: `${group.files.length}-unique`}];
+  } else {
+    for (const c of corpora) {
+      const base = corpusDir(c, cacheRoot);
+      sources.push({name: c.name, base, files: listFiles(base, '')});
+    }
+  }
+  for (const c of sources) {
+    const base = c.base;
+    for (const f of c.files) {
+      const text = fs.readFileSync(base ? path.join(base, f) : f, 'utf8');
       const isTsx = f.endsWith('.tsx');
       const want = tscNodes(text, isTsx);
       if (!want) {
@@ -233,9 +423,36 @@ async function main() {
         if (args.showCat && cat !== args.showCat) return;
         b.samples.push(`${sign} ${c.name}/${f} ${cat} ${JSON.stringify(text.slice(+st, Math.min(+en, +st + 90)))}`);
       };
+      // --show-span: up to --show samples per listed kind, at most one per file and kind
+      const spanSample = (b, sign, kind, k) => {
+        if (!args.showSpan?.has(kind)) return;
+        const n = (b.spanShown[kind] ??= {n: 0, file: null});
+        if (n.n >= args.show || n.file === f) return;
+        n.n++; n.file = f;
+        const [st, en] = k.split(':').map(Number);
+        b.samples.push(`${sign} ${c.name}/${f}:${st} ${kind} ${JSON.stringify(text.slice(st, Math.min(en, st + 90)))}`);
+      };
       for (const b of builds) {
         const tree = b.p[isTsx ? 'tsx' : 'ts'].parse(text);
         const {out: got, errors} = tsNodes(tree);
+        if (args.spans) {
+          const ws = (want.spans ??= tscSpans(want.sf));
+          const gs = tsSpans(tree, text);
+          const sp = b.span;
+          for (const [k, kind] of gs) {
+            if (ws.has(k)) sp.tp++;
+            else {
+              sp.fp++; sp.fpKinds[kind] = (sp.fpKinds[kind] ?? 0) + 1;
+              spanSample(b, '+', kind, k);
+            }
+          }
+          for (const [k, kind] of ws) {
+            if (!gs.has(k)) {
+              sp.fn++; sp.fnKinds[kind] = (sp.fnKinds[kind] ?? 0) + 1;
+              spanSample(b, '-', kind, k);
+            }
+          }
+        }
         tree.delete();
         b.files++;
         if (errors) b.errFiles++;
@@ -263,12 +480,25 @@ async function main() {
     for (const s of Object.values(b.cats)) {
       t.tp += s.tp; t.fp += s.fp; t.fn += s.fn;
     }
-    report.builds.push({name: b.name, files: b.files, filesWithErrors: b.errFiles, total: t, precision: t.tp / (t.tp + t.fp), recall: t.tp / (t.tp + t.fn), categories: b.cats});
+    const r = {name: b.name, files: b.files, filesWithErrors: b.errFiles, total: t,
+      precision: t.tp / (t.tp + t.fp), recall: t.tp / (t.tp + t.fn), categories: b.cats};
+    if (args.spans) r.spans = b.span;
+    report.builds.push(r);
   }
   console.log(`tree accuracy vs tsc ${ts.version}: ${files} files tsc parses cleanly (${skipped} skipped) in ${report.corpora.join(', ')}`);
   console.log(['build'.padEnd(28), 'precision%'.padStart(11), 'recall%'.padStart(9), 'wrong'.padStart(8), 'missed'.padStart(8), 'err files'.padStart(10)].join(' '));
   for (const r of report.builds) {
     console.log([r.name.padEnd(28), pct(r.total.tp, r.total.tp + r.total.fp).padStart(11), pct(r.total.tp, r.total.tp + r.total.fn).padStart(9), String(r.total.fp).padStart(8), String(r.total.fn).padStart(8), String(r.filesWithErrors).padStart(10)].join(' '));
+  }
+  if (args.spans) {
+    const top = (o) => Object.entries(o).sort((x, y) => y[1] - x[1]).slice(0, 12).map(([k, n]) => `${k} ${n}`).join(', ');
+    for (const b of builds) {
+      const sp = b.span;
+      console.log(`${b.name} spans: precision ${pct(sp.tp, sp.tp + sp.fp)}% recall ${pct(sp.tp, sp.tp + sp.fn)}%` +
+        ` (${sp.fp} unmatched here, ${sp.fn} unmatched in tsc)`);
+      console.log(`  unmatched here, by kind: ${top(sp.fpKinds)}`);
+      console.log(`  unmatched in tsc, by kind: ${top(sp.fnKinds)}`);
+    }
   }
   for (const b of builds) for (const s of b.samples) console.log(`${b.name} ${s}`);
   if (args.json) fs.writeFileSync(args.json, JSON.stringify(report, null, 1) + '\n');
