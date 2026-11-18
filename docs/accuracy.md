@@ -35,8 +35,9 @@ named node here, compared by span alone. It finds wrong trees in node kinds the 
 not cover. Leaves, list wrappers that only one side has, and the layout conventions of each
 grammar (decorators beside a method, `?:` annotations, `for (let …;` declaration lists, a
 same-line comment after a statement, and others listed in the script) are left out on both
-sides. A comment after the `}` of a method, function, arrow or static block body still counts:
-there it belongs outside the body (#115). `--show-span KINDS` prints up to `--show N` (default
+sides. A comment after the `}` of a method, function expression, arrow or static block body
+still counts: there it belongs outside the body (#115); after a function declaration it is
+the statement convention. `--show-span KINDS` prints up to `--show N` (default
 5) unmatched spans of each named kind, by tree-sitter or tsc kind name. Span numbers are not
 part of the results below; on the corpora, every unmatched span the check found was either a
 convention, now filtered, or a bug that is now fixed (#115).
@@ -44,9 +45,9 @@ convention, now filtered, or a bug that is now fixed (#115).
 `--files LIST` measures the files named in a list instead of the corpora: one path per line,
 relative to the list's directory, identical content measured once per dialect. Files it leaves
 out (no TypeScript extension, unreadable, over 2 MB) are reported, and a list with nothing to
-measure is an error. Over 41,485 parse-clean local TypeScript files, it found no class of
-wrong tree beyond the corpora's, apart from one parse of `unique symbol[]`, a type tsc's
-checker rejects.
+measure is an error. Over 41,591 parse-clean local TypeScript files, with the
+#116 build, it finds 2 wrong and 2 missed nodes and 2 unmatched spans on each side, all from
+one fixture's `unique symbol[]`, a type tsc's checker rejects.
 
 ## Results
 

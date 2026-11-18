@@ -373,10 +373,9 @@ function parseArgs(argv) {
       a.showSpan = new Set(v().split(',')); a.spans = true;
     } else throw new Error(`unknown argument ${k}`);
   }
-  // --show-span lists up to --show spans of each kind (5 when --show is not given); category
-  // samples need their own --show
-  a.showSpanN = a.show || 5;
-  if (a.showSpan && !argv.includes('--show')) a.show = 0;
+  // --show-span lists up to --show spans of each kind (5 when --show is not given); with it,
+  // category samples are printed only for --show-category
+  a.showSpanN = argv.includes('--show') ? a.show : 5;
   if (!a.builds.length) a.builds.push({name: 'this', ts: path.join(ROOT, 'tree-sitter-typescript.wasm'), tsx: path.join(ROOT, 'tree-sitter-tsx.wasm')});
   return a;
 }
@@ -415,7 +414,7 @@ async function main() {
       if (EXTS.has(path.extname(l))) list.push(path.resolve(dir, l));
       else dropped.extension.push(l);
     }
-    sources.push({name: 'files', base: '', files: list, dedup: true});
+    sources.push({name: 'files', base: '', files: list, dedup: true, rel: dir});
   } else {
     for (const c of corpora) {
       const base = corpusDir(c, cacheRoot);
@@ -448,11 +447,12 @@ async function main() {
         skipped++; continue;
       }
       files++;
+      const label = c.rel ? path.relative(c.rel, f) : f;
       const sample = (b, sign, x) => {
-        if (b.samples.length >= args.show) return;
+        if (b.samples.length >= args.show || (args.showSpan && !args.showCat)) return;
         const [cat, st, en] = x.split(':');
         if (args.showCat && cat !== args.showCat) return;
-        b.samples.push(`${sign} ${c.name}/${f} ${cat} ${JSON.stringify(text.slice(+st, Math.min(+en, +st + 90)))}`);
+        b.samples.push(`${sign} ${c.name}/${label} ${cat} ${JSON.stringify(text.slice(+st, Math.min(+en, +st + 90)))}`);
       };
       // --show-span: up to --show samples per listed kind, at most one per file and kind
       const spanSample = (b, sign, kind, k) => {
@@ -461,7 +461,7 @@ async function main() {
         if (n.n >= args.showSpanN || n.file === f) return;
         n.n++; n.file = f;
         const [st, en] = k.split(':').map(Number);
-        b.spanSamples.push(`${sign} ${c.name}/${f}:${st} ${kind} ${JSON.stringify(text.slice(st, Math.min(en, st + 90)))}`);
+        b.spanSamples.push(`${sign} ${c.name}/${label}:${st} ${kind} ${JSON.stringify(text.slice(st, Math.min(en, st + 90)))}`);
       };
       for (const b of builds) {
         const tree = b.p[isTsx ? 'tsx' : 'ts'].parse(text);
@@ -507,6 +507,7 @@ async function main() {
   }
   if (args.files) {
     corpora = [{name: `files:${path.basename(args.files)}`, sha: `${seen.size}-unique`}];
+    if (dropped.duplicate) console.error(`tree-accuracy: ${dropped.duplicate} listed file(s) repeat earlier content and were measured once`);
     for (const [why, l] of Object.entries(dropped)) {
       if (why === 'duplicate') continue;
       if (l.length) console.error(`tree-accuracy: ${l.length} listed file(s) left out (${why}): ${l.slice(0, 5).join(', ')}${l.length > 5 ? ', ...' : ''}`);
