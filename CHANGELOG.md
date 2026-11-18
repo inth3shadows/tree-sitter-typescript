@@ -4,6 +4,17 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
+## Unreleased
+
+### Fixes
+- A same-line comment after a method's closing brace is a child of `class_body` (or of
+  the `object`, for an object-literal method), after the `method_definition`, as in
+  tree-sitter-javascript (#115): `get f() { return 1 } // c` put the comment inside the
+  method's `statement_block`. A method's body no longer takes an automatic semicolon
+  after its `}`. Comments after statements keep their place: `x = 1 // c` and
+  `function f() {} // c` still hold the comment, as in tree-sitter-javascript. Tree shape
+  only: node types are unchanged. The parse table grows by 8 states (tsx 8).
+
 ## 0.25.0
 
 Version 0.25.0, since node types changed (see **Node types** below).
