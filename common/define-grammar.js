@@ -60,6 +60,10 @@ module.exports = function defineGrammar(dialect) {
     ]),
 
     precedences: ($, previous) => previous.concat([
+      // `=> {` starts a body, as statement_block outranks 'object' in JavaScript; where a
+      // `function` may be a declaration or an expression (`export default`), the
+      // declaration's body wins, as 'declaration' outranks 'literal' (#115)
+      [$.statement_block, $._method_body, 'object'],
       [
         // 'member' ranks above this row, as in JavaScript's ladder. It makes a
         // postfix `!` bind before a type assertion, `<T>x!` is `<T>(x!)` (#98), and
@@ -728,13 +732,62 @@ module.exports = function defineGrammar(dialect) {
       // Object-literal methods: no markers, so `{ get\n x }` as a block keeps ASI.
       method_definition: $ => prec.left(seq(
         methodSignature($, $._property_name, false),
-        field('body', $.statement_block),
+        field('body', alias($._method_body, $.statement_block)),
       )),
 
       _class_method_definition: $ => prec.left(seq(
         methodSignature($, $._class_member_name),
-        field('body', $.statement_block),
+        field('body', alias($._method_body, $.statement_block)),
       )),
+
+      // The body of a method, a function or arrow expression, or a static block takes no
+      // automatic semicolon after its `}`, which would pull a same-line comment after it
+      // into the body (#115). The comment then belongs to what holds the body (class_body,
+      // an object, a call's arguments, or the statement). tree-sitter-javascript 0.23.1
+      // agrees for methods, static blocks and object or class-field values, and keeps the
+      // comment in the body elsewhere. A block that is itself a statement, or a function
+      // declaration's body, keeps the automatic semicolon and the comment (#38).
+      _method_body: $ => seq('{', repeat($.statement), '}'),
+
+      // As tree-sitter-javascript's, with the body above.
+      function_expression: $ => prec('literal', seq(
+        optional('async'),
+        'function',
+        field('name', optional($.identifier)),
+        $._call_signature,
+        field('body', alias($._method_body, $.statement_block)),
+      )),
+
+      generator_function: $ => prec('literal', seq(
+        optional('async'),
+        'function',
+        '*',
+        field('name', optional($.identifier)),
+        $._call_signature,
+        field('body', alias($._method_body, $.statement_block)),
+      )),
+
+      arrow_function: $ => seq(
+        optional('async'),
+        choice(
+          field('parameter', choice(
+            alias($._reserved_identifier, $.identifier),
+            $.identifier,
+          )),
+          $._call_signature,
+        ),
+        '=>',
+        field('body', choice(
+          $.expression,
+          alias($._method_body, $.statement_block),
+        )),
+      ),
+
+      class_static_block: $ => seq(
+        'static',
+        optional($._automatic_semicolon),
+        field('body', alias($._method_body, $.statement_block)),
+      ),
 
       declaration: ($, previous) => choice(
         previous,

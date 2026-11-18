@@ -4,6 +4,28 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
+## Unreleased
+
+### Fixes
+- A same-line comment after the closing brace of a method, a function or arrow
+  expression, or a static block now belongs to what holds that body, not to the body
+  (#115). `get f() { return 1 } // c` and `static {} // c` put the comment in
+  `class_body`; `{ m() {} // c` and `{ f: function () {} // c` put it in the `object`;
+  `f(() => {} // c` puts it in the `arguments`; `x = () => {} // c` puts it in the
+  `expression_statement`. Each of these was inside the body's `statement_block`. These
+  bodies no longer take an automatic semicolon after their `}`. A block that is a
+  statement, and a function declaration's body, keep the comment as before
+  (`if (a) {} // c`, `function f() {} // c`, `export default function f() {} // c`), as
+  in tree-sitter-javascript. An anonymous `export default function () {} // c` is a
+  `function_expression` here, so its comment moves to the `export_statement`.
+  tree-sitter-javascript 0.23.1 agrees for methods, static blocks, and arrows and
+  function expressions that are object property values or class fields; it keeps the
+  comment inside the body for those that are call arguments, array elements, assigned
+  or declared (`x = () => {} // c`, `const f = function () {} // c`), or
+  `export default`. Tree shape only: node types are unchanged. Of 14,625
+  corpus files, 4 parse differently (comments only); none errors before or after. The
+  parse table grows by 20 states (tsx 20).
+
 ## 0.25.0
 
 Version 0.25.0, since node types changed (see **Node types** below).
