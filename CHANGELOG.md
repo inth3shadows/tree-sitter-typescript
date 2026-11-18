@@ -4,7 +4,9 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
-## Unreleased
+## 0.25.0
+
+Version 0.25.0, since node types changed (see **Node types** below).
 
 ### Fixes
 - `readonly` binds only to the type directly after it, as `keyof` does, so a following
