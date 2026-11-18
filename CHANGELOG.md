@@ -4,6 +4,14 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
+## Unreleased
+
+### Packaging
+- The npm job is a local copy of tree-sitter/workflows' package-npm.yml that can publish with
+  npm trusted publishing (OIDC): npm 11.21.3 and `id-token: write` in the publish step. The
+  token stays as a fallback until a trusted publisher is set up on npmjs.com. One failed
+  native build no longer cancels the others.
+
 ## 0.25.2
 
 ### Packaging
