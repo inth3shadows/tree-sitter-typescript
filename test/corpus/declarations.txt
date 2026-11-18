@@ -1658,6 +1658,49 @@ class Foo {
               (arguments))))))))
 
 =======================================
+Static index signatures (#123)
+=======================================
+
+class C {
+  static [x: string]: number;
+  static readonly [y: number]: string
+  static
+  [w: string]: number;
+  static [k];
+  static [k]: number;
+}
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (index_signature
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))
+      (index_signature
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))
+      (index_signature
+        (identifier)
+        (predefined_type)
+        (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (computed_property_name
+          (identifier)))
+      (public_field_definition
+        (computed_property_name
+          (identifier))
+        (type_annotation
+          (predefined_type))))))
+
+=======================================
 Global namespace declarations
 =======================================
 

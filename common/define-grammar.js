@@ -1427,6 +1427,9 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       index_signature: $ => seq(
+        // A class's static index signature (tsc 4.3+); `static` on a type member is
+        // a tsc error, accepted here as property_signature accepts it.
+        optional(seq('static', optional($._modifier_marker))),
         optional(
           seq(
             field('sign', optional(choice('-', '+'))),
