@@ -1,0 +1,12 @@
+# zizmor config.
+rules:
+  adhoc-packages:
+    # package-npm.yml is a local copy of tree-sitter/workflows package-npm.yml; its
+    # `npm i --omit peer --omit optional` and pinned `npm install -g npm@11.21.3` mirror
+    # upstream on purpose (trusted publishing needs that npm).
+    ignore:
+      - package-npm.yml
+  self-repository:
+    # publish.yml calls the local package-npm.yml with `uses: ./...` by design.
+    ignore:
+      - publish.yml

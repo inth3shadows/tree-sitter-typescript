@@ -1,0 +1,6 @@
+# osv-scanner ignores. Each entry expires so it resurfaces.
+
+[[IgnoredVulns]]
+id = "GHSA-fc5q-39xc-vjpf"
+ignoreUntil = 2026-12-18T00:00:00Z
+reason = "picomatch ReDoS: no fixed release exists yet (4.0.7 is latest and listed last_affected). Transitive via the build toolchain; re-check when a fix ships."

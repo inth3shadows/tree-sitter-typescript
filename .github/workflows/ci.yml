@@ -25,6 +25,9 @@ concurrency:
   group: ${{github.workflow}}-${{github.ref}}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test parsers
@@ -37,18 +40,20 @@ jobs:
         os: [ubuntu-latest, windows-2022, macos-latest]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       # Pin the CLI to the version the parsers are generated with: the action's
       # default (latest) broke its own config step at v0.27.1.
       - name: Set up tree-sitter
-        uses: tree-sitter/setup-action/cli@v1
+        uses: tree-sitter/setup-action/cli@82b255ba7408ae2a2ec3f3a697ec211bff912f2a # v1
         with:
           tree-sitter-ref: v0.25.10
       # Parsing real code is the differential's job (differential.yml): pinned corpora,
       # tsc as the oracle, a baseline of known gaps. Unpinned HEAD clones made this red
       # whenever upstream projects added syntax the grammar lacks.
       - name: Run tests
-        uses: tree-sitter/parser-test-action@v2
+        uses: tree-sitter/parser-test-action@aba4a3de737f86f8ce83be38166a1ab521d4c960 # v2
         with:
           test-rust: true
           test-node: true
