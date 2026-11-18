@@ -1,0 +1,162 @@
+# A copy of tree-sitter/workflows' package-npm.yml at
+# d66eebce6bd661badf0ce10f1ce8f90ea8a89279, changed so the publish step can use npm trusted
+# publishing (OIDC): it runs npm 11.21.3 (trusted publishing needs 11.5.1 or later) with
+# id-token: write. npm checks the calling workflow's filename, publish.yml, so that is the
+# workflow registered on npmjs.com, with environment npm. The token is a fallback until
+# the trusted publisher is set up, then it can be revoked and the secret deleted.
+# Also: build_node does not fail fast, so one runner problem does not cancel the others.
+name: Publish package (npm)
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: The name of the package
+        default: ${{github.event.repository.name}}
+        type: string
+      environment-name:
+        description: The name of the environment
+        default: npm
+        type: string
+      node-version:
+        description: The NodeJS version
+        default: ${{vars.NODE_VERSION || '22'}}
+        type: string
+      generate:
+        description: Generate the parser artifacts
+        default: false
+        type: boolean
+      abi-version:
+        description: The tree-sitter ABI version
+        default: 15
+        type: number
+    secrets:
+      NODE_AUTH_TOKEN:
+        description: An authentication token for npm (a fallback for trusted publishing)
+        required: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build_wasm:
+    name: Build Wasm binaries
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up NodeJS
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          cache: npm
+          node-version: ${{inputs.node-version}}
+      - name: Install dependencies
+        run: npm i --omit peer --omit optional
+      - name: Regenerate parser
+        if: ${{inputs.generate}}
+        run: |
+          while read -r grammar_dir; do
+            pushd "$grammar_dir"
+            npm x -- tree-sitter generate
+            popd > /dev/null
+          done < <(jq -r '.grammars[].path // "."' tree-sitter.json)
+        env:
+          TREE_SITTER_ABI_VERSION: ${{inputs.abi-version}}
+      - name: Build Wasm binaries
+        run: |-
+          while read -r grammar_dir; do
+            npm x -- tree-sitter build --wasm "$grammar_dir"
+          done < <(jq -r '.grammars[].path // "."' tree-sitter.json)
+      - name: Upload binaries
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: "*.wasm"
+          name: prebuilds-wasm
+          retention-days: 2
+
+  build_node:
+    name: Build NodeJS binaries on ${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2022
+          - windows-11-arm
+          - ubuntu-24.04
+          - ubuntu-24.04-arm
+          - macos-15
+          - macos-15-intel
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up NodeJS
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          cache: npm
+          node-version: ${{inputs.node-version}}
+      - name: Install dependencies
+        run: npm i --omit peer --omit optional
+      - name: Regenerate parser
+        if: ${{inputs.generate}}
+        shell: bash
+        run: |
+          while read -r grammar_dir; do
+            grammar_dir="${grammar_dir%$'\r'}"
+            pushd "$grammar_dir"
+            npm x -- tree-sitter generate
+            popd > /dev/null
+          done < <(jq -r '.grammars[].path // "."' tree-sitter.json)
+      - name: Build binary
+        run: npm x -- prebuildify -t 20.19.5
+      - name: Upload binaries
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: prebuilds/**
+          name: prebuilds-${{matrix.os}}
+          retention-days: 2
+
+  package:
+    name: Publish NodeJS package
+    needs: [build_wasm, build_node]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: ${{inputs.environment-name}}
+      url: https://www.npmjs.com/package/${{inputs.package-name}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up NodeJS
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          cache: npm
+          node-version: ${{inputs.node-version}}
+          registry-url: https://registry.npmjs.org/
+      - name: Install npm with trusted publishing
+        run: npm install -g npm@11.21.3 && npm --version
+      - name: Download binaries
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          path: prebuilds
+          pattern: prebuilds-*
+          merge-multiple: true
+      - name: Check binaries
+        run: tree prebuilds
+      - name: Move Wasm binaries to root
+        continue-on-error: true
+        run: mv -v prebuilds/*.wasm .
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
