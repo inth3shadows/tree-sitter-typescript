@@ -8019,8 +8019,13 @@
             "type": "FIELD",
             "name": "body",
             "content": {
-              "type": "SYMBOL",
-              "name": "statement_block"
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_method_body"
+              },
+              "named": true,
+              "value": "statement_block"
             }
           }
         ]
@@ -9805,12 +9810,37 @@
             "type": "FIELD",
             "name": "body",
             "content": {
-              "type": "SYMBOL",
-              "name": "statement_block"
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_method_body"
+              },
+              "named": true,
+              "value": "statement_block"
             }
           }
         ]
       }
+    },
+    "_method_body": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "statement"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
     },
     "type_assertion": {
       "type": "PREC_LEFT",

@@ -1342,6 +1342,78 @@ class Foo<Bar> extends Baz { bar = 5; static one(a) { return a; }; two(b) { retu
             (identifier)))))))
 
 =======================================
+Comments after a method's closing brace (#115)
+=======================================
+
+class A {
+  get f() { return 1 } // a
+  m() {} /* b */
+  async n() {}; // c
+  @d o() {} // e
+  p() {
+  } // f
+  q() { /* g */ }
+}
+const o = { m() {} // h
+}
+function g() {} // i
+
+---
+
+(program
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (return_statement
+            (number))))
+      (comment)
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (comment)
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (comment)
+      (decorator
+        (identifier))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (comment)
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (comment)
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (comment)))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (object
+        (method_definition
+          (property_identifier)
+          (formal_parameters)
+          (statement_block))
+        (comment))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (comment))))
+
+=======================================
 Classes with static blocks
 =======================================
 

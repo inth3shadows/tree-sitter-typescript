@@ -728,13 +728,19 @@ module.exports = function defineGrammar(dialect) {
       // Object-literal methods: no markers, so `{ get\n x }` as a block keeps ASI.
       method_definition: $ => prec.left(seq(
         methodSignature($, $._property_name, false),
-        field('body', $.statement_block),
+        field('body', alias($._method_body, $.statement_block)),
       )),
 
       _class_method_definition: $ => prec.left(seq(
         methodSignature($, $._class_member_name),
-        field('body', $.statement_block),
+        field('body', alias($._method_body, $.statement_block)),
       )),
+
+      // A method's body takes no automatic semicolon after its `}`, which would pull a
+      // same-line comment after the method into the body (#115). The comment stays in
+      // class_body or the object, as in tree-sitter-javascript; class_body reads any
+      // `;` after a method.
+      _method_body: $ => seq('{', repeat($.statement), '}'),
 
       declaration: ($, previous) => choice(
         previous,
