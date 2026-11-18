@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-typescript-next",
-  "version": "0.25.1",
+  "version": "0.25.2",
   "description": "TypeScript and TSX grammars for tree-sitter",
   "repository": "https://github.com/inth3shadows/tree-sitter-typescript",
   "license": "MIT",
@@ -48,6 +48,7 @@
   "devDependencies": {
     "eslint": ">=9.14.0",
     "eslint-config-treesitter": "^1.0.2",
+    "node-gyp": "13.1.0",
     "prebuildify": "^6.0.1",
     "tree-sitter": "0.25.1",
     "tree-sitter-cli": "0.25.10",

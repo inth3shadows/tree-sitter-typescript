@@ -4,6 +4,14 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
+## 0.25.2
+
+### Packaging
+- The first npm release of `tree-sitter-typescript-next`. The 0.25.1 npm job failed: the
+  Windows Arm runner's Visual Studio 2026 is newer than the node-gyp bundled with npm, so
+  node-gyp 13.1.0 is now a pinned devDependency, which prebuildify uses. The grammar is the
+  same as 0.25.1.
+
 ## 0.25.1
 
 ### Packaging
