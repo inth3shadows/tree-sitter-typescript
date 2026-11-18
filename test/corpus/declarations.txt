@@ -738,6 +738,11 @@ import type from from "m";
 import type from = require("m");
 import from from "m";
 import type from "m";
+export import x from "m";
+export import type * as ns2 from "m";
+import defer "m";
+export import r = require;
+const m = import.defer("m");
 
 ---
 
@@ -820,7 +825,35 @@ import type from "m";
     (import_clause
       (identifier))
     (string
-      (string_fragment))))
+      (string_fragment)))
+  (export_statement
+    (import_statement
+      (import_clause
+        (identifier))
+      (string
+        (string_fragment))))
+  (export_statement
+    (import_statement
+      (import_clause
+        (namespace_import
+          (identifier)))
+      (string
+        (string_fragment))))
+  (import_statement
+    (string
+      (string_fragment)))
+  (export_statement
+    (import_alias
+      (identifier)
+      (identifier)))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (call_expression
+        (meta_property)
+        (arguments
+          (string
+            (string_fragment)))))))
 
 ==================================
 Property signatures with accessibility modifiers

@@ -434,6 +434,9 @@ module.exports = function defineGrammar(dialect) {
       export_specifier: ($, previous) => specifier($, previous, $._module_export_name),
 
       // `type`, `defer` and `from` name a default import (`import type from from "m"`)
+      // `import.defer("m")` (TypeScript 5.9) beside `import.meta` and `new.target`
+      meta_property: _ => choice(seq('new', '.', 'target'), seq('import', '.', choice('meta', 'defer'))),
+
       _import_identifier: $ => choice($.identifier, keywordName($, 'type'), keywordName($, 'defer'), keywordName($, 'from')),
 
       import_specifier: ($, previous) => specifier($, previous, $.identifier),
@@ -463,11 +466,17 @@ module.exports = function defineGrammar(dialect) {
       // `type` is a modifier, unless it is the default import's name (`import defer from`)
       import_statement: $ => seq(
         'import',
-        optional(choice('type', 'typeof', 'defer')),
         choice(
-          seq($.import_clause, $._from_clause),
-          $.import_require_clause,
-          field('source', $.string),
+          seq(
+            optional(choice('type', 'typeof')),
+            choice(
+              seq($.import_clause, $._from_clause),
+              $.import_require_clause,
+              field('source', $.string),
+            ),
+          ),
+          // no `import defer a = require("m")`: tsc expects `from`
+          seq('defer', choice(seq($.import_clause, $._from_clause), field('source', $.string))),
         ),
         optional($.import_attribute),
         $._semicolon,
@@ -492,8 +501,9 @@ module.exports = function defineGrammar(dialect) {
           optional($._no_asi_marker),
           choice(
             field('declaration', $.declaration),
-            // `export import a = require("m")`: the import_statement `import a = require("m")` gives
-            field('declaration', alias($._import_require_declaration, $.import_statement)),
+            // `export import a = require("m")`, `export import x from "m"`: tsc's parser takes any
+            // import after `export` (its checker rejects most), so the import_statement is the same
+            field('declaration', $.import_statement),
             seq(
               'default',
               choice(
@@ -843,13 +853,6 @@ module.exports = function defineGrammar(dialect) {
         $.implements_clause,
       ),
 
-      _import_require_declaration: $ => seq(
-        'import',
-        optional('type'),
-        $.import_require_clause,
-        $._semicolon,
-      ),
-
       import_require_clause: $ => seq(
         $._import_identifier,
         '=',
@@ -947,7 +950,8 @@ module.exports = function defineGrammar(dialect) {
         optional('type'),
         $._import_identifier,
         '=',
-        choice($.identifier, $.nested_identifier),
+        // `require` is a keyword here (for `= require("m")`) but also names a namespace
+        choice($.identifier, keywordName($, 'require'), $.nested_identifier),
         $._semicolon,
       ),
 
