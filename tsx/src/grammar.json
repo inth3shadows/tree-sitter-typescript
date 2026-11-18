@@ -163,6 +163,14 @@
                   }
                 },
                 {
+                  "type": "FIELD",
+                  "name": "declaration",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "import_statement"
+                  }
+                },
+                {
                   "type": "SEQ",
                   "members": [
                     {
@@ -879,50 +887,95 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "CHOICE",
+              "type": "SEQ",
               "members": [
                 {
-                  "type": "STRING",
-                  "value": "type"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "STRING",
+                          "value": "type"
+                        },
+                        {
+                          "type": "STRING",
+                          "value": "typeof"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
                 },
                 {
-                  "type": "STRING",
-                  "value": "typeof"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "import_clause"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_from_clause"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "import_require_clause"
+                    },
+                    {
+                      "type": "FIELD",
+                      "name": "source",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "string"
+                      }
+                    }
+                  ]
                 }
               ]
             },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
             {
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "import_clause"
+                  "type": "STRING",
+                  "value": "defer"
                 },
                 {
-                  "type": "SYMBOL",
-                  "name": "_from_clause"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "import_clause"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_from_clause"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "FIELD",
+                      "name": "source",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "string"
+                      }
+                    }
+                  ]
                 }
               ]
-            },
-            {
-              "type": "SYMBOL",
-              "name": "import_require_clause"
-            },
-            {
-              "type": "FIELD",
-              "name": "source",
-              "content": {
-                "type": "SYMBOL",
-                "name": "string"
-              }
             }
           ]
         },
@@ -7311,8 +7364,17 @@
               "value": "."
             },
             {
-              "type": "STRING",
-              "value": "meta"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "meta"
+                },
+                {
+                  "type": "STRING",
+                  "value": "defer"
+                }
+              ]
             }
           ]
         }
@@ -8936,6 +8998,24 @@
           },
           "named": true,
           "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "defer"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "from"
+          },
+          "named": true,
+          "value": "identifier"
         }
       ]
     },
@@ -9956,7 +10036,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "identifier"
+          "name": "_import_identifier"
         },
         {
           "type": "STRING",
@@ -10320,8 +10400,20 @@
           "value": "import"
         },
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "type"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "SYMBOL",
-          "name": "identifier"
+          "name": "_import_identifier"
         },
         {
           "type": "STRING",
@@ -13514,6 +13606,15 @@
     [
       "class_static_block",
       "_property_name"
+    ],
+    [
+      "import_statement",
+      "_import_identifier"
+    ],
+    [
+      "import_statement",
+      "_import_identifier",
+      "import_alias"
     ],
     [
       "optional_tuple_parameter",

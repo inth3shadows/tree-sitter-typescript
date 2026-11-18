@@ -29,6 +29,7 @@
   "private"
   "protected"
   "public"
+  "defer"
   "type"
   "readonly"
   "override"

@@ -12,6 +12,33 @@ because editor queries match on node names.
   token stays as a fallback until a trusted publisher is set up on npmjs.com. One failed
   native build no longer cancels the others.
 
+### Fixes
+- Import forms that tsc accepts no longer have an ERROR (#122):
+  - `export import a = require("m")` and `export import type a = require("m")` are an
+    `export_statement` around the `import_statement` that `import a = require("m")` gives.
+    They had a MISSING `;` or an ERROR. Any import may follow `export`, as tsc's parser
+    allows (its checker rejects most): `export import x from "m"` parses too.
+  - `import a = require` with `("m")` on the next line stays a require import, and the
+    exported form, which was an alias followed by a separate statement, is one too.
+  - `import type a = N.b` and `export import type a = N.b` are an `import_alias`.
+  - `import defer * as ns from "m"` (TypeScript 5.9), `import defer x from "m"` and
+    `import defer "m"` take `defer` as the import phase, and `import.defer("m")` is a
+    `meta_property` call, as `import.meta` is. `import defer a = require("m")` stays an
+    error, as in tsc. `defer` is highlighted as a keyword.
+  - `type`, `defer` and `from` can name an import, as in `import type from from "m"`,
+    `import defer from "m"` and `import defer = require("m")`; a following `from`, `,` or `=`
+    decides, as in tsc.
+
+  Over TypeScript's own test suite (v5.9.3, 12,663 files tsc parses cleanly), files with an
+  ERROR fall from 337 to 317, and no file newly errors. On the corpora, no tree changes. The
+  parse table grows by 69 states (tsx 69). Known limit: an alias of a namespace named
+  `require` (`import a = require;`, `import a = require.b`) is an error, now with or without
+  `export`; it was one without `export` before.
+
+### Node types
+- `export_statement`'s `declaration` field can be an `import_statement` (#122).
+- `import_statement` has a new anonymous `defer` token (#122).
+
 ## 0.25.2
 
 ### Packaging
