@@ -62,6 +62,7 @@
     "build:wasm": "tree-sitter build --wasm -o tree-sitter-typescript.wasm typescript && tree-sitter build --wasm -o tree-sitter-tsx.wasm tsx",
     "differential": "node scripts/ts-differential.mjs",
     "accuracy": "node scripts/tree-accuracy.mjs",
+    "ts-suite": "node scripts/ts-suite.mjs",
     "triage": "node --liftoff-only scripts/upstream-triage.mjs"
   },
   "overrides": {

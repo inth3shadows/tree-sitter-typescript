@@ -89,6 +89,40 @@ counted once; #112 fixed `new a.b!.C()` (#100), which accounted for the `new`, `
 the comment after it (#115). The [span check](#span-check) finds no
 remaining mismatch on the corpora either.
 
+## TypeScript test suite
+
+`scripts/ts-suite.mjs` (`npm run ts-suite`) turns TypeScript's own tests into a corpus for
+`--files`. It fetches microsoft/TypeScript v5.9.3 (c63de15) into the differential's cache,
+`tests/cases/compiler` and `tests/cases/conformance` only, and splits each test on its
+`// @filename:` directives into one file per part, keeping each part's bytes and line breaks.
+It writes two lists:
+
+- `list.txt`: every part with a TypeScript extension.
+- `list-clean.txt`: the parts of tests with no `.errors.txt` baseline, which compile with no
+  errors. An error file in this list is a grammar bug. In `list.txt`, it may instead be a
+  construct tsc's parser accepts and its checker rejects, such as a misplaced modifier.
+
+Run it with a bigger stack, because a few stress tests nest deeply enough to overflow the
+tree walkers:
+
+```sh
+npm run ts-suite
+node --stack-size=60000 scripts/tree-accuracy.mjs --spans \
+  --files ~/.cache/tree-sitter-typescript-differential/typescript-suite-c63de15a992d-split/list-clean.txt
+```
+
+At da80b94 (#129):
+
+| List | Files tsc parses cleanly | Precision % | Recall % | Wrong | Missed | Error files |
+|---|---|---|---|---|---|---|
+| `list.txt` | 12,703 | 99.807 | 99.548 | 294 | 691 | 317 |
+| `list-clean.txt` | 7,000 | 99.895 | 99.379 | 72 | 428 | 30 |
+
+Unlike the corpora, these files test edge cases on purpose, so the numbers are a list of
+constructs to check, not a measure of real-world accuracy. #122 to #128 came from the
+error files in `list-clean.txt`. Its wrong and missed nodes, which have no ERROR, have not
+been triaged yet.
+
 ## Other forks
 
 Measured 2026-11-18 with the rules above, with the same files
