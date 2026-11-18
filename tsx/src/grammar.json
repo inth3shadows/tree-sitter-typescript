@@ -4257,8 +4257,13 @@
             "type": "FIELD",
             "name": "body",
             "content": {
-              "type": "SYMBOL",
-              "name": "statement_block"
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_method_body"
+              },
+              "named": true,
+              "value": "statement_block"
             }
           }
         ]
@@ -4371,8 +4376,13 @@
             "type": "FIELD",
             "name": "body",
             "content": {
-              "type": "SYMBOL",
-              "name": "statement_block"
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_method_body"
+              },
+              "named": true,
+              "value": "statement_block"
             }
           }
         ]
@@ -4500,8 +4510,13 @@
                 "name": "expression"
               },
               {
-                "type": "SYMBOL",
-                "name": "statement_block"
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_method_body"
+                },
+                "named": true,
+                "value": "statement_block"
               }
             ]
           }
@@ -7843,8 +7858,13 @@
           "type": "FIELD",
           "name": "body",
           "content": {
-            "type": "SYMBOL",
-            "name": "statement_block"
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_method_body"
+            },
+            "named": true,
+            "value": "statement_block"
           }
         }
       ]
@@ -13860,6 +13880,20 @@
       {
         "type": "SYMBOL",
         "name": "primary_expression"
+      }
+    ],
+    [
+      {
+        "type": "SYMBOL",
+        "name": "statement_block"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "_method_body"
+      },
+      {
+        "type": "STRING",
+        "value": "object"
       }
     ],
     [
