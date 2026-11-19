@@ -27,10 +27,15 @@ comma expressions, `typeof` operands in types, JSX, interface `extends` and `imp
 union or intersection nodes (tsc's are flat), the inner parts of a qualified name (`a.b` and
 `a.b.c` in `a.b.c.d.E` are `member_expression`s here, from the JavaScript grammar, and
 `QualifiedName`s in tsc), and the predicate inside `asserts x is T` (one `TypePredicate` in tsc,
-an `asserts` around a `type_predicate` here, counted once), and the defaults and rests of a
-destructuring assignment (`[a = 1, ...b] = x`, `({p: a = 1} = x)`: an array or object literal
-with `=` BinaryExpressions and spread elements in tsc, a pattern here). What remains is a small constant
+an `asserts` around a `type_predicate` here, counted once). What remains is a small constant
 floor, so the change between builds is the signal.
+
+One difference is mapped instead: in a destructuring assignment (`[a = 1, ...b] = x`,
+`({p: a = 1} = x)`, `for ([a] of x)`), tsc builds an array or object literal whose defaults are
+`=` BinaryExpressions and whose rests are spread elements, and this grammar builds a pattern.
+There, an `assignment_pattern` counts as `binary` and a `rest_pattern` as `spread`, so both
+sides are still compared (a declaration's or parameter's pattern is tsc's binding pattern and
+is not counted).
 
 ### Span check
 
@@ -136,20 +141,18 @@ node --stack-size=60000 scripts/tree-accuracy.mjs --spans \
   --files ~/.cache/tree-sitter-typescript-differential/typescript-suite-c63de15a992d-split/list-clean.txt
 ```
 
-At 9ebf7b4 (#135):
+Grammar at 9ebf7b4 (#135), measured with the destructuring-assignment mapping above (#136):
 
 | List | Files tsc parses cleanly | Precision % | Recall % | Wrong | Missed | Error files |
 |---|---|---|---|---|---|---|
-| `list.txt` | 12,700 | 99.836 | 99.879 | 250 | 184 | 297 |
+| `list.txt` | 12,700 | 99.839 | 99.880 | 246 | 184 | 297 |
 | `list-clean.txt` | 6,997 | 99.956 | 99.959 | 30 | 28 | 20 |
 
 Unlike the corpora, these files test edge cases on purpose, so the numbers are a list of
 constructs to check, not a measure of real-world accuracy. #122 to #128 came from the
-error files in `list-clean.txt`. In its 6,977 files with no ERROR, 5 nodes are wrong and 2
-missed. Before destructuring-assignment defaults and rests were left out (see
-[Method](#method)), they counted as about 280 missed nodes in this list. `list.txt` also
-holds tests that tsc's checker rejects; a few of them, such as `[...x = a] = b`, are a
-`spread_element` here, which now counts as wrong.
+error files in `list-clean.txt`. In its 6,975 files with no ERROR or MISSING node, 5 nodes
+are wrong and 2 missed. Before the destructuring-assignment mapping (see [Method](#method)),
+every such default and rest counted as missed: about 280 nodes in this list.
 
 ## Other forks
 
