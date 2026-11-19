@@ -106,10 +106,11 @@ after the history below, so it is kept out of the default numbers. At a93e19a:
 
 The 4 error files are `new InjectionToken<<T>(…) => T>(…)` (#62), `abstract override input:
 any` (#133) and two `@((…) => …)` decorators (#124); every wrong node and every unmatched span
-is in the #62 and #124 files. The #133 file has an ERROR but no mismatched node. Two of
-angular's missed nodes are not grammar bugs: in `[fnName, ...args] = check;` tsc builds a
-`SpreadElement` in the assignment target, which this grammar parses as a destructuring
-pattern with a rest element, so the `spread` category has nothing to match.
+is in the #62 and #124 files, as are 12 of the 14 missed nodes. The #133 file has an ERROR but
+no mismatched node. The other two missed nodes, in angular, are not grammar bugs: in
+`[fnName, ...args] = check;` tsc builds a `SpreadElement` in the assignment target, which this
+grammar parses as a destructuring pattern with a rest element, so the `spread` category has
+nothing to match.
 
 ## TypeScript test suite
 
