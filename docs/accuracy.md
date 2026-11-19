@@ -95,8 +95,9 @@ remaining mismatch on the corpora either.
 
 `--set extra` measures the second pinned set: Angular `packages/` (250ca07), NestJS (bbbfaf1),
 Vue core (148fdac) and TanStack Query (816a0aa), 9,632 files tsc parses cleanly. It was added
-after the history below, so it is kept out of the default numbers. With the #124 fix (at
-a93e19a, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => …)` decorators):
+after the history below, so it is kept out of the default numbers. After #124 (at a93e19a,
+before it, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => …)`
+decorators):
 
 | Corpus | Files | Wrong | Missed | Error files |
 |---|---|---|---|---|
@@ -107,10 +108,10 @@ a93e19a, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => �
 
 The 2 error files are `new InjectionToken<<T>(…) => T>(…)` (#62) and `abstract override input:
 any` (#133). Every wrong node and every unmatched span is in the #62 file, as are 2 of the 4
-missed nodes. The #133 file has an ERROR but no mismatched node. The other two missed nodes, in angular, are not grammar bugs: in
-`[fnName, ...args] = check;` tsc builds a `SpreadElement` in the assignment target, which this
-grammar parses as a destructuring pattern with a rest element, so the `spread` category has
-nothing to match.
+missed nodes. The #133 file has an ERROR but no mismatched node. The other two missed nodes,
+in angular, are not grammar bugs: in `[fnName, ...args] = check;` tsc builds a `SpreadElement`
+in the assignment target, which this grammar parses as a destructuring pattern with a rest
+element, so the `spread` category has nothing to match.
 
 ## TypeScript test suite
 
@@ -199,6 +200,7 @@ node scripts/tree-accuracy.mjs \
 ```
 
 `--corpus NAME` (repeatable) limits the run to the named corpora, from either set, and
-`--set extra` measures the [extra corpora](#extra-corpora) instead of the default ones. `--show N --show-category CAT` prints mismatched
-nodes with their source text. `--spans`, `--show-span KINDS` and `--files LIST` are described
+`--set extra` measures the [extra corpora](#extra-corpora) instead of the default ones; the
+two do not combine. `--show N --show-category CAT` prints mismatched nodes with their source
+text. `--spans`, `--show-span KINDS` and `--files LIST` are described
 under [Span check](#span-check). A full run of one build takes about two minutes.

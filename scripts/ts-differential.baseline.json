@@ -1,7 +1,7 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.27.1",
- "generatedAt": "2026-11-19T01:00:27.484Z",
+ "generatedAt": "2026-11-19T01:18:58.760Z",
  "wasmSha256": {
   "typescript": "8db02877e95e3f7ca61649b0e1e9be880eadffe3b598042cfb1142a8bbcc982c",
   "tsx": "f289423acc17091b8026e5330c3dea1672b09430ae009ab932c4cf7f8bc354d5"

@@ -1880,6 +1880,7 @@ class C {
     (): MethodDecorator => (t, k, d) => d
   )) n() {}
   @(a) ['x']() {}
+  @(this.x) p() {}
 }
 
 ---
@@ -1944,7 +1945,25 @@ class C {
           (string
             (string_fragment)))
         (formal_parameters)
+        (statement_block))
+      (decorator
+        (parenthesized_expression
+          (member_expression
+            (this)
+            (property_identifier))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
         (statement_block)))))
+
+==================================
+A call after a parenthesized decorator is an error (#124)
+:error
+==================================
+
+@(a)() class C {}
+
+---
 
 ==================================
 Index type queries
