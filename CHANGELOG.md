@@ -4,7 +4,7 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
-## Unreleased
+## 0.25.3
 
 ### Packaging
 - The npm job is a local copy of tree-sitter/workflows' package-npm.yml that can publish with
