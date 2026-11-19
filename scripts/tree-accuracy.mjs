@@ -14,8 +14,9 @@
  * A wrong nesting (`(a + b)!` for `a + (b!)`) costs both: the wrong node is unmatched and
  * tsc's node is missing. Convention differences the grammar cannot change (comma
  * expressions, `typeof` operands in types, JSX) are left out on both sides, and unions and
- * intersections count only the outermost node because tsc's are flat. What remains is a
- * constant floor, so the change between builds is the signal.
+ * intersections count only the outermost node because tsc's are flat. In a destructuring
+ * assignment target, a pattern's defaults and rests count as tsc's BinaryExpressions and
+ * spreads. What remains is a constant floor, so the change between builds is the signal.
  *
  * Usage:
  *   node scripts/tree-accuracy.mjs [--build NAME=TS_WASM,TSX_WASM]... [--corpus NAME]... [--set SET]
@@ -147,6 +148,24 @@ function inQualifiedName(n) {
   return !!q && q.type === 'nested_identifier';
 }
 
+// A destructuring assignment target (`[a = 1, ...b] = x`, `({p: a = 1, ...c} = x)`,
+// `for ([a] of x)`) is a pattern here and an array or object literal in tsc, whose defaults are
+// `=` BinaryExpressions and whose rests are spread elements. True for a pattern node inside
+// such a target (not a declaration's or a parameter's).
+const PATTERN_PARTS = new Set(['array_pattern', 'object_pattern', 'pair_pattern', 'assignment_pattern', 'rest_pattern', 'object_assignment_pattern']);
+function inAssignmentTarget(n) {
+  let c = n;
+  let p = n.parent;
+  while (p && PATTERN_PARTS.has(p.type)) {
+    c = p; p = p.parent;
+  }
+  if (!p) return false;
+  if (p.type === 'assignment_expression') return p.childForFieldName('left')?.id === c.id;
+  // `for ([a] of x)`, not `for (const [a] of x)`
+  if (p.type === 'for_in_statement') return p.childForFieldName('left')?.id === c.id && !p.childForFieldName('kind');
+  return false;
+}
+
 function tsNodes(tree) {
   const out = new Set();
   let errors = 0;
@@ -164,6 +183,9 @@ function tsNodes(tree) {
     if (n.type === 'member_expression' && inQualifiedName(n)) cat = undefined;
     // `asserts x is T` is one TypePredicate in tsc; here `asserts` (counted above) wraps a type_predicate
     if (n.type === 'type_predicate' && n.parent && n.parent.type === 'asserts') cat = undefined;
+    // a default or rest in a destructuring assignment target: tsc's BinaryExpression or spread
+    if (n.type === 'assignment_pattern' && inAssignmentTarget(n)) cat = 'binary';
+    if (n.type === 'rest_pattern' && inAssignmentTarget(n)) cat = 'spread';
     if (cat) out.add(`${cat}:${n.startIndex}:${n.endIndex}`);
     for (let i = 0; i < n.namedChildCount; i++) visit(n.namedChild(i));
   };
@@ -312,7 +334,8 @@ function tsSpans(tree, text) {
       // `typeof f<T>` is one TypeQuery; `{a: b = 1}` is one BindingElement; `with {type: "json"}`
       // is one ImportAttributes; `\`a\`` is a literal
       (n.type === 'instantiation_expression' && p?.type === 'type_query') ||
-      (n.type === 'assignment_pattern' && p?.type === 'pair_pattern') ||
+      // (in an assignment target, `({p: a = 1} = x)`, tsc has the default as a BinaryExpression)
+      (n.type === 'assignment_pattern' && p?.type === 'pair_pattern' && !inAssignmentTarget(n)) ||
       (n.type === 'object' && p?.type === 'import_attribute') ||
       (n.type === 'template_literal_type' && !n.namedChildren.some((c) => c.type === 'template_type')) ||
       // `namespace a.b.c {}` is one name here and nested ModuleDeclarations in tsc
