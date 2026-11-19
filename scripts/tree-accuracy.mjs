@@ -21,7 +21,8 @@
  *   node scripts/tree-accuracy.mjs [--build NAME=TS_WASM,TSX_WASM]... [--corpus NAME]... [--set SET]
  *                                  [--files LIST] [--spans] [--show-span KINDS] [--json FILE] [--show N]
  *   --set SET     measure the corpora whose "set" is SET (corpora.json) instead of the default
- *                 corpora, which have no set; --corpus NAME picks corpora from any set
+ *                 corpora, which have no set; --corpus NAME picks corpora from any set and
+ *                 cannot be combined with --set
  *   --files LIST  measure the files named in LIST instead of the corpora: one path per line,
  *                 relative to LIST's directory; identical content is measured once per
  *                 dialect, and files left out are reported
@@ -403,11 +404,18 @@ async function main() {
   const all = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'ts-differential.corpora.json'), 'utf8')).filter((c) => !c.local);
   // The default corpora have no set, so their numbers stay comparable with the measured
   // history; a set (such as "extra") is measured with --set, or one corpus with --corpus.
+  if (args.set !== null && (args.corpora.length || args.files)) {
+    throw new Error('--set picks the corpora itself: use it without --corpus and --files');
+  }
+  const have = () => `(have: ${all.map((c) => c.name + (c.set ? ` [${c.set}]` : '')).join(', ')})`;
   let corpora;
-  if (args.corpora.length) corpora = all.filter((c) => args.corpora.includes(c.name));
-  else corpora = all.filter((c) => (c.set ?? null) === args.set);
-  if (!args.files && corpora.length < (args.corpora.length || 1)) {
-    throw new Error(`no such corpus or set (have: ${all.map((c) => c.name + (c.set ? ` [${c.set}]` : '')).join(', ')})`);
+  if (args.corpora.length) {
+    const unknown = [...new Set(args.corpora)].filter((n) => !all.some((c) => c.name === n));
+    if (unknown.length) throw new Error(`no corpus named ${unknown.join(', ')} ${have()}`);
+    corpora = all.filter((c) => args.corpora.includes(c.name));
+  } else {
+    corpora = all.filter((c) => (c.set ?? null) === args.set);
+    if (!args.files && !corpora.length) throw new Error(`no corpus in set ${args.set} ${have()}`);
   }
   let files = 0;
   let skipped = 0;

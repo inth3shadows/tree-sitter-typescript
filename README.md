@@ -22,8 +22,9 @@ fixes ended up here.
   Excalidraw and VS Code `src/`, about 14.5k files; a second set adds Angular, NestJS, Vue
   and TanStack Query, about 9.6k more) plus one-construct fixtures in `test/tsc-fixtures/` is
   parsed with both grammars. A file that tsc accepts and the grammar
-  rejects fails CI unless it is already in the baseline. On those corpora, upstream v0.23.2
-  fails 259 files; this fork fails none.
+  rejects fails CI unless it is already in the baseline. On the first set, upstream v0.23.2
+  fails 259 files; this fork fails none. On the second, the fork fails 4 files, each an open
+  issue (#62, #124, #133).
 - **Tree accuracy** ([docs/accuracy.md](docs/accuracy.md)): the same corpora, but node by node.
   Each expression and type node is compared with the node tsc builds (kind and exact span). From
   upstream v0.23.2 to this fork's main, wrong nodes fell from 17,344 to 0 and missed nodes from

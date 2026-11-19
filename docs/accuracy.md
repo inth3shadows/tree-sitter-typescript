@@ -104,9 +104,12 @@ after the history below, so it is kept out of the default numbers. At a93e19a:
 | vue | 493 | 0 | 0 | 0 |
 | query | 2,076 | 0 | 0 | 0 |
 
-Every mismatch is in the 4 error files: `new InjectionToken<<T>(…) => T>(…)` (#62),
-`abstract override input: any` (#133) and two `@((…) => …)` decorators (#124). The span check
-finds nothing else.
+The 4 error files are `new InjectionToken<<T>(…) => T>(…)` (#62), `abstract override input:
+any` (#133) and two `@((…) => …)` decorators (#124); every wrong node and every unmatched span
+is in the #62 and #124 files. The #133 file has an ERROR but no mismatched node. Two of
+angular's missed nodes are not grammar bugs: in `[fnName, ...args] = check;` tsc builds a
+`SpreadElement` in the assignment target, which this grammar parses as a destructuring
+pattern with a rest element, so the `spread` category has nothing to match.
 
 ## TypeScript test suite
 
@@ -194,6 +197,7 @@ node scripts/tree-accuracy.mjs \
   --json out.json             # several builds in one pass; tsc parses each file once
 ```
 
-`--corpus NAME` limits the run to one corpus. `--show N --show-category CAT` prints mismatched
+`--corpus NAME` (repeatable) limits the run to the named corpora, from either set, and
+`--set extra` measures the [extra corpora](#extra-corpora) instead of the default ones. `--show N --show-category CAT` prints mismatched
 nodes with their source text. `--spans`, `--show-span KINDS` and `--files LIST` are described
 under [Span check](#span-check). A full run of one build takes about two minutes.
