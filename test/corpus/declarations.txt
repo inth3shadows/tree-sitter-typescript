@@ -1861,12 +1861,149 @@ class C {
       (decorator
         (parenthesized_expression
           (member_expression
-            (identifier)
+            (super)
             (property_identifier))))
       (method_definition
         (property_identifier)
         (formal_parameters)
         (statement_block)))))
+
+==================================
+Decorators with any parenthesized expression (#124)
+==================================
+
+@((t) => t) class A {}
+@(a, b) class B {}
+class C {
+  @(a["b"]) m() {}
+  @((
+    (): MethodDecorator => (t, k, d) => d
+  )) n() {}
+  @(a) ['x']() {}
+  @(this.x) p() {}
+}
+
+---
+
+(program
+  (class_declaration
+    (decorator
+      (parenthesized_expression
+        (arrow_function
+          (formal_parameters
+            (required_parameter
+              (identifier)))
+          (identifier))))
+    (type_identifier)
+    (class_body))
+  (class_declaration
+    (decorator
+      (parenthesized_expression
+        (sequence_expression
+          (identifier)
+          (identifier))))
+    (type_identifier)
+    (class_body))
+  (class_declaration
+    (type_identifier)
+    (class_body
+      (decorator
+        (parenthesized_expression
+          (subscript_expression
+            (identifier)
+            (string
+              (string_fragment)))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (decorator
+        (parenthesized_expression
+          (parenthesized_expression
+            (arrow_function
+              (formal_parameters)
+              (type_annotation
+                (type_identifier))
+              (arrow_function
+                (formal_parameters
+                  (required_parameter
+                    (identifier))
+                  (required_parameter
+                    (identifier))
+                  (required_parameter
+                    (identifier)))
+                (identifier))))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (decorator
+        (parenthesized_expression
+          (identifier)))
+      (method_definition
+        (computed_property_name
+          (string
+            (string_fragment)))
+        (formal_parameters)
+        (statement_block))
+      (decorator
+        (parenthesized_expression
+          (member_expression
+            (this)
+            (property_identifier))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block)))))
+
+==================================
+A call after a parenthesized decorator is an error (#124)
+:error
+==================================
+
+@(a)() class C {}
+
+---
+
+==================================
+Decorators with a parenthesized expression (typescript, #124)
+:language(typescript)
+==================================
+
+@(this.x) class A {}
+@(a as any, b) class B {}
+
+---
+
+(program
+  (class_declaration
+    (decorator
+      (parenthesized_expression
+        (member_expression
+          (this)
+          (property_identifier))))
+    (type_identifier)
+    (class_body))
+  (class_declaration
+    (decorator
+      (parenthesized_expression
+        (sequence_expression
+          (as_expression
+            (identifier)
+            (predefined_type))
+          (identifier))))
+    (type_identifier)
+    (class_body)))
+
+==================================
+A call after a parenthesized decorator is an error (typescript, #124)
+:language(typescript)
+:error
+==================================
+
+@(a)() class C {}
+
+---
 
 ==================================
 Index type queries

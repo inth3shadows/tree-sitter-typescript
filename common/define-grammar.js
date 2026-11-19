@@ -693,7 +693,8 @@ module.exports = function defineGrammar(dialect) {
           $.identifier,
           alias($.decorator_member_expression, $.member_expression),
           alias($.decorator_call_expression, $.call_expression),
-          alias($.decorator_parenthesized_expression, $.parenthesized_expression),
+          // `@( Expression )`: any expression, as in the ES decorators grammar and tsc (#124)
+          $.parenthesized_expression,
         ),
       ),
 
@@ -705,16 +706,6 @@ module.exports = function defineGrammar(dialect) {
         optional(field('type_arguments', $.type_arguments)),
         field('arguments', $.arguments),
       )),
-
-      decorator_parenthesized_expression: $ => seq(
-        '(',
-        choice(
-          $.identifier,
-          alias($.decorator_member_expression, $.member_expression),
-          alias($.decorator_call_expression, $.call_expression),
-        ),
-        ')',
-      ),
 
       class_body: $ => seq(
         '{',
