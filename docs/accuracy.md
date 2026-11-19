@@ -150,8 +150,9 @@ Grammar at 9ebf7b4 (#135), measured with the destructuring-assignment mapping ab
 
 Unlike the corpora, these files test edge cases on purpose, so the numbers are a list of
 constructs to check, not a measure of real-world accuracy. #122 to #128 came from the
-error files in `list-clean.txt`. In its 6,975 files with no ERROR or MISSING node, 5 nodes
-are wrong and 2 missed. Before the destructuring-assignment mapping (see [Method](#method)),
+error files in `list-clean.txt`. In its 6,975 files whose tree has no ERROR or MISSING node
+(`rootNode.hasError` false; the Error files column above misses a missing anonymous token, as
+in #106, and counts 20), 5 nodes are wrong and 2 missed. Before the destructuring-assignment mapping (see [Method](#method)),
 every such default and rest counted as missed: about 280 nodes in this list.
 
 ## Other forks
