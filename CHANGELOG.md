@@ -16,12 +16,15 @@ because editor queries match on node names.
 - A decorator can hold any parenthesized expression, `@( Expression )` as in the ES decorators
   grammar: `@((t) => t)`, `@(a["b"])`, `@(a, b)`, `@(yield 0)` (#124). Only an identifier,
   member chain or call fit before, and anything else was an ERROR. Inside the parentheses,
-  keywords are now the nodes they are in any other expression, where they were `identifier`:
-  `super`, `this`, `true`, `false`, `null`, `undefined`, `import` in `import("m")` and the
-  `meta_property` of `import.meta`. Without parentheses (`@this.x`) they stay `identifier`.
-  A call or member access after the parentheses (`@(a)()`, `@(a).b`) stays an ERROR; tsc's
-  checker rejects it too. `await` and `yield` as plain identifiers inside the parentheses
-  (`@(await)`, `@(yield())`) are now an ERROR, as `(await)` already is elsewhere (#126).
+  keywords are now the nodes they are in any other expression: `super`, `this`, `true`,
+  `false`, `null`, `undefined` and the `import` of `import("m")`, which were `identifier`,
+  and `import.meta`, `import.defer` and `new.target`, which were a `member_expression` and are
+  a `meta_property`. Without parentheses (`@this.x`) they stay as before. A call or member
+  access after the parentheses (`@(a)()`, `@(a).b`) stays an ERROR; tsc's checker rejects it
+  too. Inside the parentheses, forms the rest of the grammar does not take now fail there as
+  well: `await` and `yield` as plain identifiers are an ERROR (`@(await)`, `@(yield())`) or a
+  wrong `await_expression`/`yield_expression` (`@(await(1))`, `@(yield)`), as `(await)` is
+  elsewhere (#126), and `@(import.source("m"))` is an ERROR, as `import.source` is anywhere.
 - A class's static index signature, `static [k: string]: T` (also `static readonly`), is an
   `index_signature` (#123). It was a field with a computed name and an ERROR. As with
   `property_signature`, `static` is also accepted on an object-type index signature, which

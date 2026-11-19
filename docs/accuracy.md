@@ -95,9 +95,8 @@ remaining mismatch on the corpora either.
 
 `--set extra` measures the second pinned set: Angular `packages/` (250ca07), NestJS (bbbfaf1),
 Vue core (148fdac) and TanStack Query (816a0aa), 9,632 files tsc parses cleanly. It was added
-after the history below, so it is kept out of the default numbers. After #124 (at a93e19a,
-before it, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => …)`
-decorators):
+after the history below, so it is kept out of the default numbers. Since #124 (before it, at
+a93e19a, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => …)` decorators):
 
 | Corpus | Files | Wrong | Missed | Error files |
 |---|---|---|---|---|
@@ -200,7 +199,7 @@ node scripts/tree-accuracy.mjs \
 ```
 
 `--corpus NAME` (repeatable) limits the run to the named corpora, from either set, and
-`--set extra` measures the [extra corpora](#extra-corpora) instead of the default ones; the
-two do not combine. `--show N --show-category CAT` prints mismatched nodes with their source
-text. `--spans`, `--show-span KINDS` and `--files LIST` are described
+`--set extra` measures the [extra corpora](#extra-corpora) instead of the default ones; `--set`
+does not combine with `--corpus` or `--files`. `--show N --show-category CAT` prints mismatched
+nodes with their source text. `--spans`, `--show-span KINDS` and `--files LIST` are described
 under [Span check](#span-check). A full run of one build takes about two minutes.
