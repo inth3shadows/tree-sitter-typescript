@@ -19,17 +19,21 @@ fixes ended up here.
 
 - **tsc differential** ([docs/differential.md](docs/differential.md)): `tsc`'s syntax
   diagnostics are the ground truth, and every `.ts`/`.tsx` file in pinned corpora (Effect, Zod,
-  Excalidraw and VS Code `src/`, about 14.5k files) plus one-construct fixtures in
-  `test/tsc-fixtures/` is parsed with both grammars. A file that tsc accepts and the grammar
-  rejects fails CI unless it is already in the baseline. On those corpora, upstream v0.23.2
-  fails 259 files; this fork fails none.
-- **Tree accuracy** ([docs/accuracy.md](docs/accuracy.md)): the same corpora, but node by node.
+  Excalidraw and VS Code `src/`, about 14.5k files; a second set adds Angular, NestJS, Vue
+  and TanStack Query, about 9.6k more) plus one-construct fixtures in `test/tsc-fixtures/` is
+  parsed with both grammars. A file that tsc accepts and the grammar
+  rejects fails CI unless it is already in the baseline. On the first set, upstream v0.23.2
+  fails 259 files; this fork fails none. On the second, the fork fails 4 files, each an open
+  issue (#62, #124, #133).
+- **Tree accuracy** ([docs/accuracy.md](docs/accuracy.md)): the first set of corpora, node by node.
   Each expression and type node is compared with the node tsc builds (kind and exact span). From
   upstream v0.23.2 to this fork's main, wrong nodes fell from 17,344 to 0 and missed nodes from
   13,071 to 0, out of 6.2 million. Measured on 2026-11-18 against upstream `master` and the 15
   other forks that change the grammar, this fork had the fewest wrong and missed nodes. The next
-  best had 6,392 and 5,822. TypeScript's own test suite is a second, edge-case corpus for the
-  same check ([docs/accuracy.md](docs/accuracy.md#typescript-test-suite)).
+  best had 6,392 and 5,822. The second set has 10 wrong and 14 missed nodes, all but two in
+  the files of #62 and #124 ([docs/accuracy.md](docs/accuracy.md#extra-corpora)).
+  TypeScript's own test suite is an edge-case corpus for the same check
+  ([docs/accuracy.md](docs/accuracy.md#typescript-test-suite)).
 - **Corpus tests** (`test/corpus/`) pin node shapes, and node tests in `bindings/node/` pin
   field readings for the trickier cases.
 

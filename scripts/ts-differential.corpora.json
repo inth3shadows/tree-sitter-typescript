@@ -3,5 +3,9 @@
   { "name": "zod", "repo": "colinhacks/zod", "sha": "2554b70c3d4a80273381e61d527d820720626440", "subdir": "" },
   { "name": "excalidraw", "repo": "excalidraw/excalidraw", "sha": "dd2f8fc32b92cbf56f4abee6a0cf3b14681b4b55", "subdir": "" },
   { "name": "vscode", "repo": "microsoft/vscode", "sha": "ca43fc94a6cc0a20cb4deefc90e63693d15063e8", "subdir": "src" },
+  { "name": "angular", "set": "extra", "repo": "angular/angular", "sha": "250ca0795363827975a2610854f1273ed768c5ca", "subdir": "packages" },
+  { "name": "nest", "set": "extra", "repo": "nestjs/nest", "sha": "bbbfaf1765308826a581a75424a11d0f3e59521a", "subdir": "" },
+  { "name": "vue", "set": "extra", "repo": "vuejs/core", "sha": "148fdacdc3a67aaa2b8d1b615da227c3fcc2df53", "subdir": "" },
+  { "name": "query", "set": "extra", "repo": "TanStack/query", "sha": "816a0aab2e904cd5364d3b0f278582eccc660318", "subdir": "" },
   { "name": "local", "local": "test/tsc-fixtures" }
 ]

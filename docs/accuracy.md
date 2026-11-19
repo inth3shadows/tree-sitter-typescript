@@ -11,6 +11,8 @@ the nodes this grammar builds with the nodes the TypeScript parser builds for th
   TypeScript parser itself, with no type check.
 - **Files**: every `.ts`/`.tsx`/`.mts`/`.cts` file in the differential's pinned corpora that tsc
   parses with no diagnostics: 14,533 files from Effect, Zod, Excalidraw and VS Code `src/`.
+  The differential's extra set is left out unless `--set extra` is given (see
+  [Extra corpora](#extra-corpora)).
 - **Unit**: a node as `(category, start, end)`. Each side's node kinds map to shared categories
   (binary, unary, await, non_null, member, subscript, call, new, cast, type_assertion, ternary,
   instantiation, arrow, parenthesized, yield, spread, and the union, intersection, function,
@@ -88,6 +90,27 @@ counted once; #112 fixed `new a.b!.C()` (#100), which accounted for the `new`, `
 `call` and `member` pairs; and #116 fixed the last one, an arrow function whose span took in
 the comment after it (#115). The [span check](#span-check) finds no
 remaining mismatch on the corpora either.
+
+## Extra corpora
+
+`--set extra` measures the second pinned set: Angular `packages/` (250ca07), NestJS (bbbfaf1),
+Vue core (148fdac) and TanStack Query (816a0aa), 9,632 files tsc parses cleanly. It was added
+after the history below, so it is kept out of the default numbers. At a93e19a:
+
+| Corpus | Files | Wrong | Missed | Error files |
+|---|---|---|---|---|
+| angular | 4,712 | 6 | 4 | 2 |
+| nest | 2,351 | 4 | 10 | 2 |
+| vue | 493 | 0 | 0 | 0 |
+| query | 2,076 | 0 | 0 | 0 |
+
+The 4 error files are `new InjectionToken<<T>(…) => T>(…)` (#62), `abstract override input:
+any` (#133) and two `@((…) => …)` decorators (#124); every wrong node and every unmatched span
+is in the #62 and #124 files, as are 12 of the 14 missed nodes. The #133 file has an ERROR but
+no mismatched node. The other two missed nodes, in angular, are not grammar bugs: in
+`[fnName, ...args] = check;` tsc builds a `SpreadElement` in the assignment target, which this
+grammar parses as a destructuring pattern with a rest element, so the `spread` category has
+nothing to match.
 
 ## TypeScript test suite
 
@@ -175,6 +198,7 @@ node scripts/tree-accuracy.mjs \
   --json out.json             # several builds in one pass; tsc parses each file once
 ```
 
-`--corpus NAME` limits the run to one corpus. `--show N --show-category CAT` prints mismatched
+`--corpus NAME` (repeatable) limits the run to the named corpora, from either set, and
+`--set extra` measures the [extra corpora](#extra-corpora) instead of the default ones. `--show N --show-category CAT` prints mismatched
 nodes with their source text. `--spans`, `--show-span KINDS` and `--files LIST` are described
 under [Span check](#span-check). A full run of one build takes about two minutes.

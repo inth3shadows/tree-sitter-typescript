@@ -54,7 +54,11 @@ yield diagnostics and `let x: number = 1;` none under `ScriptKind.TS`, and under
 `hasError` and `let x: number = 1;` must not.
 
 Corpora (`scripts/ts-differential.corpora.json`, pinned by SHA): Effect, Zod,
-Excalidraw, VS Code `src/`, plus the fixtures.
+Excalidraw, VS Code `src/`, plus the fixtures. A second set, marked `"set": "extra"`, adds
+Angular `packages/`, NestJS, Vue core and TanStack Query (9,632 more files). The differential
+checks both sets; tree accuracy measures the extra set only with `--set extra`, so its default
+numbers stay comparable with the measured history. The extra set's 4 baselined files are
+#62, #124 and #133.
 
 ## Run it
 
@@ -71,10 +75,10 @@ can run out of Zone memory on a grammar this size), so a plain `node scripts/ts-
 is fine. `TS_DIFF_RELAUNCHED` guards the loop; if it is set but `--liftoff-only` is missing
 from `process.execArgv`, the run exits 2 rather than running unflagged.
 
-Corpora are cloned (depth 1; VS Code blobless + sparse `src/`) into
+Corpora are cloned (depth 1; VS Code and Angular blobless + sparse, `src/` and `packages/`) into
 `$TS_DIFF_CACHE`, default `~/.cache/tree-sitter-typescript-differential/<name>-<sha12>` (CI: `$RUNNER_TEMP/ts-diff-cache`) (plus `-<sha1(subdir)[0:8]>`
 for a sparse corpus), and re-used on later runs only if the completion marker (JSON `{sha, subdir}`)
-matches. The first run downloads a few hundred MB.
+matches. The clones take about 700 MB on disk.
 
 Exit codes: `0` ok, `1` gate failure (above), `2` setup failure (above) or the installed
 `typescript` / `web-tree-sitter` version differs from the baseline's.
