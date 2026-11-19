@@ -30,8 +30,8 @@ fixes ended up here.
   upstream v0.23.2 to this fork's main, wrong nodes fell from 17,344 to 0 and missed nodes from
   13,071 to 0, out of 6.2 million. Measured on 2026-11-18 against upstream `master` and the 15
   other forks that change the grammar, this fork had the fewest wrong and missed nodes. The next
-  best had 6,392 and 5,822. The second set has 6 wrong and 4 missed nodes, all but two in
-  the file of #62 ([docs/accuracy.md](docs/accuracy.md#extra-corpora)).
+  best had 6,392 and 5,822. The second set has 6 wrong and 2 missed nodes, all in the file
+  of #62 ([docs/accuracy.md](docs/accuracy.md#extra-corpora)).
   TypeScript's own test suite is an edge-case corpus for the same check
   ([docs/accuracy.md](docs/accuracy.md#typescript-test-suite)).
 - **Corpus tests** (`test/corpus/`) pin node shapes, and node tests in `bindings/node/` pin

@@ -112,6 +112,28 @@ const TSN = new Map(Object.entries({
 const TSN_SKIP = new Set(['type_query', 'jsx_element', 'jsx_self_closing_element', 'extends_type_clause', 'implements_clause']);
 const COND_PARENTS = new Set(['if_statement', 'while_statement', 'do_statement', 'switch_statement', 'with_statement']);
 
+// A destructuring assignment target (`[a = 1, ...b] = x`, `({a: b = 1, ...c} = x)`,
+// `for ([a] of x)`) is an array or object literal in tsc, its defaults BinaryExpressions and
+// its rests spread elements; here it is a pattern (assignment_pattern, rest_pattern), which
+// no category counts. True for such a literal, nested ones included.
+function isAssignmentPattern(n) {
+  const p = n?.parent;
+  if (!p || (n.kind !== K.ArrayLiteralExpression && n.kind !== K.ObjectLiteralExpression)) return false;
+  if (p.kind === K.BinaryExpression && p.operatorToken.kind === K.EqualsToken && p.left === n) return true;
+  if ((p.kind === K.ForOfStatement || p.kind === K.ForInStatement) && p.initializer === n) return true;
+  if (p.kind === K.ArrayLiteralExpression) return isAssignmentPattern(p);
+  if (p.kind === K.SpreadElement || p.kind === K.SpreadAssignment || p.kind === K.PropertyAssignment) return isAssignmentPattern(p.parent);
+  return false;
+}
+// a default or a rest inside a destructuring assignment target (see isAssignmentPattern)
+function inAssignmentPattern(n) {
+  const p = n.parent;
+  if (n.kind === K.BinaryExpression && n.operatorToken.kind === K.EqualsToken) {
+    return isAssignmentPattern(p) || (p?.kind === K.PropertyAssignment && isAssignmentPattern(p.parent));
+  }
+  return (n.kind === K.SpreadElement || n.kind === K.SpreadAssignment) && isAssignmentPattern(p);
+}
+
 function tscNodes(text, isTsx) {
   const sf = ts.createSourceFile('x' + (isTsx ? '.tsx' : '.ts'), text, ts.ScriptTarget.Latest, true, isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   if (sf.parseDiagnostics.length) return null;
@@ -126,6 +148,8 @@ function tscNodes(text, isTsx) {
     let cat = TSC.get(n.kind);
     // a comma expression is a sequence_expression on our side, nested the other way
     if (n.kind === K.BinaryExpression && n.operatorToken.kind === K.CommaToken) cat = undefined;
+    // a default or rest in a destructuring assignment target is a pattern here
+    if (inAssignmentPattern(n)) cat = undefined;
     // heritage clauses are not instantiation expressions on our side
     if (n.kind === K.ExpressionWithTypeArguments && n.parent && n.parent.kind === K.HeritageClause) cat = undefined;
     // `unique symbol` is a type operator in tsc and a single token here
@@ -237,7 +261,10 @@ function tscSpans(sf) {
       n.kind === K.TypeParameter && (p?.kind === K.MappedType || p?.kind === K.InferType) ||
       // `a, b, c` is one flat sequence_expression here; `namespace a.b {}` is one internal_module
       n.kind === K.BinaryExpression && n.operatorToken.kind === K.CommaToken && p?.kind === K.BinaryExpression && p.operatorToken.kind === K.CommaToken ||
-      n.kind === K.ModuleDeclaration && p?.kind === K.ModuleDeclaration;
+      n.kind === K.ModuleDeclaration && p?.kind === K.ModuleDeclaration ||
+      // `({p: a = 1} = x)`: the default is inside one pair_pattern here, as `{p: a = 1}` in a
+      // declaration is one BindingElement (array-pattern defaults keep their own span)
+      p?.kind === K.PropertyAssignment && inAssignmentPattern(n);
     // `for (let i = 0; ...)` has no VariableStatement; its list is the lexical_declaration here
     const forInit = n.kind === K.VariableDeclarationList && p?.kind === K.ForStatement;
     if ((!TSC_SPAN_SKIP.has(n.kind) || forInit) && !ts.isJSDoc(n) && n.kind > K.LastToken && !bareRef && !leafish && !innerFlat) {

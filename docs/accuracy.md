@@ -27,7 +27,9 @@ comma expressions, `typeof` operands in types, JSX, interface `extends` and `imp
 union or intersection nodes (tsc's are flat), the inner parts of a qualified name (`a.b` and
 `a.b.c` in `a.b.c.d.E` are `member_expression`s here, from the JavaScript grammar, and
 `QualifiedName`s in tsc), and the predicate inside `asserts x is T` (one `TypePredicate` in tsc,
-an `asserts` around a `type_predicate` here, counted once). What remains is a small constant
+an `asserts` around a `type_predicate` here, counted once), and the defaults and rests of a
+destructuring assignment (`[a = 1, ...b] = x`, `({p: a = 1} = x)`: an array or object literal
+with `=` BinaryExpressions and spread elements in tsc, a pattern here). What remains is a small constant
 floor, so the change between builds is the signal.
 
 ### Span check
@@ -100,17 +102,14 @@ a93e19a, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => �
 
 | Corpus | Files | Wrong | Missed | Error files |
 |---|---|---|---|---|
-| angular | 4,712 | 6 | 4 | 2 |
+| angular | 4,712 | 6 | 2 | 2 |
 | nest | 2,351 | 0 | 0 | 0 |
 | vue | 493 | 0 | 0 | 0 |
 | query | 2,076 | 0 | 0 | 0 |
 
 The 2 error files are `new InjectionToken<<T>(…) => T>(…)` (#62) and `abstract override input:
-any` (#133). Every wrong node and every unmatched span is in the #62 file, as are 2 of the 4
-missed nodes. The #133 file has an ERROR but no mismatched node. The other two missed nodes,
-in angular, are not grammar bugs: in `[fnName, ...args] = check;` tsc builds a `SpreadElement`
-in the assignment target, which this grammar parses as a destructuring pattern with a rest
-element, so the `spread` category has nothing to match.
+any` (#133). Every mismatched node and every unmatched span is in the #62 file; the #133 file
+has an ERROR but no mismatched node.
 
 ## TypeScript test suite
 
@@ -137,17 +136,20 @@ node --stack-size=60000 scripts/tree-accuracy.mjs --spans \
   --files ~/.cache/tree-sitter-typescript-differential/typescript-suite-c63de15a992d-split/list-clean.txt
 ```
 
-At 25a2d5f (#130):
+At 9ebf7b4 (#135):
 
 | List | Files tsc parses cleanly | Precision % | Recall % | Wrong | Missed | Error files |
 |---|---|---|---|---|---|---|
-| `list.txt` | 12,700 | 99.807 | 99.548 | 294 | 691 | 306 |
-| `list-clean.txt` | 6,997 | 99.895 | 99.379 | 72 | 428 | 26 |
+| `list.txt` | 12,700 | 99.836 | 99.879 | 250 | 184 | 297 |
+| `list-clean.txt` | 6,997 | 99.956 | 99.959 | 30 | 28 | 20 |
 
 Unlike the corpora, these files test edge cases on purpose, so the numbers are a list of
 constructs to check, not a measure of real-world accuracy. #122 to #128 came from the
-error files in `list-clean.txt`. Its wrong and missed nodes, which have no ERROR, have not
-been triaged yet.
+error files in `list-clean.txt`. In its 6,977 files with no ERROR, 5 nodes are wrong and 2
+missed. Before destructuring-assignment defaults and rests were left out (see
+[Method](#method)), they counted as about 280 missed nodes in this list. `list.txt` also
+holds tests that tsc's checker rejects; a few of them, such as `[...x = a] = b`, are a
+`spread_element` here, which now counts as wrong.
 
 ## Other forks
 
