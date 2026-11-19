@@ -3,7 +3,7 @@ $(error "Windows is not supported")
 endif
 
 HOMEPAGE_URL := https://github.com/tree-sitter/tree-sitter-typescript
-VERSION := 0.25.2
+VERSION := 0.25.3
 
 # repository
 SRC_DIR := src
