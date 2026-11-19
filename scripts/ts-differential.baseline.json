@@ -1,10 +1,10 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.27.1",
- "generatedAt": "2026-11-18T23:45:17.541Z",
+ "generatedAt": "2026-11-19T01:00:27.484Z",
  "wasmSha256": {
-  "typescript": "23ce5b6c03f3b4c323a186866cccc375da9551f90b93d2613adac26d88c6a5a3",
-  "tsx": "f0a0f75ff148b0a23805de356dfd0495bdd7126acb7784fa84a0b56ea293f93f"
+  "typescript": "8db02877e95e3f7ca61649b0e1e9be880eadffe3b598042cfb1142a8bbcc982c",
+  "tsx": "f289423acc17091b8026e5330c3dea1672b09430ae009ab932c4cf7f8bc354d5"
  },
  "divergent": {
   "effect": {},
@@ -15,10 +15,7 @@
    "packages/core/test/acceptance/inherit_definition_feature_spec.ts": 417,
    "packages/platform-browser/animations/async/src/async_animation_renderer.ts": 328
   },
-  "nest": {
-   "packages/microservices/test/decorators/event-pattern.decorator.spec.ts": 76,
-   "packages/microservices/test/decorators/message-pattern.decorator.spec.ts": 58
-  },
+  "nest": {},
   "vue": {},
   "query": {},
   "local": {}

@@ -95,19 +95,19 @@ remaining mismatch on the corpora either.
 
 `--set extra` measures the second pinned set: Angular `packages/` (250ca07), NestJS (bbbfaf1),
 Vue core (148fdac) and TanStack Query (816a0aa), 9,632 files tsc parses cleanly. It was added
-after the history below, so it is kept out of the default numbers. At a93e19a:
+after the history below, so it is kept out of the default numbers. With the #124 fix (at
+a93e19a, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => …)` decorators):
 
 | Corpus | Files | Wrong | Missed | Error files |
 |---|---|---|---|---|
 | angular | 4,712 | 6 | 4 | 2 |
-| nest | 2,351 | 4 | 10 | 2 |
+| nest | 2,351 | 0 | 0 | 0 |
 | vue | 493 | 0 | 0 | 0 |
 | query | 2,076 | 0 | 0 | 0 |
 
-The 4 error files are `new InjectionToken<<T>(…) => T>(…)` (#62), `abstract override input:
-any` (#133) and two `@((…) => …)` decorators (#124); every wrong node and every unmatched span
-is in the #62 and #124 files, as are 12 of the 14 missed nodes. The #133 file has an ERROR but
-no mismatched node. The other two missed nodes, in angular, are not grammar bugs: in
+The 2 error files are `new InjectionToken<<T>(…) => T>(…)` (#62) and `abstract override input:
+any` (#133). Every wrong node and every unmatched span is in the #62 file, as are 2 of the 4
+missed nodes. The #133 file has an ERROR but no mismatched node. The other two missed nodes, in angular, are not grammar bugs: in
 `[fnName, ...args] = check;` tsc builds a `SpreadElement` in the assignment target, which this
 grammar parses as a destructuring pattern with a rest element, so the `spread` category has
 nothing to match.
