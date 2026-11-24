@@ -226,7 +226,7 @@ module.exports = function defineGrammar(dialect) {
         )),
         choice(
           seq(optional(seq('static', optional($._modifier_marker))), optional($.override_modifier), optional('readonly')),
-          seq(optional('abstract'), optional('readonly')),
+          seq(optional('abstract'), optional($.override_modifier), optional('readonly')),
           seq(optional('readonly'), optional('abstract')),
         ),
         optional('accessor'),

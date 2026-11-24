@@ -4,6 +4,15 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
+## Unreleased
+
+### Fixes
+- A class field can be both `abstract` and `override`: `abstract override x: T`, also with an
+  accessibility modifier before it and `readonly` after it (#133). It was an ERROR; the method
+  form already parsed. The field gets an `override_modifier` child, as an overriding field
+  without `abstract` does. The reverse order, `override abstract x`, stays an ERROR: tsc's
+  checker rejects it (TS1029), and so does the method form `override abstract m()`.
+
 ## 0.25.3
 
 ### Packaging
