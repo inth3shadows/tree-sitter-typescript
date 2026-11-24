@@ -2260,6 +2260,51 @@ class Bar extends Foo {
         body: (statement_block)))))
 
 =====================
+Abstract override field
+=====================
+
+abstract class A extends B {
+  abstract override x: any;
+  protected abstract override y?: string;
+  abstract override readonly z: number;
+  abstract
+  override w: any;
+}
+
+---
+
+(program
+  (abstract_class_declaration
+    name: (type_identifier)
+    (class_heritage
+      (extends_clause
+        value: (identifier)))
+    body: (class_body
+      (public_field_definition
+        (override_modifier)
+        name: (property_identifier)
+        type: (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (accessibility_modifier)
+        (override_modifier)
+        name: (property_identifier)
+        type: (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        (override_modifier)
+        name: (property_identifier)
+        type: (type_annotation
+          (predefined_type)))
+      (public_field_definition
+        name: (property_identifier))
+      (public_field_definition
+        (override_modifier)
+        name: (property_identifier)
+        type: (type_annotation
+          (predefined_type))))))
+
+=====================
 Export type star
 =====================
 

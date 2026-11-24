@@ -107,14 +107,14 @@ a93e19a, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => �
 
 | Corpus | Files | Wrong | Missed | Error files |
 |---|---|---|---|---|
-| angular | 4,712 | 6 | 2 | 2 |
+| angular | 4,712 | 6 | 2 | 1 |
 | nest | 2,351 | 0 | 0 | 0 |
 | vue | 493 | 0 | 0 | 0 |
 | query | 2,076 | 0 | 0 | 0 |
 
-The 2 error files are `new InjectionToken<<T>(…) => T>(…)` (#62) and `abstract override input:
-any` (#133). Every mismatched node and every unmatched span is in the #62 file; the #133 file
-has an ERROR but no mismatched node.
+The error file is `new InjectionToken<<T>(…) => T>(…)` (#62), and every mismatched node and
+every unmatched span is in it. A second error file, `abstract override input: any`, parses since
+#139 (#133).
 
 ## TypeScript test suite
 
