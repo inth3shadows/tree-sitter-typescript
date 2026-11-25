@@ -113,7 +113,7 @@ a93e19a, NestJS had 4 wrong, 10 missed and 2 error files, all from `@((…) => �
 | query | 2,076 | 0 | 0 | 0 |
 
 Angular's last two error files parse now: `abstract override input: any` since #139 (#133), and
-`new InjectionToken<<T>(…) => T>(…)` since the fix for #62, which also removed all 6 wrong and
+`new InjectionToken<<T>(…) => T>(…)` since #140 (#62), which also removed all 6 wrong and
 2 missed nodes (they were all in that file).
 
 ## TypeScript test suite
