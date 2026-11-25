@@ -88,11 +88,17 @@ jobs:
         run: |
           set -euo pipefail
           tested() {
-            local wf=$1 status conclusion sha
+            local wf=$1 status conclusion sha id untested
             shift
-            read -r status conclusion sha < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
-              --event push --limit 1 --json status,conclusion,headSha \
-              -q '.[0] | "\(.status) \(.conclusion) \(.headSha)"') || true
+            read -r status conclusion sha id < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
+              --event push --limit 1 --json status,conclusion,headSha,databaseId \
+              -q '.[0] | "\(.status) \(.conclusion) \(.headSha) \(.databaseId)"') || true
+            # A run still going (a merge just before the schedule): wait up to 45 minutes for it.
+            if [[ ${status:-} == queued || ${status:-} == in_progress || ${status:-} == waiting ]]; then
+              timeout 2700 gh run watch "$id" -R "$GITHUB_REPOSITORY" > /dev/null || true
+              read -r status conclusion < <(gh run view "$id" -R "$GITHUB_REPOSITORY" --json status,conclusion \
+                -q '"\(.status) \(.conclusion)"') || true
+            fi
             if [[ ${status:-} != completed || ${conclusion:-} != success ]]; then
               echo "::error::The latest $wf push run on main is ${status:-missing}/${conclusion:-}; release after it passes"
               exit 1
@@ -101,9 +107,13 @@ jobs:
               echo "::error::The latest $wf run on main ($sha) is not an ancestor of main's head"
               exit 1
             fi
-            if ! git diff --quiet "$sha" HEAD -- "$@"; then
-              echo "::error::$wf last passed on $sha, and these files changed after it:"
-              git diff --name-only "$sha" HEAD -- "$@"
+            # Commits after the tested one that touch what it tests, other than release commits
+            # (pushed by this job, which starts no CI; they change only version fields).
+            untested=$(git log --format='%h %s' -E --invert-grep --grep='^release [0-9]+\.[0-9]+\.[0-9]+$' \
+              "$sha"..HEAD -- "$@")
+            if [[ -n $untested ]]; then
+              echo "::error::$wf last passed on $sha, and these commits changed what it tests after it:"
+              echo "$untested"
               exit 1
             fi
             echo "$wf passed on $sha; nothing it tests changed after it."
