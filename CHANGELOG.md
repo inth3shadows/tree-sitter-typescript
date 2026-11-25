@@ -4,7 +4,7 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
-## Unreleased
+## 0.25.4
 
 ### Fixes
 - A class field can be both `abstract` and `override`: `abstract override x: T`, also with an
