@@ -16,10 +16,11 @@ because editor queries match on node names.
   `f<<T>(x: T) => T>(g)`, `new A<<T>(x: T) => T>(0)` (#62). The `<<` lexed as a shift, so
   these were an ERROR or a wrong `binary_expression`. The external scanner now reads that `<<`
   as two `<` when a generic function type (`<…>(…) =>`) follows, as tsc re-scans it; no shift
-  tsc accepts has that shape. The scanner looks ahead at most 4,096 characters. Still wrong,
-  with no ERROR: whitespace or a line break before the `<<` (`f <<T>(x: T) => T>(g)`), and a
-  type parameter or parameter list longer than that limit. Both parse as a shift where tsc
-  builds a call.
+  tsc accepts has that shape. Still read as a shift where tsc builds a call (a wrong tree,
+  sometimes with an ERROR): whitespace or a line break before the `<<` (`f <<T>(x: T) => T>(g)`);
+  a type parameter or parameter list longer than 4,096 characters, the scanner's lookahead
+  limit for each; and a `/` in either list that starts no comment (`(x = a / b)`), since it
+  may open a regex. tsc's checker rejects a parameter initializer in a function type anyway.
 
 ## 0.25.3
 

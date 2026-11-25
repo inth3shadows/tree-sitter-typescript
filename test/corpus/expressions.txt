@@ -402,12 +402,13 @@ a<<b > (c);
         (identifier)))))
 
 =====================
-Generic function type after << with templates, division and modifiers
+Generic function type after << with templates, regexes and modifiers
 =====================
 
 f<<T>(x: `${`)`}`) => T>(g);
-f<<const T>(x = a / b) => T>(g);
+f<<const T>(x: T) => T>(g);
 a<<b>(`${`)=>`}`);
+foo(a<<b, /x>(y)=>/.test(s));
 (h<<5) - h;
 
 ---
@@ -443,9 +444,8 @@ a<<b>(`${`)=>`}`);
           parameters: (formal_parameters
             (required_parameter
               pattern: (identifier)
-              value: (binary_expression
-                left: (identifier)
-                right: (identifier))))
+              type: (type_annotation
+                (type_identifier))))
           return_type: (type_identifier)))
       arguments: (arguments
         (identifier))))
@@ -459,6 +459,20 @@ a<<b>(`${`)=>`}`);
           (template_substitution
             (template_string
               (string_fragment)))))))
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      arguments: (arguments
+        (binary_expression
+          left: (identifier)
+          right: (identifier))
+        (call_expression
+          function: (member_expression
+            object: (regex
+              pattern: (regex_pattern))
+            property: (property_identifier))
+          arguments: (arguments
+            (identifier))))))
   (expression_statement
     (binary_expression
       left: (parenthesized_expression

@@ -879,8 +879,9 @@ static bool scan_asserts_keyword(TSLexer *lexer) {
     return true;
 }
 
-// The `<<` lookahead below reads at most this many characters, strings and
-// comments included, so a plain shift costs little however long the file.
+// The `<<` lookahead below reads at most this many characters for each of its two
+// lists, strings and comments included, so a plain shift costs little however
+// long the file.
 #define TYPE_ARGUMENTS_LOOKAHEAD 4096
 
 // advance() within the lookahead budget. False at the end of input or budget.
@@ -949,10 +950,16 @@ static bool advance_string(TSLexer *lexer, unsigned *budget) {
         if (is_line_terminator(lexer->lookahead)) {
             return false;
         }
-        if (lexer->lookahead == '\\' && !lookahead_advance(lexer, budget)) {
+        bool escape = lexer->lookahead == '\\';
+        if (escape && !lookahead_advance(lexer, budget)) {
             return false;
         }
+        bool cr = lexer->lookahead == '\r';
         if (!lookahead_advance(lexer, budget)) {
+            return false;
+        }
+        // A `\` before CRLF continues the line over both characters.
+        if (escape && cr && lexer->lookahead == '\n' && !lookahead_advance(lexer, budget)) {
             return false;
         }
     }
@@ -985,8 +992,8 @@ static bool advance_template(TSLexer *lexer, unsigned *budget) {
 
 // Moves past the `close` that ends a bracket `depth` levels deep (0: start at
 // `open`). Strings, templates and comments are skipped; with angles, the `>` of
-// `=>` does not close (`<T = () => void>`). A `/` that starts no comment is read
-// as division.
+// `=>` does not close (`<T = () => void>`). A `/` that starts no comment ends the
+// scan: it may open a regex, which can hold any bracket (`a<<b, /x>(y)=>/`).
 static bool advance_balanced(TSLexer *lexer, int32_t open, int32_t close, unsigned depth, unsigned *budget) {
     for (;;) {
         int32_t c = lexer->lookahead;
@@ -1006,7 +1013,7 @@ static bool advance_balanced(TSLexer *lexer, int32_t open, int32_t close, unsign
             return false;
         }
         if (c == '/') {
-            if ((lexer->lookahead == '/' || lexer->lookahead == '*') && !advance_comment_rest(lexer, budget)) {
+            if (!advance_comment_rest(lexer, budget)) {
                 return false;
             }
         } else if (c == '=' && open == '<' && lexer->lookahead == '>') {
@@ -1051,7 +1058,11 @@ static bool scan_type_arguments_lt(TSLexer *lexer) {
         return false;
     }
     if (!advance_balanced(lexer, '<', '>', 1, &budget) || !advance_trivia(lexer, &budget) ||
-        lexer->lookahead != '(' || !advance_balanced(lexer, '(', ')', 0, &budget) ||
+        lexer->lookahead != '(') {
+        return false;
+    }
+    budget = TYPE_ARGUMENTS_LOOKAHEAD;
+    if (!advance_balanced(lexer, '(', ')', 0, &budget) ||
         !advance_trivia(lexer, &budget) || lexer->lookahead != '=' || !lookahead_advance(lexer, &budget) ||
         lexer->lookahead != '>') {
         return false;
