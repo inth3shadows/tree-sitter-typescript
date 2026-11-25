@@ -16,7 +16,10 @@ because editor queries match on node names.
   `f<<T>(x: T) => T>(g)`, `new A<<T>(x: T) => T>(0)` (#62). The `<<` lexed as a shift, so
   these were an ERROR or a wrong `binary_expression`. The external scanner now reads that `<<`
   as two `<` when a generic function type (`<…>(…) =>`) follows, as tsc re-scans it; no shift
-  has that shape. With whitespace before the `<<` (`f <<T>…`), it stays a shift.
+  tsc accepts has that shape. The scanner looks ahead at most 4,096 characters. Still wrong,
+  with no ERROR: whitespace or a line break before the `<<` (`f <<T>(x: T) => T>(g)`), and a
+  type parameter or parameter list longer than that limit. Both parse as a shift where tsc
+  builds a call.
 
 ## 0.25.3
 

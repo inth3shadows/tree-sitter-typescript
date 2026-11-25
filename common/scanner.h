@@ -879,35 +879,56 @@ static bool scan_asserts_keyword(TSLexer *lexer) {
     return true;
 }
 
+// The `<<` lookahead below reads at most this many characters, strings and
+// comments included, so a plain shift costs little however long the file.
+#define TYPE_ARGUMENTS_LOOKAHEAD 4096
+
+// advance() within the lookahead budget. False at the end of input or budget.
+static bool lookahead_advance(TSLexer *lexer, unsigned *budget) {
+    if (*budget == 0 || lexer->eof(lexer)) {
+        return false;
+    }
+    (*budget)--;
+    advance(lexer);
+    return true;
+}
+
+// Just past a `/`: moves past the rest of a `//` or `/* */` comment. False when
+// the `/` starts no comment, or the comment is unclosed.
+static bool advance_comment_rest(TSLexer *lexer, unsigned *budget) {
+    if (lexer->lookahead == '/') {
+        while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
+            if (!lookahead_advance(lexer, budget)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (lexer->lookahead != '*' || !lookahead_advance(lexer, budget)) {
+        return false;
+    }
+    for (;;) {
+        bool star = lexer->lookahead == '*';
+        if (!lookahead_advance(lexer, budget)) {
+            return false;
+        }
+        if (star && lexer->lookahead == '/') {
+            return lookahead_advance(lexer, budget);
+        }
+    }
+}
+
 // Moves past spaces, line breaks and comments with advance(), so it can run
-// after mark_end without moving the token's start. False at an unclosed comment.
-static bool advance_trivia(TSLexer *lexer) {
+// after mark_end without moving the token's start. False at a `/` that starts
+// no comment.
+static bool advance_trivia(TSLexer *lexer, unsigned *budget) {
     for (;;) {
         if (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
-            advance(lexer);
+            if (!lookahead_advance(lexer, budget)) {
+                return false;
+            }
         } else if (lexer->lookahead == '/') {
-            advance(lexer);
-            if (lexer->lookahead == '/') {
-                while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
-                    advance(lexer);
-                }
-            } else if (lexer->lookahead == '*') {
-                advance(lexer);
-                for (;;) {
-                    if (lexer->eof(lexer)) {
-                        return false;
-                    }
-                    if (lexer->lookahead == '*') {
-                        advance(lexer);
-                        if (lexer->lookahead == '/') {
-                            advance(lexer);
-                            break;
-                        }
-                    } else {
-                        advance(lexer);
-                    }
-                }
-            } else {
+            if (!lookahead_advance(lexer, budget) || !advance_comment_rest(lexer, budget)) {
                 return false;
             }
         } else {
@@ -916,66 +937,123 @@ static bool advance_trivia(TSLexer *lexer) {
     }
 }
 
-// From an `open` character, moves past its matching `close`. Strings are skipped;
-// with angles, the `>` of `=>` does not close (`<T = () => void>`).
-static bool advance_balanced(TSLexer *lexer, int32_t open, int32_t close) {
-    unsigned depth = 0;
-    for (unsigned n = 0; n < 4096; n++) {
-        int32_t c = lexer->lookahead;
-        if (lexer->eof(lexer)) {
+static bool advance_balanced(TSLexer *lexer, int32_t open, int32_t close, unsigned depth, unsigned *budget);
+
+// From a quote: moves past the closing quote.
+static bool advance_string(TSLexer *lexer, unsigned *budget) {
+    int32_t quote = lexer->lookahead;
+    if (!lookahead_advance(lexer, budget)) {
+        return false;
+    }
+    while (lexer->lookahead != quote) {
+        if (is_line_terminator(lexer->lookahead)) {
             return false;
         }
-        if (c == '"' || c == '\'' || c == '`') {
-            advance(lexer);
-            while (lexer->lookahead != c) {
-                if (lexer->eof(lexer) || (c != '`' && is_line_terminator(lexer->lookahead))) {
-                    return false;
-                }
-                if (lexer->lookahead == '\\') {
-                    advance(lexer);
-                }
-                advance(lexer);
-            }
-            advance(lexer);
-            continue;
+        if (lexer->lookahead == '\\' && !lookahead_advance(lexer, budget)) {
+            return false;
         }
-        if (c == '/') {
-            if (!advance_trivia(lexer)) {
+        if (!lookahead_advance(lexer, budget)) {
+            return false;
+        }
+    }
+    return lookahead_advance(lexer, budget);
+}
+
+// From a backtick: moves past the closing backtick, through `${…}`, which may
+// hold strings and templates of its own.
+static bool advance_template(TSLexer *lexer, unsigned *budget) {
+    if (!lookahead_advance(lexer, budget)) {
+        return false;
+    }
+    while (lexer->lookahead != '`') {
+        int32_t c = lexer->lookahead;
+        if (!lookahead_advance(lexer, budget)) {
+            return false;
+        }
+        if (c == '\\') {
+            if (!lookahead_advance(lexer, budget)) {
+                return false;
+            }
+        } else if (c == '$' && lexer->lookahead == '{') {
+            if (!advance_balanced(lexer, '{', '}', 0, budget)) {
+                return false;
+            }
+        }
+    }
+    return lookahead_advance(lexer, budget);
+}
+
+// Moves past the `close` that ends a bracket `depth` levels deep (0: start at
+// `open`). Strings, templates and comments are skipped; with angles, the `>` of
+// `=>` does not close (`<T = () => void>`). A `/` that starts no comment is read
+// as division.
+static bool advance_balanced(TSLexer *lexer, int32_t open, int32_t close, unsigned depth, unsigned *budget) {
+    for (;;) {
+        int32_t c = lexer->lookahead;
+        if (c == '"' || c == '\'') {
+            if (!advance_string(lexer, budget)) {
                 return false;
             }
             continue;
         }
-        if (c == '=' && open == '<') {
-            advance(lexer);
-            if (lexer->lookahead == '>') {
-                advance(lexer);
+        if (c == '`') {
+            if (!advance_template(lexer, budget)) {
+                return false;
             }
             continue;
         }
-        advance(lexer);
-        if (c == open) {
+        if (!lookahead_advance(lexer, budget)) {
+            return false;
+        }
+        if (c == '/') {
+            if ((lexer->lookahead == '/' || lexer->lookahead == '*') && !advance_comment_rest(lexer, budget)) {
+                return false;
+            }
+        } else if (c == '=' && open == '<' && lexer->lookahead == '>') {
+            if (!lookahead_advance(lexer, budget)) {
+                return false;
+            }
+        } else if (c == open) {
             depth++;
         } else if (c == close && --depth == 0) {
             return true;
         }
     }
-    return false;
 }
 
 // At `<<` right after an expression: the first `<` opens type arguments when the
 // second starts a generic function type, `<…>(…) =>`, as tsc re-scans `<<` to try
-// type arguments (#62). No shift has that shape: an arrow function is never a
-// binary operand. The token is the first `<` only.
+// type arguments (#62). No shift tsc accepts has that shape: an arrow function is
+// never a binary operand. The token is the first `<` only.
 static bool scan_type_arguments_lt(TSLexer *lexer) {
+    unsigned budget = TYPE_ARGUMENTS_LOOKAHEAD;
     advance(lexer);
     lexer->mark_end(lexer);
-    if (lexer->lookahead != '<' || !advance_balanced(lexer, '<', '>') || !advance_trivia(lexer) ||
-        lexer->lookahead != '(' || !advance_balanced(lexer, '(', ')') || !advance_trivia(lexer) ||
-        lexer->lookahead != '=') {
+    if (lexer->lookahead != '<' || !lookahead_advance(lexer, &budget) || !advance_trivia(lexer, &budget)) {
         return false;
     }
-    advance(lexer);
-    if (lexer->lookahead != '>') {
+    // A cheap check first, so a shift such as `a<<b;` or `(h<<5)` stops here: a
+    // type parameter list starts with a name, then `>`, `,`, `=`, `extends` or,
+    // after a modifier (`const T`, `in T`), another name.
+    if (!is_identifier_start(lexer->lookahead)) {
+        return false;
+    }
+    while (is_identifier_part(lexer->lookahead)) {
+        if (!lookahead_advance(lexer, &budget)) {
+            return false;
+        }
+    }
+    if (!advance_trivia(lexer, &budget)) {
+        return false;
+    }
+    int32_t c = lexer->lookahead;
+    if (c != '>' && c != ',' && c != '=' && !is_identifier_start(c)) {
+        return false;
+    }
+    if (!advance_balanced(lexer, '<', '>', 1, &budget) || !advance_trivia(lexer, &budget) ||
+        lexer->lookahead != '(' || !advance_balanced(lexer, '(', ')', 0, &budget) ||
+        !advance_trivia(lexer, &budget) || lexer->lookahead != '=' || !lookahead_advance(lexer, &budget) ||
+        lexer->lookahead != '>') {
         return false;
     }
     lexer->result_symbol = TYPE_ARGUMENTS_LT;
@@ -1015,9 +1093,12 @@ static inline bool external_scanner_scan(void *payload, TSLexer *lexer, const bo
         return true;
     }
 
-    // Only with no space before the `<<`: the later scans need any whitespace
-    // unread. Nothing below produces a token at a `<`, so failing here loses none.
-    if (valid_symbols[TYPE_ARGUMENTS_LT] && !valid_symbols[ERROR_RECOVERY] && lexer->lookahead == '<') {
+    // Only right after an expression (where `||` may follow) and with no space
+    // before the `<<`: the later scans need any whitespace unread. There, nothing
+    // below produces a token at a `<` (an HTML comment needs LOGICAL_OR invalid),
+    // so failing here loses none.
+    if (valid_symbols[TYPE_ARGUMENTS_LT] && valid_symbols[LOGICAL_OR] && !valid_symbols[ERROR_RECOVERY] &&
+        lexer->lookahead == '<') {
         return scan_type_arguments_lt(lexer);
     }
 

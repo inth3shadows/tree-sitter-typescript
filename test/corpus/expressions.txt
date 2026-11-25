@@ -401,6 +401,72 @@ a<<b > (c);
       right: (parenthesized_expression
         (identifier)))))
 
+=====================
+Generic function type after << with templates, division and modifiers
+=====================
+
+f<<T>(x: `${`)`}`) => T>(g);
+f<<const T>(x = a / b) => T>(g);
+a<<b>(`${`)=>`}`);
+(h<<5) - h;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      type_arguments: (type_arguments
+        (function_type
+          type_parameters: (type_parameters
+            (type_parameter
+              name: (type_identifier)))
+          parameters: (formal_parameters
+            (required_parameter
+              pattern: (identifier)
+              type: (type_annotation
+                (template_literal_type
+                  (template_type
+                    (template_literal_type
+                      (string_fragment)))))))
+          return_type: (type_identifier)))
+      arguments: (arguments
+        (identifier))))
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      type_arguments: (type_arguments
+        (function_type
+          type_parameters: (type_parameters
+            (type_parameter
+              name: (type_identifier)))
+          parameters: (formal_parameters
+            (required_parameter
+              pattern: (identifier)
+              value: (binary_expression
+                left: (identifier)
+                right: (identifier))))
+          return_type: (type_identifier)))
+      arguments: (arguments
+        (identifier))))
+  (expression_statement
+    (binary_expression
+      left: (binary_expression
+        left: (identifier)
+        right: (identifier))
+      right: (parenthesized_expression
+        (template_string
+          (template_substitution
+            (template_string
+              (string_fragment)))))))
+  (expression_statement
+    (binary_expression
+      left: (parenthesized_expression
+        (binary_expression
+          left: (identifier)
+          right: (number)))
+      right: (identifier))))
+
 ==================================
 Prefix operators before generic calls
 ==================================
