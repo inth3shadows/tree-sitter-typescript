@@ -57,8 +57,8 @@ Corpora (`scripts/ts-differential.corpora.json`, pinned by SHA): Effect, Zod,
 Excalidraw, VS Code `src/`, plus the fixtures. A second set, marked `"set": "extra"`, adds
 Angular `packages/`, NestJS, Vue core and TanStack Query (9,632 more files). The differential
 checks both sets; tree accuracy measures the extra set only with `--set extra`, so its default
-numbers stay comparable with the measured history. The extra set's 1 baselined file is
-#62.
+numbers stay comparable with the measured history. The extra set has no baselined
+file.
 
 ## Run it
 

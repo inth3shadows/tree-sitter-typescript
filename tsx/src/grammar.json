@@ -12520,8 +12520,22 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "<"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "<"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_type_arguments_lt"
+              },
+              "named": false,
+              "value": "<"
+            }
+          ]
         },
         {
           "type": "SEQ",
@@ -14405,6 +14419,10 @@
     {
       "type": "SYMBOL",
       "name": "_asserts_keyword"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_type_arguments_lt"
     },
     {
       "type": "SYMBOL",

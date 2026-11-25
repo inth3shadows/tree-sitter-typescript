@@ -12,6 +12,15 @@ because editor queries match on node names.
   form already parsed. The field gets an `override_modifier` child, as an overriding field
   without `abstract` does. The reverse order, `override abstract x`, stays an ERROR: tsc's
   checker rejects it (TS1029), and so does the method form `override abstract m()`.
+- A generic function type can be the first type argument with no space after the `<`:
+  `f<<T>(x: T) => T>(g)`, `new A<<T>(x: T) => T>(0)` (#62). The `<<` lexed as a shift, so
+  these were an ERROR or a wrong `binary_expression`. The external scanner now reads that `<<`
+  as two `<` when a generic function type (`<…>(…) =>`) follows, as tsc re-scans it; no shift
+  tsc accepts has that shape. Still read as a shift where tsc builds a call (a wrong tree,
+  sometimes with an ERROR): whitespace or a line break before the `<<` (`f <<T>(x: T) => T>(g)`);
+  a type parameter or parameter list longer than about 4,096 characters (the scanner's
+  lookahead limit for each, which also counts the space and comments after the list); and a `/` in either list that starts no comment (`(x = a / b)`), since it
+  may open a regex. tsc's checker rejects a parameter initializer in a function type anyway.
 
 ## 0.25.3
 
