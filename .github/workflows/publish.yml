@@ -61,7 +61,5 @@ jobs:
       contents: read
       id-token: write   # npm trusted publishing: the local package-npm.yml's publish job needs it
     uses: ./.github/workflows/package-npm.yml
-    secrets:
-      NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
     with:
       package-name: tree-sitter-typescript-next

@@ -2,8 +2,8 @@
 # d66eebce6bd661badf0ce10f1ce8f90ea8a89279, changed so the publish step can use npm trusted
 # publishing (OIDC): it runs npm 11.21.3 (trusted publishing needs 11.5.1 or later) with
 # id-token: write. npm checks the calling workflow's filename, publish.yml, so that is the
-# workflow registered on npmjs.com, with environment npm. The token is a fallback until
-# the trusted publisher is set up, then it can be revoked and the secret deleted.
+# workflow registered on npmjs.com, with environment npm. Token publishing is disallowed on
+# npmjs.com (since 0.25.4), so there is no npm token secret.
 # Also: build_node does not fail fast, so one runner problem does not cancel the others.
 name: Publish package (npm)
 
@@ -30,10 +30,6 @@ on:
         description: The tree-sitter ABI version
         default: 15
         type: number
-    secrets:
-      NODE_AUTH_TOKEN:
-        description: An authentication token for npm (a fallback for trusted publishing)
-        required: false
 
 defaults:
   run:
@@ -158,5 +154,3 @@ jobs:
         run: mv -v prebuilds/*.wasm .
       - name: Publish to npm
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
