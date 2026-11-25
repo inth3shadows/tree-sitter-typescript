@@ -24,6 +24,7 @@ enum TokenType {
     TYPE_MEMBER_END_MARKER,
     GLOBAL_KEYWORD,
     ASSERTS_KEYWORD,
+    TYPE_ARGUMENTS_LT,
     // TSX-only, never produced: quoted JSX must not scan HTML comments.
     JSX_STRING_MARKER,
 };
@@ -878,6 +879,109 @@ static bool scan_asserts_keyword(TSLexer *lexer) {
     return true;
 }
 
+// Moves past spaces, line breaks and comments with advance(), so it can run
+// after mark_end without moving the token's start. False at an unclosed comment.
+static bool advance_trivia(TSLexer *lexer) {
+    for (;;) {
+        if (iswspace(lexer->lookahead) || is_unicode_space(lexer->lookahead)) {
+            advance(lexer);
+        } else if (lexer->lookahead == '/') {
+            advance(lexer);
+            if (lexer->lookahead == '/') {
+                while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
+                    advance(lexer);
+                }
+            } else if (lexer->lookahead == '*') {
+                advance(lexer);
+                for (;;) {
+                    if (lexer->eof(lexer)) {
+                        return false;
+                    }
+                    if (lexer->lookahead == '*') {
+                        advance(lexer);
+                        if (lexer->lookahead == '/') {
+                            advance(lexer);
+                            break;
+                        }
+                    } else {
+                        advance(lexer);
+                    }
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+}
+
+// From an `open` character, moves past its matching `close`. Strings are skipped;
+// with angles, the `>` of `=>` does not close (`<T = () => void>`).
+static bool advance_balanced(TSLexer *lexer, int32_t open, int32_t close) {
+    unsigned depth = 0;
+    for (unsigned n = 0; n < 4096; n++) {
+        int32_t c = lexer->lookahead;
+        if (lexer->eof(lexer)) {
+            return false;
+        }
+        if (c == '"' || c == '\'' || c == '`') {
+            advance(lexer);
+            while (lexer->lookahead != c) {
+                if (lexer->eof(lexer) || (c != '`' && is_line_terminator(lexer->lookahead))) {
+                    return false;
+                }
+                if (lexer->lookahead == '\\') {
+                    advance(lexer);
+                }
+                advance(lexer);
+            }
+            advance(lexer);
+            continue;
+        }
+        if (c == '/') {
+            if (!advance_trivia(lexer)) {
+                return false;
+            }
+            continue;
+        }
+        if (c == '=' && open == '<') {
+            advance(lexer);
+            if (lexer->lookahead == '>') {
+                advance(lexer);
+            }
+            continue;
+        }
+        advance(lexer);
+        if (c == open) {
+            depth++;
+        } else if (c == close && --depth == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// At `<<` right after an expression: the first `<` opens type arguments when the
+// second starts a generic function type, `<…>(…) =>`, as tsc re-scans `<<` to try
+// type arguments (#62). No shift has that shape: an arrow function is never a
+// binary operand. The token is the first `<` only.
+static bool scan_type_arguments_lt(TSLexer *lexer) {
+    advance(lexer);
+    lexer->mark_end(lexer);
+    if (lexer->lookahead != '<' || !advance_balanced(lexer, '<', '>') || !advance_trivia(lexer) ||
+        lexer->lookahead != '(' || !advance_balanced(lexer, '(', ')') || !advance_trivia(lexer) ||
+        lexer->lookahead != '=') {
+        return false;
+    }
+    advance(lexer);
+    if (lexer->lookahead != '>') {
+        return false;
+    }
+    lexer->result_symbol = TYPE_ARGUMENTS_LT;
+    return true;
+}
+
 static inline bool external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     if (valid_symbols[TEMPLATE_CHARS]) {
         if (valid_symbols[AUTOMATIC_SEMICOLON]) {
@@ -909,6 +1013,12 @@ static inline bool external_scanner_scan(void *payload, TSLexer *lexer, const bo
 
     if (valid_symbols[JSX_TEXT] && scan_jsx_text(lexer)) {
         return true;
+    }
+
+    // Only with no space before the `<<`: the later scans need any whitespace
+    // unread. Nothing below produces a token at a `<`, so failing here loses none.
+    if (valid_symbols[TYPE_ARGUMENTS_LT] && !valid_symbols[ERROR_RECOVERY] && lexer->lookahead == '<') {
+        return scan_type_arguments_lt(lexer);
     }
 
     if (valid_symbols[AUTOMATIC_SEMICOLON] || valid_symbols[FUNCTION_SIGNATURE_AUTOMATIC_SEMICOLON]) {

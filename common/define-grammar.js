@@ -52,6 +52,9 @@ module.exports = function defineGrammar(dialect) {
       // `asserts` in a return type only when an identifier or keyword follows on
       // the same line, as in tsc; otherwise `asserts` is an identifier (#87).
       $._asserts_keyword,
+      // `<` that opens type arguments where `<<` would lex as a shift: produced
+      // only before a generic function type, as in `f<<T>(x: T) => T>()` (#62).
+      $._type_arguments_lt,
     ], dialect === 'tsx' ? [$._jsx_string_marker] : []),
 
     supertypes: ($, previous) => previous.concat([
@@ -1333,7 +1336,7 @@ module.exports = function defineGrammar(dialect) {
       ),
 
       type_arguments: $ => seq(
-        '<',
+        choice('<', alias($._type_arguments_lt, '<')),
         commaSep1($.type),
         optional(','),
         '>',

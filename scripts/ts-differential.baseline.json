@@ -1,19 +1,17 @@
 {
  "tsc": "5.9.3",
  "webTreeSitter": "0.27.1",
- "generatedAt": "2026-11-24T21:03:33.891Z",
+ "generatedAt": "2026-11-25T11:14:54.374Z",
  "wasmSha256": {
-  "typescript": "90225d50cdc5b803d3419568f31e7e01cb8183dba633719710aa0936a16c7f89",
-  "tsx": "a61d061e4ae52f94cdf35c6a71773116d0ac754f5ded565c321b703c96b68872"
+  "typescript": "c120a9abfc99e086789501de35a5ca9dc2935959e3acb6aa3ec68b5b21c3c12a",
+  "tsx": "e5c32bc3e0377d7a8b9fe7d2bdcd6536100baf4b8d5fab6f08a311148def7282"
  },
  "divergent": {
   "effect": {},
   "zod": {},
   "excalidraw": {},
   "vscode": {},
-  "angular": {
-   "packages/platform-browser/animations/async/src/async_animation_renderer.ts": 328
-  },
+  "angular": {},
   "nest": {},
   "vue": {},
   "query": {},
