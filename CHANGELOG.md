@@ -18,8 +18,8 @@ because editor queries match on node names.
   as two `<` when a generic function type (`<…>(…) =>`) follows, as tsc re-scans it; no shift
   tsc accepts has that shape. Still read as a shift where tsc builds a call (a wrong tree,
   sometimes with an ERROR): whitespace or a line break before the `<<` (`f <<T>(x: T) => T>(g)`);
-  a type parameter or parameter list longer than 4,096 characters, the scanner's lookahead
-  limit for each; and a `/` in either list that starts no comment (`(x = a / b)`), since it
+  a type parameter or parameter list longer than about 4,096 characters (the scanner's
+  lookahead limit for each, which also counts the space and comments after the list); and a `/` in either list that starts no comment (`(x = a / b)`), since it
   may open a regex. tsc's checker rejects a parameter initializer in a function type anyway.
 
 ## 0.25.3
