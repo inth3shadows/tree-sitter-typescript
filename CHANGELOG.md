@@ -4,6 +4,14 @@ Changes in this fork since tree-sitter/tree-sitter-typescript v0.23.2. Every cha
 `node-types.json` (a node added, renamed, moved or removed) is listed under **Node types**,
 because editor queries match on node names.
 
+## Unreleased
+
+### Packaging
+- npm publishes only through trusted publishing (OIDC); the npm token is gone (#144).
+- A weekly workflow releases the next patch version every Monday when the grammar, scanner,
+  queries or bindings changed since the last tag (`scripts/bump-version.sh`, also usable by
+  hand). A change there needs an entry under `## Unreleased` here, or the release fails.
+
 ## 0.25.4
 
 ### Fixes

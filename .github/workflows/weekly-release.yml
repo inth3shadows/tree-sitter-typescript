@@ -1,0 +1,123 @@
+name: Weekly release
+
+# Every Monday: if the grammar, scanner, queries or bindings changed since the last v* tag,
+# release the next patch version. It bumps the version (scripts/bump-version.sh), runs the
+# corpus, pushes the release commit and tag to main, and starts publish.yml from the tag.
+# publish.yml stays a run of its own, so npm's trusted publisher (registered for
+# publish.yml) still matches. A week with no such change does nothing. A failed guard
+# fails the run, and GitHub emails the repo owner.
+# Run it by hand with dry-run to go through every step, even with no change, and push nothing.
+# A grammar change needs a `## Unreleased` section in CHANGELOG.md, or the run fails.
+on:
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Bump and test, but push and publish nothing
+        type: boolean
+        default: false
+
+concurrency:
+  group: weekly-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Release if the grammar changed
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write   # push the release commit and tag
+      actions: write    # start publish.yml; read CI runs on main
+    env:
+      GH_TOKEN: ${{github.token}}
+      DRY_RUN: ${{inputs.dry-run || false}}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Anything to release?
+        id: check
+        run: |
+          set -euo pipefail
+          last=$(git describe --tags --abbrev=0 --match 'v*' HEAD)
+          changed=$(git diff --name-only "$last"..HEAD -- common typescript/grammar.js tsx/grammar.js \
+            typescript/src tsx/src queries bindings binding.gyp)
+          if [[ -z $changed ]]; then
+            echo "Nothing in the grammar, scanner, queries or bindings changed since $last."
+            if [[ $DRY_RUN != true ]]; then
+              echo "release=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Dry run: going through the release steps anyway."
+          else
+            echo "Changed since $last:"
+            echo "$changed"
+          fi
+          current=$(node -p "require('./package.json').version")
+          if [[ "v$current" != "$last" ]]; then
+            echo "::error::package.json is at $current but the last tag is $last"
+            exit 1
+          fi
+          IFS=. read -r major minor patch <<< "$current"
+          echo "version=$major.$minor.$((patch + 1))" >> "$GITHUB_OUTPUT"
+          echo "release=true" >> "$GITHUB_OUTPUT"
+
+      - name: CI on main is green
+        if: steps.check.outputs.release == 'true'
+        run: |
+          set -euo pipefail
+          for wf in ci.yml differential.yml; do
+            read -r status conclusion < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
+              --limit 1 --json status,conclusion -q '.[0] | "\(.status) \(.conclusion)"')
+            if [[ $status != completed || $conclusion != success ]]; then
+              echo "::error::The latest $wf run on main is $status/$conclusion; release after it passes"
+              exit 1
+            fi
+          done
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        if: steps.check.outputs.release == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install the pinned tree-sitter CLI
+        if: steps.check.outputs.release == 'true'
+        run: npm ci --ignore-scripts && npm rebuild tree-sitter-cli && npx tree-sitter --version
+
+      - name: Bump the version
+        if: steps.check.outputs.release == 'true'
+        env:
+          VERSION: ${{steps.check.outputs.version}}
+        run: scripts/bump-version.sh "$VERSION"
+
+      - name: Corpus
+        if: steps.check.outputs.release == 'true'
+        run: npx tree-sitter test
+
+      - name: Push the release and start publishing
+        if: steps.check.outputs.release == 'true'
+        env:
+          VERSION: ${{steps.check.outputs.version}}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -a -m "release $VERSION"
+          git tag -a "v$VERSION" -m "v$VERSION"
+          git show --stat HEAD
+          if [[ $DRY_RUN == true ]]; then
+            echo "Dry run: not pushing release $VERSION."
+            exit 0
+          fi
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push "$remote" HEAD:refs/heads/main "refs/tags/v$VERSION"
+          gh workflow run publish.yml -R "$GITHUB_REPOSITORY" --ref "v$VERSION"
+          echo "Released $VERSION; publish.yml started from v$VERSION."
