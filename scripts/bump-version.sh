@@ -56,8 +56,8 @@ for dialect in typescript tsx; do
   (cd "$dialect" && npx tree-sitter generate)
 done
 
-# Regenerating must change nothing but the version: same grammar.json and
-# node-types.json, and only the version fields of parser.c.
+# Regenerating must change nothing but the version: same grammar.json, node-types.json
+# and src/tree_sitter headers, and only the version fields of parser.c.
 if ! git diff --quiet -- typescript/src/grammar.json tsx/src/grammar.json \
   typescript/src/node-types.json tsx/src/node-types.json typescript/src/tree_sitter tsx/src/tree_sitter; then
   echo "tree-sitter generate changed grammar.json, node-types.json or src/tree_sitter/*.h; the generated files were stale" >&2

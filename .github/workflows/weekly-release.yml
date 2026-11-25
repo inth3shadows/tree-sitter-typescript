@@ -1,6 +1,6 @@
 name: Weekly release
 
-# Every Monday: if the grammar, scanner, queries or bindings changed since the last v* tag,
+# Every Monday (Tuesday retries a failed Monday): if the grammar, scanner, queries or bindings changed since the last v* tag,
 # release the next patch version. It bumps the version (scripts/bump-version.sh), runs the
 # corpus, pushes the release commit and tag to main, and starts publish.yml from the tag.
 # publish.yml stays a run of its own, so npm's trusted publisher (registered for
@@ -10,7 +10,8 @@ name: Weekly release
 # A grammar change needs a `## Unreleased` section in CHANGELOG.md, or the run fails.
 on:
   schedule:
-    - cron: "0 14 * * 1"
+    - cron: "0 14 * * 1"   # Monday
+    - cron: "0 14 * * 2"   # Tuesday: retries a Monday that failed; does nothing once it released
   workflow_dispatch:
     inputs:
       dry-run:
@@ -94,24 +95,19 @@ jobs:
             read -r id sha status conclusion < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
               --event push --limit 1 --json status,conclusion,headSha,databaseId \
               -q '.[0] | "\(.databaseId) \(.headSha) \(.status) \(.conclusion)"') || true
-            # A run still going (a merge just before the schedule): wait up to 45 minutes for it.
-            if [[ ${status:-} == queued || ${status:-} == in_progress || ${status:-} == waiting ]]; then
-              timeout 2700 gh run watch "$id" -R "$GITHUB_REPOSITORY" > /dev/null || true
-              read -r status conclusion < <(gh run view "$id" -R "$GITHUB_REPOSITORY" --json status,conclusion \
-                -q '"\(.status) \(.conclusion)"') || true
-            fi
             if [[ ${status:-} != completed || ${conclusion:-} != success ]]; then
-              echo "::error::The latest $wf push run on main is ${status:-missing}/${conclusion:-}; release after it passes"
+              echo "::error::The latest $wf push run on main is ${status:-missing}/${conclusion:-}; Tuesday's run retries"
               exit 1
             fi
             if ! git merge-base --is-ancestor "$sha" HEAD; then
               echo "::error::The latest $wf run on main ($sha) is not an ancestor of main's head"
               exit 1
             fi
-            # Commits after the tested one that touch what it tests, other than release commits
-            # (pushed by this job, which starts no CI; they change only version fields).
-            untested=$(git log --format='%h %s' -E --invert-grep --grep='^release [0-9]+\.[0-9]+\.[0-9]+$' \
-              "$sha"..HEAD -- "$@")
+            # Commits after the tested one that touch what it tests, other than this job's own
+            # release commits (they start no CI and change only version fields). Stricter than a
+            # net diff: a change and its revert after the tested commit also block.
+            untested=$(git log --format='%h %an|%s' "$sha"..HEAD -- "$@" |
+              grep -vE '^[0-9a-f]+ github-actions\[bot\]\|release [0-9]+\.[0-9]+\.[0-9]+$' || true)
             if [[ -n $untested ]]; then
               echo "::error::$wf last passed on $sha, and these commits changed what it tests after it:"
               echo "$untested"
