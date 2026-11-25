@@ -24,7 +24,7 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   exit 1
 fi
 
-# Replaces the one line that matches $2 (a fixed string) in file $1 with $3.
+# Replaces the one line that is exactly $2 in file $1 with $3, and checks it took.
 replace_line() {
   local file=$1 from=$2 to=$3 count
   count=$(grep -cxF -- "$from" "$file" || true)
@@ -33,6 +33,10 @@ replace_line() {
     exit 1
   fi
   FROM=$from TO=$to perl -0pi -e 's/^\Q$ENV{FROM}\E$/$ENV{TO}/m' "$file"
+  if [[ $(grep -cxF -- "$to" "$file" || true) != 1 ]]; then
+    echo "$file: the line '$to' is not there once after the edit" >&2
+    exit 1
+  fi
 }
 
 replace_line CHANGELOG.md '## Unreleased' "## $new"
@@ -60,16 +64,16 @@ if ! git diff --quiet -- typescript/src/grammar.json tsx/src/grammar.json \
   exit 1
 fi
 other=$(git diff --unified=0 -- typescript/src/parser.c tsx/src/parser.c |
-  grep -E '^[-+] ' | grep -vE '^[-+] +\.(major|minor|patch)_version = [0-9]+,$' || true)
+  grep -E '^[-+]' | grep -vE '^(\+\+\+|---) (a/|b/|/dev/null)' |
+  grep -vE '^[-+] +\.(major|minor|patch)_version = [0-9]+,$' || true)
 if [[ -n $other ]]; then
   echo "tree-sitter generate changed parser.c beyond its version fields:" >&2
   echo "$other" | head -20 >&2
   exit 1
 fi
 
-left=$(git grep -lF "$old" -- Cargo.toml pyproject.toml common/common.mak CMakeLists.txt tree-sitter.json package.json || true)
-if [[ -n $left ]]; then
-  echo "still at $old: $left" >&2
+if [[ $(node -p "require('./package.json').version") != "$new" ]]; then
+  echo "package.json is not at $new after npm version" >&2
   exit 1
 fi
 echo "bumped $old -> $new"

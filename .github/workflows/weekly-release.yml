@@ -35,6 +35,8 @@ jobs:
     env:
       GH_TOKEN: ${{github.token}}
       DRY_RUN: ${{inputs.dry-run || false}}
+      # What a release ships; a change here since the last tag triggers one.
+      RELEASE_PATHS: common typescript/grammar.js tsx/grammar.js typescript/src tsx/src queries bindings binding.gyp
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -47,8 +49,18 @@ jobs:
         run: |
           set -euo pipefail
           last=$(git describe --tags --abbrev=0 --match 'v*' HEAD)
-          changed=$(git diff --name-only "$last"..HEAD -- common typescript/grammar.js tsx/grammar.js \
-            typescript/src tsx/src queries bindings binding.gyp)
+          # A tag whose publish.yml was never started (the dispatch failed after the push):
+          # start it now. A run that started and failed is left for a person to look at.
+          if [[ $(gh run list -R "$GITHUB_REPOSITORY" --workflow publish.yml --branch "$last" --json databaseId -q length) == 0 ]]; then
+            if [[ $DRY_RUN == true ]]; then
+              echo "Dry run: $last has no publish.yml run; a real run would start one."
+            else
+              gh workflow run publish.yml -R "$GITHUB_REPOSITORY" --ref "$last"
+              echo "::warning::$last had no publish.yml run; started one."
+            fi
+          fi
+          # shellcheck disable=SC2086 # RELEASE_PATHS is a list
+          changed=$(git diff --name-only "$last"..HEAD -- $RELEASE_PATHS)
           if [[ -z $changed ]]; then
             echo "Nothing in the grammar, scanner, queries or bindings changed since $last."
             if [[ $DRY_RUN != true ]]; then
@@ -69,18 +81,36 @@ jobs:
           echo "version=$major.$minor.$((patch + 1))" >> "$GITHUB_OUTPUT"
           echo "release=true" >> "$GITHUB_OUTPUT"
 
-      - name: CI on main is green
+      # Each workflow's latest push run on main must have passed, on a commit after which
+      # nothing it tests changed: what ships is what CI tested.
+      - name: CI on main passed for what ships
         if: steps.check.outputs.release == 'true'
         run: |
           set -euo pipefail
-          for wf in ci.yml differential.yml; do
-            read -r status conclusion < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
-              --limit 1 --json status,conclusion -q '.[0] | "\(.status) \(.conclusion)"')
-            if [[ $status != completed || $conclusion != success ]]; then
-              echo "::error::The latest $wf run on main is $status/$conclusion; release after it passes"
+          tested() {
+            local wf=$1 status conclusion sha
+            shift
+            read -r status conclusion sha < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
+              --event push --limit 1 --json status,conclusion,headSha \
+              -q '.[0] | "\(.status) \(.conclusion) \(.headSha)"') || true
+            if [[ ${status:-} != completed || ${conclusion:-} != success ]]; then
+              echo "::error::The latest $wf push run on main is ${status:-missing}/${conclusion:-}; release after it passes"
               exit 1
             fi
-          done
+            if ! git merge-base --is-ancestor "$sha" HEAD; then
+              echo "::error::The latest $wf run on main ($sha) is not an ancestor of main's head"
+              exit 1
+            fi
+            if ! git diff --quiet "$sha" HEAD -- "$@"; then
+              echo "::error::$wf last passed on $sha, and these files changed after it:"
+              git diff --name-only "$sha" HEAD -- "$@"
+              exit 1
+            fi
+            echo "$wf passed on $sha; nothing it tests changed after it."
+          }
+          # shellcheck disable=SC2086 # RELEASE_PATHS is a list
+          tested ci.yml $RELEASE_PATHS
+          tested differential.yml common typescript/grammar.js tsx/grammar.js typescript/src tsx/src
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         if: steps.check.outputs.release == 'true'
@@ -96,7 +126,16 @@ jobs:
         if: steps.check.outputs.release == 'true'
         env:
           VERSION: ${{steps.check.outputs.version}}
-        run: scripts/bump-version.sh "$VERSION"
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # A dry run with nothing unreleased still goes through the bump: give it a heading.
+          if [[ $DRY_RUN == true ]] && ! grep -qx '## Unreleased' CHANGELOG.md; then
+            perl -0pi -e 's/^(## \d+\.\d+\.\d+)$/## Unreleased\n\n$1/m' CHANGELOG.md
+            git commit -q -a -m "dry run: placeholder Unreleased heading"
+          fi
+          scripts/bump-version.sh "$VERSION"
 
       - name: Corpus
         if: steps.check.outputs.release == 'true'
@@ -108,8 +147,6 @@ jobs:
           VERSION: ${{steps.check.outputs.version}}
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -q -a -m "release $VERSION"
           git tag -a "v$VERSION" -m "v$VERSION"
           git show --stat HEAD
@@ -118,6 +155,7 @@ jobs:
             exit 0
           fi
           remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push "$remote" HEAD:refs/heads/main "refs/tags/v$VERSION"
+          # --atomic: if main moved meanwhile, neither the branch nor the tag is updated.
+          git push --atomic "$remote" HEAD:refs/heads/main "refs/tags/v$VERSION"
           gh workflow run publish.yml -R "$GITHUB_REPOSITORY" --ref "v$VERSION"
           echo "Released $VERSION; publish.yml started from v$VERSION."
