@@ -90,9 +90,10 @@ jobs:
           tested() {
             local wf=$1 status conclusion sha id untested
             shift
-            read -r status conclusion sha id < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
+            # conclusion last: it is empty while a run is queued or in progress.
+            read -r id sha status conclusion < <(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf" --branch main \
               --event push --limit 1 --json status,conclusion,headSha,databaseId \
-              -q '.[0] | "\(.status) \(.conclusion) \(.headSha) \(.databaseId)"') || true
+              -q '.[0] | "\(.databaseId) \(.headSha) \(.status) \(.conclusion)"') || true
             # A run still going (a merge just before the schedule): wait up to 45 minutes for it.
             if [[ ${status:-} == queued || ${status:-} == in_progress || ${status:-} == waiting ]]; then
               timeout 2700 gh run watch "$id" -R "$GITHUB_REPOSITORY" > /dev/null || true
